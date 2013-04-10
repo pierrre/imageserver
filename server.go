@@ -23,7 +23,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		bytes = item.Value
 	} else {
 		time.Sleep(200 * time.Millisecond)
-		bytes, _ = ioutil.ReadFile("google.jpg")
+		bytes, _ = ioutil.ReadFile("arbre.webp")
 		item = &memcache.Item{Key: "foo", Value: bytes}
 		cache.Set(item)
 	}
