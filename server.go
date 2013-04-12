@@ -1,10 +1,10 @@
 package main
 
 import (
-	"time"
+	"github.com/bradfitz/gomemcache/memcache"
 	"io/ioutil"
 	"net/http"
-	"github.com/bradfitz/gomemcache/memcache"
+	"time"
 )
 
 var (
@@ -29,4 +29,3 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(bytes)
 }
-
