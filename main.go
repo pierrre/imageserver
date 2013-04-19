@@ -60,3 +60,20 @@ func (c *MemcacheImageCache) Get(key string) *Image {
 
 func (c *MemcacheImageCache) Set(key string, image *Image) {
 }
+
+type ImageConverter interface {
+	Convert(image *Image, parameters *ImageConverterParameters) *Image
+}
+
+type ImageConverterParameters struct {
+	Width  int
+	Height int
+}
+
+type GraphicsMagickImageConverter struct {
+	executable string
+}
+
+func (converter *GraphicsMagickImageConverter) Convert(image *Image, parameters *ImageConverterParameters) *Image {
+	return nil
+}
