@@ -8,12 +8,13 @@ import (
 
 func main() {
 	server := imageproxy.NewServer(
+		&http.Server{
+			Addr: ":8080",
+		},
 		imageproxy.NewMemcacheCache(
 			"imageproxy",
 			memcache.New("localhost"),
 		),
 	)
-
-	http.HandleFunc("/", server.HandleHttpRequest)
-	http.ListenAndServe(":8080", nil)
+	server.Run();
 }

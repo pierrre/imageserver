@@ -5,15 +5,22 @@ import (
 )
 
 type Server struct {
-	cache Cache
+	httpServer *http.Server
+	cache      Cache
 }
 
-func NewServer(cache Cache) *Server {
+func NewServer(httpServer *http.Server, cache Cache) *Server {
 	return &Server{
-		cache: cache,
+		httpServer: httpServer,
+		cache:      cache,
 	}
 }
 
-func (server *Server) HandleHttpRequest(w http.ResponseWriter, r *http.Request) {
+func (server *Server) Run() {
+	server.httpServer.Handler = http.HandlerFunc(server.handleHttpRequest)
+	server.httpServer.ListenAndServe()
+}
+
+func (server *Server) handleHttpRequest(w http.ResponseWriter, r *http.Request) {
 
 }
