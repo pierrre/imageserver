@@ -17,10 +17,11 @@ func NewServer(httpServer *http.Server, cache Cache) *Server {
 }
 
 func (server *Server) Run() {
-	server.httpServer.Handler = http.HandlerFunc(server.handleHttpRequest)
+	serveMux := http.NewServeMux();
+	serveMux.HandleFunc("/", server.handleHttpRequest);
+	server.httpServer.Handler = serveMux
 	server.httpServer.ListenAndServe()
 }
 
 func (server *Server) handleHttpRequest(w http.ResponseWriter, r *http.Request) {
-
 }
