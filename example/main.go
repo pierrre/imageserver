@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./src/imageproxy"
+	imageproxy ".."
 	"github.com/bradfitz/gomemcache/memcache"
 	"net/http"
 )
@@ -9,7 +9,7 @@ import (
 func main() {
 	server := imageproxy.NewServer(
 		imageproxy.NewMemcacheCache(
-			"lol",
+			"imageproxy",
 			memcache.New("localhost"),
 		),
 	)
