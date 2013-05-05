@@ -3,6 +3,7 @@ package imageproxy
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -28,8 +29,16 @@ func (server *Server) Run() {
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	source, parameters, error := server.parseRequest(request)
-	fmt.Println(source, parameters, error)
+	source, parameters, err := server.parseRequest(request)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(source, parameters, err)
+
+	sourceImage, err := server.getSourceImage(source)
+	fmt.Println(sourceImage, err)
 }
 
 func (server *Server) parseRequest(request *http.Request) (source *url.URL, parameters *Parameters, err error) {
@@ -72,6 +81,31 @@ func (server *Server) parseRequest(request *http.Request) (source *url.URL, para
 			err = errors.New("Invalid height parameter")
 			return
 		}
+	}
+
+	return
+}
+
+func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) {
+	response, err := http.Get(source.String())
+	if err != nil {
+		return
+	}
+
+	if response.StatusCode != 200 {
+		err = errors.New("Error while downloading source")
+		return
+	}
+
+	fmt.Println(response)
+
+	defer response.Body.Close()
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return
+	}
+	image = &Image{
+		Data: data,
 	}
 
 	return
