@@ -36,10 +36,15 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	fmt.Println(source, parameters, err)
+	fmt.Println(parameters)
 
 	sourceImage, err := server.getSourceImage(source)
-	fmt.Println(sourceImage, err)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	server.sendImage(writer, sourceImage)
 }
 
 func (server *Server) parseRequest(request *http.Request) (source *url.URL, parameters *Parameters, err error) {
@@ -119,4 +124,12 @@ func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) 
 	}
 
 	return
+}
+
+func (server *Server) sendImage(writer http.ResponseWriter, image *Image) {
+	if len(image.Type) > 0 {
+		writer.Header().Set("Content-Type", "image/"+image.Type)
+	}
+
+	writer.Write(image.Data)
 }
