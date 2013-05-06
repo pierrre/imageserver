@@ -11,22 +11,22 @@ import (
 )
 
 type Server struct {
-	httpServer *http.Server
-	cache      Cache
+	HttpServer *http.Server
+	Cache      Cache
 }
 
 func NewServer(httpServer *http.Server, cache Cache) *Server {
 	return &Server{
-		httpServer: httpServer,
-		cache:      cache,
+		HttpServer: httpServer,
+		Cache:      cache,
 	}
 }
 
 func (server *Server) Run() {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc("/", server.handleHttpRequest)
-	server.httpServer.Handler = serveMux
-	server.httpServer.ListenAndServe()
+	server.HttpServer.Handler = serveMux
+	server.HttpServer.ListenAndServe()
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {

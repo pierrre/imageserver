@@ -7,14 +7,15 @@ import (
 )
 
 func main() {
-	server := imageproxy.NewServer(
-		&http.Server{
+	server := &imageproxy.Server{
+		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
-		imageproxy.NewMemcacheCache(
-			"imageproxy",
-			memcache.New("localhost"),
-		),
-	)
-	server.Run();
+		Cache: &imageproxy.MemcacheCache{
+			Prefix:   "imageproxy",
+			Memcache: memcache.New("localhost"),
+		},
+	}
+
+	server.Run()
 }

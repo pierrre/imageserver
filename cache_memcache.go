@@ -5,15 +5,8 @@ import (
 )
 
 type MemcacheCache struct {
-	prefix   string
-	memcache *memcache.Client
-}
-
-func NewMemcacheCache(prefix string, memcache *memcache.Client) *MemcacheCache {
-	return &MemcacheCache{
-		prefix:   prefix,
-		memcache: memcache,
-	}
+	Prefix   string
+	Memcache *memcache.Client
 }
 
 func (c *MemcacheCache) Get(key string) *Image {
