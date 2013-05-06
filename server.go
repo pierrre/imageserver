@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 )
 
@@ -49,11 +50,12 @@ func (server *Server) parseRequest(request *http.Request) (source *url.URL, para
 
 	query := request.URL.Query()
 
-	if len(query["source"]) == 0 {
+	sourceString := query.Get("source")
+	if len(sourceString) == 0 {
 		err = errors.New("Missing source parameter")
 		return
 	}
-	source, err = url.ParseRequestURI(query["source"][0])
+	source, err = url.ParseRequestURI(sourceString)
 	if err != nil {
 		err = fmt.Errorf("Invalid source parameter (%s)", err)
 		return
@@ -61,8 +63,9 @@ func (server *Server) parseRequest(request *http.Request) (source *url.URL, para
 
 	parameters = &Parameters{}
 
-	if len(query["width"]) > 0 {
-		parameters.Width, err = strconv.Atoi(query["width"][0])
+	widthString := query.Get("width")
+	if len(widthString) > 0 {
+		parameters.Width, err = strconv.Atoi(widthString)
 		if err != nil {
 			return
 		}
@@ -72,8 +75,9 @@ func (server *Server) parseRequest(request *http.Request) (source *url.URL, para
 		}
 	}
 
-	if len(query["height"]) > 0 {
-		parameters.Height, err = strconv.Atoi(query["height"][0])
+	heightString := query.Get("height")
+	if len(heightString) > 0 {
+		parameters.Height, err = strconv.Atoi(heightString)
 		if err != nil {
 			return
 		}
@@ -97,15 +101,21 @@ func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) 
 		return
 	}
 
-	fmt.Println(response)
+	image = &Image{}
+
+	contentType := response.Header.Get("Content-Type")
+	if len(contentType) > 0 {
+		r, _ := regexp.Compile("image/(.+)")
+		matches := r.FindStringSubmatch(contentType)
+		if matches != nil && len(matches) == 2 {
+			image.Type = matches[1]
+		}
+	}
 
 	defer response.Body.Close()
-	data, err := ioutil.ReadAll(response.Body)
+	image.Data, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		return
-	}
-	image = &Image{
-		Data: data,
 	}
 
 	return
