@@ -11,6 +11,7 @@ func main() {
 		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
+		RequestParser: &imageproxy.SimpleRequestParser{},
 		Cache: &imageproxy.MemcacheCache{
 			Prefix:   "imageproxy",
 			Memcache: memcache.New("localhost"),

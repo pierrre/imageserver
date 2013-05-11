@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"strconv"
 )
 
 type Server struct {
-	HttpServer *http.Server
-	Cache      Cache
-	Converter  Converter
+	HttpServer    *http.Server
+	RequestParser RequestParser
+	Cache         Cache
+	Converter     Converter
 }
 
 func (server *Server) Run() {
@@ -24,7 +24,7 @@ func (server *Server) Run() {
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	source, parameters, err := server.parseRequest(request)
+	source, parameters, err := server.RequestParser.ParseRequest(request)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -45,54 +45,6 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 	}
 
 	server.sendImage(writer, image)
-}
-
-func (server *Server) parseRequest(request *http.Request) (source *url.URL, parameters *Parameters, err error) {
-	if request.Method != "GET" {
-		err = errors.New("Invalid request method")
-		return
-	}
-
-	query := request.URL.Query()
-
-	sourceString := query.Get("source")
-	if len(sourceString) == 0 {
-		err = errors.New("Missing source parameter")
-		return
-	}
-	source, err = url.ParseRequestURI(sourceString)
-	if err != nil {
-		err = fmt.Errorf("Invalid source parameter (%s)", err)
-		return
-	}
-
-	parameters = &Parameters{}
-
-	widthString := query.Get("width")
-	if len(widthString) > 0 {
-		parameters.Width, err = strconv.Atoi(widthString)
-		if err != nil {
-			return
-		}
-		if parameters.Width < 0 {
-			err = errors.New("Invalid width parameter")
-			return
-		}
-	}
-
-	heightString := query.Get("height")
-	if len(heightString) > 0 {
-		parameters.Height, err = strconv.Atoi(heightString)
-		if err != nil {
-			return
-		}
-		if parameters.Height < 0 {
-			err = errors.New("Invalid height parameter")
-			return
-		}
-	}
-
-	return
 }
 
 func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) {
