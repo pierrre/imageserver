@@ -1,8 +1,8 @@
 package main
 
 import (
-	imageproxy ".."
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/pierrre/imageproxy"
 	"net/http"
 )
 
@@ -14,6 +14,9 @@ func main() {
 		Cache: &imageproxy.MemcacheCache{
 			Prefix:   "imageproxy",
 			Memcache: memcache.New("localhost"),
+		},
+		Converter: &imageproxy.GraphicsMagickConverter{
+			Executable: "/usr/local/bin/gm",
 		},
 	}
 

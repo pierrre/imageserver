@@ -13,13 +13,7 @@ import (
 type Server struct {
 	HttpServer *http.Server
 	Cache      Cache
-}
-
-func NewServer(httpServer *http.Server, cache Cache) *Server {
-	return &Server{
-		HttpServer: httpServer,
-		Cache:      cache,
-	}
+	Converter  Converter
 }
 
 func (server *Server) Run() {
@@ -44,7 +38,13 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	server.sendImage(writer, sourceImage)
+	image, err := server.convertImage(sourceImage, parameters)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	server.sendImage(writer, image)
 }
 
 func (server *Server) parseRequest(request *http.Request) (source *url.URL, parameters *Parameters, err error) {
@@ -121,6 +121,16 @@ func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) 
 	image.Data, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		return
+	}
+
+	return
+}
+
+func (server *Server) convertImage(sourceImage *Image, parameters *Parameters) (image *Image, err error) {
+	if server.Converter != nil {
+		image, err = server.Converter.Convert(sourceImage, parameters)
+	} else {
+		image = sourceImage
 	}
 
 	return

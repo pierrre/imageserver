@@ -1,9 +1,10 @@
 package imageproxy
 
 type GraphicsMagickConverter struct {
-	executable string
+	Executable string
+	TempDir    string
 }
 
-func (converter *GraphicsMagickConverter) Convert(image *Image, parameters *Parameters) *Image {
-	return nil
+func (converter *GraphicsMagickConverter) Convert(sourceImage *Image, parameters *Parameters) (image *Image, err error) {
+	return sourceImage, nil
 }
