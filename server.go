@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"regexp"
 )
 
@@ -23,7 +22,7 @@ func (server *Server) Run() {
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	source, parameters, err := server.RequestParser.ParseRequest(request)
+	parameters, err := server.RequestParser.ParseRequest(request)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -35,7 +34,7 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	sourceImage, err := server.getSourceImage(source)
+	sourceImage, err := server.getSourceImage(parameters)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -50,8 +49,8 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 	server.sendImage(writer, image)
 }
 
-func (server *Server) getSourceImage(source *url.URL) (image *Image, err error) {
-	response, err := http.Get(source.String())
+func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err error) {
+	response, err := http.Get(parameters.Source.String())
 	if err != nil {
 		return
 	}
