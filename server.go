@@ -29,6 +29,12 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
+	err = parameters.Validate()
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	sourceImage, err := server.getSourceImage(source)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)

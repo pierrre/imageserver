@@ -38,20 +38,12 @@ func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (source *
 		if err != nil {
 			return
 		}
-		if parameters.Width < 0 {
-			err = errors.New("Invalid width parameter")
-			return
-		}
 	}
 
 	heightString := query.Get("height")
 	if len(heightString) > 0 {
 		parameters.Height, err = strconv.Atoi(heightString)
 		if err != nil {
-			return
-		}
-		if parameters.Height < 0 {
-			err = errors.New("Invalid height parameter")
 			return
 		}
 	}
