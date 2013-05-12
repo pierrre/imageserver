@@ -22,25 +22,7 @@ func (server *Server) Run() {
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	parameters, err := server.RequestParser.ParseRequest(request)
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = parameters.Validate()
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	sourceImage, err := server.getSourceImage(parameters)
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	image, err := server.convertImage(sourceImage, parameters)
+	image, err := server.getImage(request)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -49,11 +31,35 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 	server.sendImage(writer, image)
 }
 
+func (server *Server) getImage(request *http.Request) (image *Image, err error) {
+	parameters, err := server.RequestParser.ParseRequest(request)
+	if err != nil {
+		return
+	}
+	err = parameters.Validate()
+	if err != nil {
+		return
+	}
+
+	sourceImage, err := server.getSourceImage(parameters)
+	if err != nil {
+		return
+	}
+
+	image, err = server.convertImage(sourceImage, parameters)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err error) {
 	response, err := http.Get(parameters.Source.String())
 	if err != nil {
 		return
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		err = errors.New("Error while downloading source")
@@ -71,7 +77,6 @@ func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err 
 		}
 	}
 
-	defer response.Body.Close()
 	image.Data, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		return
