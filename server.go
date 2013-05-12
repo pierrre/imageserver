@@ -2,7 +2,6 @@ package imageproxy
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -30,8 +29,6 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	fmt.Println(parameters)
-
 	sourceImage, err := server.getSourceImage(source)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
@@ -40,7 +37,7 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 
 	image, err := server.convertImage(sourceImage, parameters)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 
