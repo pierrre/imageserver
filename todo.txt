@@ -1,0 +1,7 @@
+memcache cache
+use cache
+add source cache
+more resize parameters
+errors
+regroup requests
+config
