@@ -3,6 +3,7 @@ use cache
 add source cache
 more resize parameters
 errors
+status not changed
 regroup requests
 source + converter timeout
 config
