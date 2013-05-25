@@ -14,7 +14,7 @@ func main() {
 		RequestParser: &imageproxy.SimpleRequestParser{},
 		Cache: &imageproxy.MemcacheCache{
 			Prefix:   "imageproxy",
-			Memcache: memcache.New("localhost"),
+			Memcache: memcache.New("localhost:11211"),
 		},
 		Converter: &imageproxy.GraphicsMagickConverter{
 			Executable: "/usr/local/bin/gm",
