@@ -9,9 +9,10 @@ type MemcacheCache struct {
 	Memcache *memcache.Client
 }
 
-func (c *MemcacheCache) Get(key string) *Image {
-	return nil
+func (c *MemcacheCache) Get(key string) (image *Image, err error) {
+	return nil, nil
 }
 
-func (c *MemcacheCache) Set(key string, image *Image) {
+func (c *MemcacheCache) Set(key string, image *Image) error {
+	return nil
 }
