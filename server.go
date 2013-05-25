@@ -41,6 +41,11 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 		return
 	}
 
+	image, _ = server.Cache.Get("lol")
+	if image != nil {
+		return
+	}
+
 	sourceImage, err := server.getSourceImage(parameters)
 	if err != nil {
 		return
@@ -50,6 +55,8 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 	if err != nil {
 		return
 	}
+
+	_ = server.Cache.Set("lol", image)
 
 	return
 }
