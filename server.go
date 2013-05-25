@@ -2,6 +2,7 @@ package imageproxy
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -41,7 +42,7 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 		return
 	}
 
-	image, _ = server.Cache.Get("lol")
+	image, _ = server.Cache.Get(fmt.Sprint(parameters))
 	if image != nil {
 		return
 	}
@@ -56,7 +57,7 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 		return
 	}
 
-	_ = server.Cache.Set("lol", image)
+	_ = server.Cache.Set(fmt.Sprint(parameters), image)
 
 	return
 }

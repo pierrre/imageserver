@@ -1,8 +1,11 @@
 package imageproxy
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/bradfitz/gomemcache/memcache"
+	"io"
 )
 
 type MemcacheCache struct {
@@ -11,7 +14,8 @@ type MemcacheCache struct {
 }
 
 func (cache *MemcacheCache) Get(key string) (image *Image, err error) {
-	item, err := cache.Memcache.Get("a")
+	hashedKey := cache.hashKey(key)
+	item, err := cache.Memcache.Get(hashedKey)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -29,10 +33,19 @@ func (cache *MemcacheCache) Set(key string, image *Image) (err error) {
 	if err != nil {
 		return
 	}
+	hashedKey := cache.hashKey(key)
 	item := &memcache.Item{
-		Key:   "a",
+		Key:   hashedKey,
 		Value: serialized,
 	}
 	err = cache.Memcache.Set(item)
 	return
+}
+
+func (cache *MemcacheCache) hashKey(key string) string {
+	hash := md5.New()
+	io.WriteString(hash, key)
+	data := hash.Sum(nil)
+	hashedKey := hex.EncodeToString(data)
+	return hashedKey
 }
