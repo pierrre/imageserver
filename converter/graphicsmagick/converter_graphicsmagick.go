@@ -1,7 +1,8 @@
-package imageproxy
+package graphicsmagick
 
 import (
 	"fmt"
+	"github.com/pierrre/imageproxy"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -13,7 +14,7 @@ type GraphicsMagickConverter struct {
 	TempDir    string
 }
 
-func (converter *GraphicsMagickConverter) Convert(sourceImage *Image, parameters *Parameters) (image *Image, err error) {
+func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image, parameters *imageproxy.Parameters) (image *imageproxy.Image, err error) {
 	tempDir, err := ioutil.TempDir(converter.TempDir, "imageproxy_")
 	if err != nil {
 		return
@@ -44,7 +45,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *Image, parameters
 		return
 	}
 
-	image = &Image{}
+	image = &imageproxy.Image{}
 	image.Data = data
 
 	return image, nil
