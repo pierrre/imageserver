@@ -1,7 +1,6 @@
 package memcache
 
 import (
-	"fmt"
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageproxy"
 )
@@ -15,7 +14,6 @@ func (cache *MemcacheCache) Get(key string) (image *imageproxy.Image, err error)
 	hashedKey := imageproxy.HashCacheKey(key)
 	item, err := cache.Memcache.Get(cache.Prefix + hashedKey)
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	image = &imageproxy.Image{}
