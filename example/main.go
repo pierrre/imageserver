@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageproxy"
+	imageproxy_cache_memcache "github.com/pierrre/imageproxy/cache/memcache"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ func main() {
 			Addr: ":8080",
 		},
 		RequestParser: &imageproxy.SimpleRequestParser{},
-		Cache: &imageproxy.MemcacheCache{
+		Cache: &imageproxy_cache_memcache.MemcacheCache{
 			Prefix:   "imageproxy",
 			Memcache: memcache.New("localhost:11211"),
 		},
