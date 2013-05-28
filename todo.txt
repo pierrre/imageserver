@@ -1,5 +1,7 @@
+in memory cache
 add source cache
 more resize parameters
+chained cache
 errors
 status not changed
 regroup requests
