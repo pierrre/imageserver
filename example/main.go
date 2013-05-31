@@ -6,6 +6,7 @@ import (
 	//imageproxy_cache_memcache "github.com/pierrre/imageproxy/cache/memcache"
 	imageproxy_cache_memory "github.com/pierrre/imageproxy/cache/memory"
 	imageproxy_converter_graphicsmagick "github.com/pierrre/imageproxy/converter/graphicsmagick"
+	imageproxy_requestparser_simple "github.com/pierrre/imageproxy/requestparser/simple"
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ func main() {
 		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
-		RequestParser: &imageproxy.SimpleRequestParser{},
+		RequestParser: &imageproxy_requestparser_simple.SimpleRequestParser{},
 		/*
 			Cache: &imageproxy_cache_memcache.MemcacheCache{
 				Prefix:   "imageproxy",

@@ -1,20 +1,21 @@
-package imageproxy
+package simple
 
 import (
 	"errors"
+	"github.com/pierrre/imageproxy"
 	"net/http"
 )
 
 type SimpleRequestParser struct {
 }
 
-func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (parameters *Parameters, err error) {
+func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (parameters *imageproxy.Parameters, err error) {
 	if request.Method != "GET" {
 		err = errors.New("Invalid request method")
 		return
 	}
 
-	parameters = &Parameters{}
+	parameters = &imageproxy.Parameters{}
 
 	query := request.URL.Query()
 
