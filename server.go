@@ -12,6 +12,7 @@ type Server struct {
 	HttpServer    *http.Server
 	RequestParser RequestParser
 	Cache         Cache
+	SourceCache   Cache
 	Converter     Converter
 }
 
@@ -67,7 +68,16 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 }
 
 func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err error) {
-	response, err := http.Get(parameters.Source.String())
+	source := parameters.Source.String()
+
+	if server.SourceCache != nil {
+		image, _ = server.SourceCache.Get(source)
+		if image != nil {
+			return
+		}
+	}
+
+	response, err := http.Get(source)
 	if err != nil {
 		return
 	}
@@ -92,6 +102,10 @@ func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err 
 	image.Data, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		return
+	}
+
+	if server.SourceCache != nil {
+		_ = server.SourceCache.Set(source, image)
 	}
 
 	return

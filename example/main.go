@@ -11,22 +11,18 @@ import (
 )
 
 func main() {
+	cache := imageproxy_cache_memory.New(10 * 1024 * 1024)
+
 	server := &imageproxy.Server{
 		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
 		RequestParser: &imageproxy_requestparser_simple.SimpleRequestParser{},
-		/*
-			Cache: &imageproxy_cache_memcache.MemcacheCache{
-				Prefix:   "imageproxy",
-				Memcache: memcache.New("localhost:11211"),
-			},
-		*/
-		Cache: imageproxy_cache_memory.New(10 * 1024 * 1024),
+		Cache: cache,
+		SourceCache: cache,
 		Converter: &imageproxy_converter_graphicsmagick.GraphicsMagickConverter{
 			Executable: "/usr/local/bin/gm",
 		},
 	}
-
 	server.Run()
 }
