@@ -1,4 +1,3 @@
-goroutine for "set cache"
 prefix cache
 chained cache
 more resize parameters

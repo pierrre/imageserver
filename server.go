@@ -61,7 +61,9 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 	}
 
 	if server.Cache != nil {
-		_ = server.Cache.Set(fmt.Sprint(parameters), image)
+		go func() {
+			_ = server.Cache.Set(fmt.Sprint(parameters), image)
+		}()
 	}
 
 	return
@@ -105,7 +107,9 @@ func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err 
 	}
 
 	if server.SourceCache != nil {
-		_ = server.SourceCache.Set(source, image)
+		go func() {
+			_ = server.SourceCache.Set(source, image)
+		}()
 	}
 
 	return
