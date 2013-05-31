@@ -6,13 +6,12 @@ import (
 )
 
 type MemcacheCache struct {
-	Prefix   string
 	Memcache *memcache_impl.Client
 }
 
 func (cache *MemcacheCache) Get(key string) (image *imageproxy.Image, err error) {
 	hashedKey := imageproxy.HashCacheKey(key)
-	item, err := cache.Memcache.Get(cache.Prefix + hashedKey)
+	item, err := cache.Memcache.Get(hashedKey)
 	if err != nil {
 		return
 	}
@@ -31,7 +30,7 @@ func (cache *MemcacheCache) Set(key string, image *imageproxy.Image) (err error)
 	}
 	hashedKey := imageproxy.HashCacheKey(key)
 	item := &memcache_impl.Item{
-		Key:   cache.Prefix + hashedKey,
+		Key:   hashedKey,
 		Value: serialized,
 	}
 	err = cache.Memcache.Set(item)
