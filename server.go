@@ -1,8 +1,11 @@
 package imageproxy
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -43,8 +46,10 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 		return
 	}
 
+	cacheKey := hashCacheKey(fmt.Sprint(parameters))
+
 	if server.Cache != nil {
-		image, _ = server.Cache.Get(fmt.Sprint(parameters))
+		image, _ = server.Cache.Get(cacheKey)
 		if image != nil {
 			return
 		}
@@ -62,7 +67,7 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 
 	if server.Cache != nil {
 		go func() {
-			_ = server.Cache.Set(fmt.Sprint(parameters), image)
+			_ = server.Cache.Set(cacheKey, image)
 		}()
 	}
 
@@ -71,9 +76,10 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 
 func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err error) {
 	source := parameters.Source.String()
+	cacheKey := hashCacheKey(source)
 
 	if server.SourceCache != nil {
-		image, _ = server.SourceCache.Get(source)
+		image, _ = server.SourceCache.Get(cacheKey)
 		if image != nil {
 			return
 		}
@@ -108,7 +114,7 @@ func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err 
 
 	if server.SourceCache != nil {
 		go func() {
-			_ = server.SourceCache.Set(source, image)
+			_ = server.SourceCache.Set(cacheKey, image)
 		}()
 	}
 
@@ -131,4 +137,12 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *Image) {
 	}
 
 	writer.Write(image.Data)
+}
+
+func hashCacheKey(key string) string {
+	hash := md5.New()
+	io.WriteString(hash, key)
+	data := hash.Sum(nil)
+	hashedKey := hex.EncodeToString(data)
+	return hashedKey
 }

@@ -17,8 +17,7 @@ func New(capacity uint64) *MemoryCache {
 }
 
 func (cache *MemoryCache) Get(key string) (image *imageproxy.Image, err error) {
-	hashedKey := imageproxy.HashCacheKey(key)
-	value, ok := cache.lru.Get(hashedKey)
+	value, ok := cache.lru.Get(key)
 	if !ok {
 		err = fmt.Errorf("Image not found")
 		return
@@ -33,11 +32,10 @@ func (cache *MemoryCache) Get(key string) (image *imageproxy.Image, err error) {
 }
 
 func (cache *MemoryCache) Set(key string, image *imageproxy.Image) (err error) {
-	hashedKey := imageproxy.HashCacheKey(key)
 	item := &item{
 		image: image,
 	}
-	cache.lru.Set(hashedKey, item)
+	cache.lru.Set(key, item)
 	return
 }
 

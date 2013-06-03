@@ -10,8 +10,7 @@ type MemcacheCache struct {
 }
 
 func (cache *MemcacheCache) Get(key string) (image *imageproxy.Image, err error) {
-	hashedKey := imageproxy.HashCacheKey(key)
-	item, err := cache.Memcache.Get(hashedKey)
+	item, err := cache.Memcache.Get(key)
 	if err != nil {
 		return
 	}
@@ -28,9 +27,8 @@ func (cache *MemcacheCache) Set(key string, image *imageproxy.Image) (err error)
 	if err != nil {
 		return
 	}
-	hashedKey := imageproxy.HashCacheKey(key)
 	item := &memcache_impl.Item{
-		Key:   hashedKey,
+		Key:   key,
 		Value: serialized,
 	}
 	err = cache.Memcache.Set(item)
