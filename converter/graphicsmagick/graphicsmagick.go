@@ -47,6 +47,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 
 	image = &imageproxy.Image{}
 	image.Data = data
+	//FIX type
 
 	return image, nil
 }

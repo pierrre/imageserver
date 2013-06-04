@@ -50,6 +50,7 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 
 	if server.Cache != nil {
 		image, _ = server.Cache.Get(cacheKey)
+		//FIX error
 		if image != nil {
 			return
 		}
