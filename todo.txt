@@ -1,7 +1,8 @@
-chained cache
 more resize parameters
+default jpeg compression
+move http server into a package
 errors
-status not changed
+status not changed / cache
 regroup requests
-source + converter timeout
-config
+source + converter timeout?
+config?
