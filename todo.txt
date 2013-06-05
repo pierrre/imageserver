@@ -1,8 +1,12 @@
+refactor resize parameters
 more resize parameters
+fixes
+thread count problem with system calls
 default jpeg compression
-move http server into a package
-errors
+error management
 status not changed / cache
+
+move http server into a package
 regroup requests
 source + converter timeout?
 config?
