@@ -1,7 +1,7 @@
 refactor resize parameters
 more resize parameters
 fixes
-thread count problem with system calls
+thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
 default jpeg compression
 error management
 status not changed / cache
