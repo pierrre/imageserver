@@ -37,7 +37,7 @@ func main() {
 		},
 		Converter: &imageproxy_converter_graphicsmagick.GraphicsMagickConverter{
 			Executable: "/usr/local/bin/gm",
-			DefaultQuality: map[string]string{
+			DefaultQualities: map[string]string{
 				"jpeg": "85",
 			},
 		},

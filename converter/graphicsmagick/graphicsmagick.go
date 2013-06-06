@@ -12,7 +12,7 @@ import (
 type GraphicsMagickConverter struct {
 	Executable     string
 	TempDir        string
-	DefaultQuality map[string]string
+	DefaultQualities map[string]string
 }
 
 func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image, parameters imageproxy.Parameters) (image *imageproxy.Image, err error) {
@@ -50,8 +50,8 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 		format = sourceImage.Type
 	}
 	quality, _ := parameters.GetString("quality")
-	if len(quality) == 0 && converter.DefaultQuality != nil {
-		if q, ok := converter.DefaultQuality[format]; ok {
+	if len(quality) == 0 && converter.DefaultQualities != nil {
+		if q, ok := converter.DefaultQualities[format]; ok {
 			quality = q
 		}
 	}
