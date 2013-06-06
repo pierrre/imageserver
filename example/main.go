@@ -14,14 +14,13 @@ import (
 
 func main() {
 	cache := &imageproxy_cache_chained.ChainedCache{
-		Caches : []imageproxy.Cache{
+		Caches: []imageproxy.Cache{
 			imageproxy_cache_memory.New(10 * 1024 * 1024),
 			&imageproxy_cache_memcache.MemcacheCache{
 				Memcache: memcache_impl.New("localhost:11211"),
 			},
 		},
 	}
-
 
 	server := &imageproxy.Server{
 		HttpServer: &http.Server{
@@ -38,6 +37,9 @@ func main() {
 		},
 		Converter: &imageproxy_converter_graphicsmagick.GraphicsMagickConverter{
 			Executable: "/usr/local/bin/gm",
+			DefaultQuality: map[string]string{
+				"jpeg": "85",
+			},
 		},
 	}
 	server.Run()
