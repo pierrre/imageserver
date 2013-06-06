@@ -3,11 +3,11 @@ package imageproxy
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
 )
 
@@ -85,6 +85,16 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 		}
 	}
 
+	sourceUrl, err := url.ParseRequestURI(source)
+	if err != nil {
+		return
+	}
+	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
+		err = fmt.Errorf("Invalid source scheme")
+		return
+	}
+	source = sourceUrl.String()
+
 	response, err := http.Get(source)
 	if err != nil {
 		return
@@ -92,7 +102,7 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		err = errors.New("Error while downloading source")
+		err = fmt.Errorf("Error while downloading source")
 		return
 	}
 
