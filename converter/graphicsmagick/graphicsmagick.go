@@ -14,7 +14,7 @@ type GraphicsMagickConverter struct {
 	TempDir    string
 }
 
-func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image, parameters *imageproxy.Parameters) (image *imageproxy.Image, err error) {
+func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image, parameters imageproxy.Parameters) (image *imageproxy.Image, err error) {
 	tempDir, err := ioutil.TempDir(converter.TempDir, "imageproxy_")
 	if err != nil {
 		return
@@ -29,8 +29,16 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 
 	var arguments []string
 	arguments = append(arguments, "mogrify")
-	if parameters.Width != 0 || parameters.Height != 0 {
-		arguments = append(arguments, "-resize", fmt.Sprintf("%dx%d", parameters.Width, parameters.Height))
+	width, _ := parameters.GetInt("width")
+	height, _ := parameters.GetInt("height")
+	if width != 0 && height != 0 {
+		if width <= 0 {
+			err = fmt.Errorf("Invalid width")
+		}
+		if height <= 0 {
+			err = fmt.Errorf("Invalid height")
+		}
+		arguments = append(arguments, "-resize", fmt.Sprintf("%dx%d", width, height))
 	}
 	arguments = append(arguments, filePath)
 

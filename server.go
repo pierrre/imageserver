@@ -41,10 +41,6 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 	if err != nil {
 		return
 	}
-	err = parameters.Validate()
-	if err != nil {
-		return
-	}
 
 	cacheKey := hashCacheKey(fmt.Sprint(parameters))
 
@@ -75,8 +71,12 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 	return
 }
 
-func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err error) {
-	source := parameters.Source.String()
+func (server *Server) getSourceImage(parameters Parameters) (image *Image, err error) {
+	source, err := parameters.GetString("source")
+	if err != nil {
+		return
+	}
+
 	cacheKey := hashCacheKey(source)
 
 	if server.SourceCache != nil {
@@ -122,7 +122,7 @@ func (server *Server) getSourceImage(parameters *Parameters) (image *Image, err 
 	return
 }
 
-func (server *Server) convertImage(sourceImage *Image, parameters *Parameters) (image *Image, err error) {
+func (server *Server) convertImage(sourceImage *Image, parameters Parameters) (image *Image, err error) {
 	if server.Converter != nil {
 		image, err = server.Converter.Convert(sourceImage, parameters)
 	} else {

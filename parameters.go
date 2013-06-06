@@ -1,57 +1,43 @@
 package imageproxy
 
 import (
-	"errors"
-	"net/url"
-	"strconv"
+	"fmt"
 )
 
-type Parameters struct {
-	Source *url.URL
-	Width  int
-	Height int
+type Parameters map[string]interface{}
+
+func (parameters Parameters) Set(key string, value interface{}) {
+	parameters[key] = value
 }
 
-func (parameters *Parameters) ParseSource(source string) (err error) {
-	parameters.Source, err = url.ParseRequestURI(source)
+func (parameters Parameters) Get(key string) (value interface{}, err error) {
+	value, ok := parameters[key]
+	if !ok {
+		err = fmt.Errorf("Value not found")
+	}
 	return
 }
 
-func (parameters *Parameters) ParseWidth(width string) (err error) {
-	if len(width) != 0 {
-		parameters.Width, err = strconv.Atoi(width)
-	} else {
-		parameters.Width = 0
+func (parameters Parameters) GetString(key string) (value string, err error) {
+	v, err := parameters.Get(key)
+	if err != nil {
+		return
 	}
-
+	value, ok := v.(string)
+	if !ok {
+		err = fmt.Errorf("Not a string")
+	}
 	return
 }
 
-func (parameters *Parameters) ParseHeight(height string) (err error) {
-	if len(height) != 0 {
-		parameters.Height, err = strconv.Atoi(height)
-	} else {
-		parameters.Height = 0
+func (parameters Parameters) GetInt(key string) (value int, err error) {
+	v, err := parameters.Get(key)
+	if err != nil {
+		return
 	}
-
+	value, ok := v.(int)
+	if !ok {
+		err = fmt.Errorf("Not an int")
+	}
 	return
-}
-
-func (parameters *Parameters) Validate() error {
-	if parameters.Source == nil {
-		return errors.New("Invalid source")
-	}
-	if !parameters.Source.IsAbs() {
-		return errors.New("Invalid source")
-	}
-
-	if parameters.Width < 0 {
-		return errors.New("Invalid width")
-	}
-
-	if parameters.Height < 0 {
-		return errors.New("Invalid height")
-	}
-
-	return nil
 }
