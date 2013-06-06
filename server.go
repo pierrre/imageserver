@@ -45,9 +45,8 @@ func (server *Server) getImage(request *http.Request) (image *Image, err error) 
 	cacheKey := hashCacheKey(fmt.Sprint(parameters))
 
 	if server.Cache != nil {
-		image, _ = server.Cache.Get(cacheKey)
-		//FIX error
-		if image != nil {
+		image, err = server.Cache.Get(cacheKey)
+		if err == nil {
 			return
 		}
 	}
