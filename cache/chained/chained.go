@@ -1,7 +1,7 @@
 package chained
 
 import (
-	"errors"
+	"fmt"
 	"github.com/pierrre/imageproxy"
 )
 
@@ -19,7 +19,7 @@ func (cache *ChainedCache) Get(key string) (*imageproxy.Image, error) {
 			return image, nil
 		}
 	}
-	return nil, errors.New("Image not found in chained cache")
+	return nil, fmt.Errorf("Image not found in chained cache")
 }
 
 func (cache *ChainedCache) setCaches(key string, image *imageproxy.Image, indexLimit int) {
