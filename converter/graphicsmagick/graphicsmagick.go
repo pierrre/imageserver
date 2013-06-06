@@ -45,6 +45,8 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 	if len(format) > 0 {
 		arguments = append(arguments, "-format", format)
 		outFile = fmt.Sprintf("%s.%s", outFile, format)
+	} else {
+		format = sourceImage.Type
 	}
 	quality, _ := parameters.GetString("quality")
 	if len(quality) > 0 {
@@ -65,11 +67,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 
 	image = &imageproxy.Image{}
 	image.Data = data
-	if len(format) > 0 {
-		image.Type = format
-	} else {
-		image.Type = sourceImage.Type
-	}
+	image.Type = format
 
 	return image, nil
 }
