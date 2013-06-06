@@ -21,8 +21,9 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 	}
 	defer os.RemoveAll(tempDir)
 
-	filePath := filepath.Join(tempDir, "image")
-	err = ioutil.WriteFile(filePath, sourceImage.Data, os.FileMode(0600))
+	inFile := filepath.Join(tempDir, "image")
+	outFile := inFile
+	err = ioutil.WriteFile(inFile, sourceImage.Data, os.FileMode(0600))
 	if err != nil {
 		return
 	}
@@ -40,7 +41,16 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 		}
 		arguments = append(arguments, "-resize", fmt.Sprintf("%dx%d", width, height))
 	}
-	arguments = append(arguments, filePath)
+	format, _ := parameters.GetString("format")
+	if len(format) > 0 {
+		arguments = append(arguments, "-format", format)
+		outFile = fmt.Sprintf("%s.%s", outFile, format)
+	}
+	quality, _ := parameters.GetString("quality")
+	if len(quality) > 0 {
+		arguments = append(arguments, "-quality", quality)
+	}
+	arguments = append(arguments, inFile)
 
 	cmd := exec.Command(converter.Executable, arguments...)
 	err = cmd.Run()
@@ -48,14 +58,18 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 		return
 	}
 
-	data, err := ioutil.ReadFile(filePath)
+	data, err := ioutil.ReadFile(outFile)
 	if err != nil {
 		return
 	}
 
 	image = &imageproxy.Image{}
 	image.Data = data
-	image.Type = sourceImage.Type
+	if len(format) > 0 {
+		image.Type = format
+	} else {
+		image.Type = sourceImage.Type
+	}
 
 	return image, nil
 }

@@ -36,15 +36,24 @@ func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (paramete
 		return
 	}
 
+	err = parseFormat(parameters, query)
+	if err != nil {
+		return
+	}
+
+	err = parseQuality(parameters, query)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
 func parseSource(parameters imageproxy.Parameters, query url.Values) error {
 	source := query.Get("source")
-	if len(source) == 0 {
-		return fmt.Errorf("Source parameter is missing")
+	if len(source) > 0 {
+		parameters.Set("source", source)
 	}
-	parameters.Set("source", source)
 	return nil
 }
 
@@ -74,6 +83,22 @@ func parseHeight(parameters imageproxy.Parameters, query url.Values) error {
 			return fmt.Errorf("Invalid height parameter")
 		}
 		parameters.Set("height", height)
+	}
+	return nil
+}
+
+func parseFormat(parameters imageproxy.Parameters, query url.Values) error {
+	format := query.Get("format")
+	if len(format) > 0 {
+		parameters.Set("format", format)
+	}
+	return nil
+}
+
+func parseQuality(parameters imageproxy.Parameters, query url.Values) error {
+	quality := query.Get("quality")
+	if len(quality) > 0 {
+		parameters.Set("quality", quality)
 	}
 	return nil
 }
