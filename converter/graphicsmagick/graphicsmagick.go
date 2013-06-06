@@ -10,8 +10,9 @@ import (
 )
 
 type GraphicsMagickConverter struct {
-	Executable     string
-	TempDir        string
+	Executable       string
+	TempDir          string
+	AcceptedFormats  []string
 	DefaultQualities map[string]string
 }
 
@@ -48,6 +49,19 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 		outFile = fmt.Sprintf("%s.%s", outFile, format)
 	} else {
 		format = sourceImage.Type
+	}
+	if converter.AcceptedFormats != nil {
+		formatOk := false
+		for _, f := range converter.AcceptedFormats {
+			if f == format {
+				formatOk = true
+				break
+			}
+		}
+		if !formatOk {
+			err = fmt.Errorf("Invalid format")
+			return
+		}
 	}
 	quality, _ := parameters.GetString("quality")
 	if len(quality) == 0 && converter.DefaultQualities != nil {
