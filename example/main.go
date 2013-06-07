@@ -14,12 +14,10 @@ import (
 )
 
 func main() {
-	cache := &imageproxy_cache_chain.ChainedCache{
-		Caches: []imageproxy.Cache{
-			imageproxy_cache_memory.New(10 * 1024 * 1024),
-			&imageproxy_cache_memcache.MemcacheCache{
-				Memcache: memcache_impl.New("localhost:11211"),
-			},
+	cache := &imageproxy_cache_chain.ChainCache{
+		imageproxy_cache_memory.New(10 * 1024 * 1024),
+		&imageproxy_cache_memcache.MemcacheCache{
+			Memcache: memcache_impl.New("localhost:11211"),
 		},
 	}
 

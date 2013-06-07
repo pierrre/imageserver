@@ -5,12 +5,10 @@ import (
 	"github.com/pierrre/imageproxy"
 )
 
-type ChainedCache struct {
-	Caches []imageproxy.Cache
-}
+type ChainCache []imageproxy.Cache
 
-func (cache *ChainedCache) Get(key string) (*imageproxy.Image, error) {
-	for i, c := range cache.Caches {
+func (cache ChainCache) Get(key string) (*imageproxy.Image, error) {
+	for i, c := range cache {
 		image, err := c.Get(key)
 		if err == nil {
 			if i > 0 {
@@ -22,16 +20,16 @@ func (cache *ChainedCache) Get(key string) (*imageproxy.Image, error) {
 	return nil, fmt.Errorf("Image not found in chained cache")
 }
 
-func (cache *ChainedCache) setCaches(key string, image *imageproxy.Image, indexLimit int) {
+func (cache ChainCache) setCaches(key string, image *imageproxy.Image, indexLimit int) {
 	for i := 0; i < indexLimit; i++ {
 		go func(i int) {
-			cache.Caches[i].Set(key, image)
+			cache[i].Set(key, image)
 		}(i)
 	}
 }
 
-func (cache *ChainedCache) Set(key string, image *imageproxy.Image) (err error) {
-	for _, c := range cache.Caches {
+func (cache ChainCache) Set(key string, image *imageproxy.Image) (err error) {
+	for _, c := range cache {
 		go func(c imageproxy.Cache) {
 			c.Set(key, image)
 		}(c)
