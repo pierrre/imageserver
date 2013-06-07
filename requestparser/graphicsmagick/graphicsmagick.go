@@ -25,12 +25,12 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 
 	query := request.URL.Query()
 
-	err = parser.parseWidth(query, parameters)
+	err = parser.parseDimension(query, parameters, "width")
 	if err != nil {
 		return
 	}
 
-	err = parser.parseHeight(query, parameters)
+	err = parser.parseDimension(query, parameters, "height")
 	if err != nil {
 		return
 	}
@@ -48,32 +48,17 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 	return
 }
 
-func (parser *GraphicsMagickRequestParser) parseWidth(query url.Values, parameters imageproxy.Parameters) error {
-	widthString := query.Get("width")
-	if len(widthString) > 0 {
-		width, err := strconv.Atoi(widthString)
+func (parser *GraphicsMagickRequestParser) parseDimension(query url.Values, parameters imageproxy.Parameters, dimensionName string) error {
+	dimensionString := query.Get(dimensionName)
+	if len(dimensionString) > 0 {
+		dimension, err := strconv.Atoi(dimensionString)
 		if err != nil {
 			return err
 		}
-		if width <= 0 {
-			return fmt.Errorf("Invalid width parameter")
+		if dimension <= 0 {
+			return fmt.Errorf("Invalid %s", dimensionName)
 		}
-		parser.setParameter(parameters, "width", width)
-	}
-	return nil
-}
-
-func (parser *GraphicsMagickRequestParser) parseHeight(query url.Values, parameters imageproxy.Parameters) error {
-	heightString := query.Get("height")
-	if len(heightString) > 0 {
-		height, err := strconv.Atoi(heightString)
-		if err != nil {
-			return err
-		}
-		if height <= 0 {
-			return fmt.Errorf("Invalid height parameter")
-		}
-		parser.setParameter(parameters, "height", height)
+		parser.setParameter(parameters, dimensionName, dimension)
 	}
 	return nil
 }
