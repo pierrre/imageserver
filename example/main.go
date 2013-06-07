@@ -8,6 +8,7 @@ import (
 	imageproxy_cache_memory "github.com/pierrre/imageproxy/cache/memory"
 	imageproxy_cache_prefix "github.com/pierrre/imageproxy/cache/prefix"
 	imageproxy_converter_graphicsmagick "github.com/pierrre/imageproxy/converter/graphicsmagick"
+	imageproxy_requestparser_merge "github.com/pierrre/imageproxy/requestparser/merge"
 	imageproxy_requestparser_simple "github.com/pierrre/imageproxy/requestparser/simple"
 	"net/http"
 )
@@ -26,7 +27,9 @@ func main() {
 		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
-		RequestParser: &imageproxy_requestparser_simple.SimpleRequestParser{},
+		RequestParser: &imageproxy_requestparser_merge.MergeRequestParser{
+			&imageproxy_requestparser_simple.SimpleRequestParser{},
+		},
 		Cache: &imageproxy_cache_prefix.PrefixCache{
 			Prefix: "converted_",
 			Cache:  cache,
