@@ -21,27 +21,27 @@ func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (paramete
 
 	query := request.URL.Query()
 
-	err = parser.parseSource(parameters, query)
+	err = parser.parseSource(query, parameters)
 	if err != nil {
 		return
 	}
 
-	err = parser.parseWidth(parameters, query)
+	err = parser.parseWidth(query, parameters)
 	if err != nil {
 		return
 	}
 
-	err = parser.parseHeight(parameters, query)
+	err = parser.parseHeight(query, parameters)
 	if err != nil {
 		return
 	}
 
-	err = parser.parseFormat(parameters, query)
+	err = parser.parseFormat(query, parameters)
 	if err != nil {
 		return
 	}
 
-	err = parser.parseQuality(parameters, query)
+	err = parser.parseQuality(query, parameters)
 	if err != nil {
 		return
 	}
@@ -49,7 +49,7 @@ func (parser *SimpleRequestParser) ParseRequest(request *http.Request) (paramete
 	return
 }
 
-func (parser *SimpleRequestParser) parseSource(parameters imageproxy.Parameters, query url.Values) error {
+func (parser *SimpleRequestParser) parseSource(query url.Values, parameters imageproxy.Parameters) error {
 	source := query.Get("source")
 	if len(source) > 0 {
 		parameters.Set("source", source)
@@ -57,7 +57,7 @@ func (parser *SimpleRequestParser) parseSource(parameters imageproxy.Parameters,
 	return nil
 }
 
-func (parser *SimpleRequestParser) parseWidth(parameters imageproxy.Parameters, query url.Values) error {
+func (parser *SimpleRequestParser) parseWidth(query url.Values, parameters imageproxy.Parameters) error {
 	widthString := query.Get("width")
 	if len(widthString) > 0 {
 		width, err := strconv.Atoi(widthString)
@@ -72,7 +72,7 @@ func (parser *SimpleRequestParser) parseWidth(parameters imageproxy.Parameters, 
 	return nil
 }
 
-func (parser *SimpleRequestParser) parseHeight(parameters imageproxy.Parameters, query url.Values) error {
+func (parser *SimpleRequestParser) parseHeight(query url.Values, parameters imageproxy.Parameters) error {
 	heightString := query.Get("height")
 	if len(heightString) > 0 {
 		height, err := strconv.Atoi(heightString)
@@ -87,7 +87,7 @@ func (parser *SimpleRequestParser) parseHeight(parameters imageproxy.Parameters,
 	return nil
 }
 
-func (parser *SimpleRequestParser) parseFormat(parameters imageproxy.Parameters, query url.Values) error {
+func (parser *SimpleRequestParser) parseFormat(query url.Values, parameters imageproxy.Parameters) error {
 	format := query.Get("format")
 	if len(format) > 0 {
 		parameters.Set("format", format)
@@ -95,7 +95,7 @@ func (parser *SimpleRequestParser) parseFormat(parameters imageproxy.Parameters,
 	return nil
 }
 
-func (parser *SimpleRequestParser) parseQuality(parameters imageproxy.Parameters, query url.Values) error {
+func (parser *SimpleRequestParser) parseQuality(query url.Values, parameters imageproxy.Parameters) error {
 	quality := query.Get("quality")
 	if len(quality) > 0 {
 		parameters.Set("quality", quality)
