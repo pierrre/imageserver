@@ -72,8 +72,6 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 }
 
 func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parameters imageproxy.Parameters) (arguments []string, width int, height int, err error) {
-	// TODO improve
-
 	arguments = in
 
 	width, _ = parameters.GetInt("width")
@@ -88,8 +86,16 @@ func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parame
 		return
 	}
 
-	if width != 0 && height != 0 {
-		arguments = append(arguments, "-resize", fmt.Sprintf("%dx%d", width, height))
+	if width != 0 || height != 0 {
+		widthString := ""
+		if width != 0 {
+			widthString = strconv.Itoa(width)
+		}
+		heightString := ""
+		if height != 0 {
+			heightString = strconv.Itoa(height)
+		}
+		arguments = append(arguments, "-resize", fmt.Sprintf("%sx%s", widthString, heightString))
 	}
 
 	return
