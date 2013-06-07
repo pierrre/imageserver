@@ -40,7 +40,7 @@ func main() {
 		},
 		Converter: &imageproxy_converter_graphicsmagick.GraphicsMagickConverter{
 			Executable: "/usr/local/bin/gm",
-			AcceptedFormats: []string{
+			AllowedFormats: []string{
 				"jpeg",
 				"png",
 				"bmp",

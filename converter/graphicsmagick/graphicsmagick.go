@@ -13,7 +13,7 @@ import (
 type GraphicsMagickConverter struct {
 	Executable       string
 	TempDir          string
-	AcceptedFormats  []string
+	AllowedFormats  []string
 	DefaultQualities map[string]string
 }
 
@@ -127,9 +127,9 @@ func (converter *GraphicsMagickConverter) buildArgumentsFormat(in []string, para
 }
 
 func (converter *GraphicsMagickConverter) validateFormat(format string) (err error) {
-	if converter.AcceptedFormats != nil {
+	if converter.AllowedFormats != nil {
 		ok := false
-		for _, f := range converter.AcceptedFormats {
+		for _, f := range converter.AllowedFormats {
 			if f == format {
 				ok = true
 				break
