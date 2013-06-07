@@ -26,16 +26,6 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 		return
 	}
 
-	err = parser.parseString(query, parameters, "format")
-	if err != nil {
-		return
-	}
-
-	err = parser.parseString(query, parameters, "quality")
-	if err != nil {
-		return
-	}
-
 	err = parser.parseBool(query, parameters, "fill")
 	if err != nil {
 		return
@@ -56,12 +46,22 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 		return
 	}
 
+	err = parser.parseString(query, parameters, "background")
+	if err != nil {
+		return
+	}
+
 	err = parser.parseBool(query, parameters, "extent")
 	if err != nil {
 		return
 	}
 
-	err = parser.parseString(query, parameters, "background")
+	err = parser.parseString(query, parameters, "format")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseString(query, parameters, "quality")
 	if err != nil {
 		return
 	}
