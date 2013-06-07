@@ -1,4 +1,4 @@
-package chained
+package chain
 
 import (
 	"fmt"

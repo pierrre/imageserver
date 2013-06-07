@@ -3,7 +3,7 @@ package main
 import (
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageproxy"
-	imageproxy_cache_chained "github.com/pierrre/imageproxy/cache/chained"
+	imageproxy_cache_chain "github.com/pierrre/imageproxy/cache/chain"
 	imageproxy_cache_memcache "github.com/pierrre/imageproxy/cache/memcache"
 	imageproxy_cache_memory "github.com/pierrre/imageproxy/cache/memory"
 	imageproxy_cache_prefix "github.com/pierrre/imageproxy/cache/prefix"
@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	cache := &imageproxy_cache_chained.ChainedCache{
+	cache := &imageproxy_cache_chain.ChainedCache{
 		Caches: []imageproxy.Cache{
 			imageproxy_cache_memory.New(10 * 1024 * 1024),
 			&imageproxy_cache_memcache.MemcacheCache{
