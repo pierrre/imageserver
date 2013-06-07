@@ -74,13 +74,13 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parameters imageproxy.Parameters) (arguments []string, width int, height int, err error) {
 	arguments = in
 
-	width, _ = parameters.GetInt("width")
+	width, _ = parameters.GetInt("gm.width")
 	if width < 0 {
 		err = fmt.Errorf("Invalid width")
 		return
 	}
 
-	height, _ = parameters.GetInt("height")
+	height, _ = parameters.GetInt("gm.height")
 	if height < 0 {
 		err = fmt.Errorf("Invalid height")
 		return
@@ -104,7 +104,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parame
 func (converter *GraphicsMagickConverter) buildArgumentsFormat(in []string, parameters imageproxy.Parameters, sourceImage *imageproxy.Image) (arguments []string, format string, hasFileExtension bool, err error) {
 	arguments = in
 
-	format, _ = parameters.GetString("format")
+	format, _ = parameters.GetString("gm.format")
 
 	formatSpecified := true
 	if len(format) == 0 {
@@ -146,7 +146,7 @@ func (converter *GraphicsMagickConverter) validateFormat(format string) (err err
 func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, parameters imageproxy.Parameters, format string) (arguments []string, quality string, err error) {
 	arguments = in
 
-	quality, _ = parameters.GetString("quality")
+	quality, _ = parameters.GetString("gm.quality")
 
 	if len(quality) == 0 && converter.DefaultQualities != nil {
 		if q, ok := converter.DefaultQualities[format]; ok {

@@ -37,6 +37,11 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 }
 
 func (server *Server) getImage(request *http.Request) (image *Image, err error) {
+	if request.Method != "GET" {
+		err = fmt.Errorf("Invalid request method")
+		return
+	}
+
 	parameters, err := server.RequestParser.ParseRequest(request)
 	if err != nil {
 		return
