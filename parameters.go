@@ -41,3 +41,15 @@ func (parameters Parameters) GetInt(key string) (value int, err error) {
 	}
 	return
 }
+
+func (parameters Parameters) GetBool(key string) (value bool, err error) {
+	v, err := parameters.Get(key)
+	if err != nil {
+		return
+	}
+	value, ok := v.(bool)
+	if !ok {
+		err = fmt.Errorf("Not a bool")
+	}
+	return
+}
