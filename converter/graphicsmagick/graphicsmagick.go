@@ -13,7 +13,7 @@ import (
 type GraphicsMagickConverter struct {
 	Executable       string
 	TempDir          string
-	AllowedFormats  []string
+	AllowedFormats   []string
 	DefaultQualities map[string]string
 }
 
@@ -22,7 +22,17 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 
 	arguments = append(arguments, "mogrify")
 
-	arguments, _, _, err = converter.buildArgumentsSize(arguments, parameters)
+	arguments, width, height, err := converter.buildArgumentsResize(arguments, parameters)
+	if err != nil {
+		return
+	}
+
+	arguments, err = converter.buildArgumentsBackground(arguments, parameters)
+	if err != nil {
+		return
+	}
+
+	arguments, err = converter.buildArgumentsExtent(arguments, parameters, width, height)
 	if err != nil {
 		return
 	}
@@ -32,7 +42,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 		return
 	}
 
-	arguments, _, err = converter.buildArgumentsQuality(arguments, parameters, format)
+	arguments, err = converter.buildArgumentsQuality(arguments, parameters, format)
 	if err != nil {
 		return
 	}
@@ -71,7 +81,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageproxy.Image,
 	return image, nil
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parameters imageproxy.Parameters) (arguments []string, width int, height int, err error) {
+func (converter *GraphicsMagickConverter) buildArgumentsResize(in []string, parameters imageproxy.Parameters) (arguments []string, width int, height int, err error) {
 	arguments = in
 
 	width, _ = parameters.GetInt("gm.width")
@@ -95,7 +105,62 @@ func (converter *GraphicsMagickConverter) buildArgumentsSize(in []string, parame
 		if height != 0 {
 			heightString = strconv.Itoa(height)
 		}
-		arguments = append(arguments, "-resize", fmt.Sprintf("%sx%s", widthString, heightString))
+		resize := fmt.Sprintf("%sx%s", widthString, heightString)
+
+		if fill, _ := parameters.GetBool("gm.fill"); fill {
+			resize = resize + "^"
+		}
+
+		if ignoreRatio, _ := parameters.GetBool("gm.ignore_ratio"); ignoreRatio {
+			resize = resize + "!"
+		}
+
+		if onlyShrinkLarger, _ := parameters.GetBool("gm.only_shrink_larger"); onlyShrinkLarger {
+			resize = resize + ">"
+		}
+
+		if onlyEnlargeSmaller, _ := parameters.GetBool("gm.only_enlarge_smaller"); onlyEnlargeSmaller {
+			resize = resize + "<"
+		}
+
+		arguments = append(arguments, "-resize", resize)
+	}
+
+	return
+}
+
+func (converter *GraphicsMagickConverter) buildArgumentsBackground(in []string, parameters imageproxy.Parameters) (arguments []string, err error) {
+	arguments = in
+
+	background, _ := parameters.GetString("gm.background")
+
+	if backgroundLength := len(background); backgroundLength > 0 {
+		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
+			err = fmt.Errorf("Invalid background")
+			return
+		}
+
+		for _, r := range background {
+			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
+				err = fmt.Errorf("Invalid background")
+				return
+			}
+		}
+
+		arguments = append(arguments, "-background", fmt.Sprintf("#%s", background))
+	}
+
+	return
+}
+
+func (converter *GraphicsMagickConverter) buildArgumentsExtent(in []string, parameters imageproxy.Parameters, width int, height int) (arguments []string, err error) {
+	arguments = in
+
+	if width != 0 && height != 0 {
+		if extent, _ := parameters.GetBool("gm.extent"); extent {
+			arguments = append(arguments, "-gravity", "center")
+			arguments = append(arguments, "-extent", fmt.Sprintf("%dx%d", width, height))
+		}
 	}
 
 	return
@@ -112,21 +177,6 @@ func (converter *GraphicsMagickConverter) buildArgumentsFormat(in []string, para
 		formatSpecified = false
 	}
 
-	err = converter.validateFormat(format)
-	if err != nil {
-		return
-	}
-
-	if formatSpecified {
-		arguments = append(arguments, "-format", format)
-	}
-
-	hasFileExtension = formatSpecified
-
-	return
-}
-
-func (converter *GraphicsMagickConverter) validateFormat(format string) (err error) {
 	if converter.AllowedFormats != nil {
 		ok := false
 		for _, f := range converter.AllowedFormats {
@@ -140,13 +190,20 @@ func (converter *GraphicsMagickConverter) validateFormat(format string) (err err
 			return
 		}
 	}
+
+	if formatSpecified {
+		arguments = append(arguments, "-format", format)
+	}
+
+	hasFileExtension = formatSpecified
+
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, parameters imageproxy.Parameters, format string) (arguments []string, quality string, err error) {
+func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, parameters imageproxy.Parameters, format string) (arguments []string, err error) {
 	arguments = in
 
-	quality, _ = parameters.GetString("gm.quality")
+	quality, _ := parameters.GetString("gm.quality")
 
 	if len(quality) == 0 && converter.DefaultQualities != nil {
 		if q, ok := converter.DefaultQualities[format]; ok {
@@ -155,32 +212,24 @@ func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, par
 	}
 
 	if len(quality) > 0 {
-		err = converter.validateQuality(quality, format)
-		if err != nil {
+		qualityInt, e := strconv.Atoi(quality)
+		if e != nil {
+			err = e
 			return
 		}
-		arguments = append(arguments, "-quality", quality)
-	}
 
-	return
-}
-
-func (converter *GraphicsMagickConverter) validateQuality(quality string, format string) (err error) {
-	qualityInt, err := strconv.Atoi(quality)
-	if err != nil {
-		return
-	}
-
-	if qualityInt < 0 {
-		err = fmt.Errorf("Invalid quality")
-		return
-	}
-
-	if format == "jpeg" {
-		if qualityInt < 0 || qualityInt > 100 {
+		if qualityInt < 0 {
 			err = fmt.Errorf("Invalid quality")
 			return
 		}
+
+		if format == "jpeg" {
+			if qualityInt < 0 || qualityInt > 100 {
+				err = fmt.Errorf("Invalid quality")
+				return
+			}
+		}
+		arguments = append(arguments, "-quality", quality)
 	}
 
 	return

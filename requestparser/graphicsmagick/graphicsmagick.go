@@ -12,15 +12,6 @@ type GraphicsMagickRequestParser struct {
 }
 
 func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (parameters imageproxy.Parameters, err error) {
-	/*
-		TODO
-		fill
-		ignore_ratio
-		only_shrink_larger
-		only_enlarge_smaller
-		extent
-		gravity
-	*/
 	parameters = make(imageproxy.Parameters)
 
 	query := request.URL.Query()
@@ -35,12 +26,42 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 		return
 	}
 
-	err = parser.parseFormat(query, parameters)
+	err = parser.parseString(query, parameters, "format")
 	if err != nil {
 		return
 	}
 
-	err = parser.parseQuality(query, parameters)
+	err = parser.parseString(query, parameters, "quality")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseBool(query, parameters, "fill")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseBool(query, parameters, "ignore_ratio")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseBool(query, parameters, "only_shrink_larger")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseBool(query, parameters, "only_enlarge_smaller")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseBool(query, parameters, "extent")
+	if err != nil {
+		return
+	}
+
+	err = parser.parseString(query, parameters, "background")
 	if err != nil {
 		return
 	}
@@ -63,18 +84,27 @@ func (parser *GraphicsMagickRequestParser) parseDimension(query url.Values, para
 	return nil
 }
 
-func (parser *GraphicsMagickRequestParser) parseFormat(query url.Values, parameters imageproxy.Parameters) error {
-	format := query.Get("format")
-	if len(format) > 0 {
-		parser.setParameter(parameters, "format", format)
+func (parser *GraphicsMagickRequestParser) parseString(query url.Values, parameters imageproxy.Parameters, parameterName string) error {
+	parameter := query.Get(parameterName)
+	if len(parameter) > 0 {
+		parser.setParameter(parameters, parameterName, parameter)
 	}
 	return nil
 }
 
-func (parser *GraphicsMagickRequestParser) parseQuality(query url.Values, parameters imageproxy.Parameters) error {
-	quality := query.Get("quality")
-	if len(quality) > 0 {
-		parser.setParameter(parameters, "quality", quality)
+func (parser *GraphicsMagickRequestParser) parseBool(query url.Values, parameters imageproxy.Parameters, parameterName string) error {
+	parameterString := query.Get(parameterName)
+	if len(parameterString) > 0 {
+		var parameter bool
+		switch parameterString {
+		case "0":
+			parameter = false
+		case "1":
+			parameter = true
+		default:
+			return fmt.Errorf("Invalid %s", parameterName)
+		}
+		parser.setParameter(parameters, parameterName, parameter)
 	}
 	return nil
 }
