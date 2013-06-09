@@ -1,13 +1,13 @@
 package merge
 
 import (
-	"github.com/pierrre/imageproxy"
+	"github.com/pierrre/imageserver"
 	"net/http"
 )
 
-type MergeRequestParser []imageproxy.RequestParser
+type MergeRequestParser []imageserver.RequestParser
 
-func (parser MergeRequestParser) ParseRequest(request *http.Request) (parameters imageproxy.Parameters, err error) {
+func (parser MergeRequestParser) ParseRequest(request *http.Request) (parameters imageserver.Parameters, err error) {
 	for _, subParser := range parser {
 		parameters, err = parseAndMerge(request, subParser, parameters)
 		if err != nil {
@@ -18,7 +18,7 @@ func (parser MergeRequestParser) ParseRequest(request *http.Request) (parameters
 	return
 }
 
-func parseAndMerge(request *http.Request, parser imageproxy.RequestParser, inParameters imageproxy.Parameters) (parameters imageproxy.Parameters, err error) {
+func parseAndMerge(request *http.Request, parser imageserver.RequestParser, inParameters imageserver.Parameters) (parameters imageserver.Parameters, err error) {
 	parameters = inParameters
 	subParameters, err := parser.ParseRequest(request)
 	if err != nil {

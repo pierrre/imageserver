@@ -2,8 +2,8 @@ package memory
 
 import (
 	"fmt"
-	"github.com/pierrre/imageproxy"
-	lru_impl "github.com/pierrre/imageproxy/cache/memory/lru"
+	"github.com/pierrre/imageserver"
+	lru_impl "github.com/pierrre/imageserver/cache/memory/lru"
 )
 
 type MemoryCache struct {
@@ -16,7 +16,7 @@ func New(capacity uint64) *MemoryCache {
 	}
 }
 
-func (cache *MemoryCache) Get(key string) (image *imageproxy.Image, err error) {
+func (cache *MemoryCache) Get(key string) (image *imageserver.Image, err error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
 		err = fmt.Errorf("Image not found")
@@ -31,7 +31,7 @@ func (cache *MemoryCache) Get(key string) (image *imageproxy.Image, err error) {
 	return
 }
 
-func (cache *MemoryCache) Set(key string, image *imageproxy.Image) (err error) {
+func (cache *MemoryCache) Set(key string, image *imageserver.Image) (err error) {
 	item := &item{
 		image: image,
 	}
@@ -40,7 +40,7 @@ func (cache *MemoryCache) Set(key string, image *imageproxy.Image) (err error) {
 }
 
 type item struct {
-	image *imageproxy.Image
+	image *imageserver.Image
 }
 
 func (item *item) Size() int {

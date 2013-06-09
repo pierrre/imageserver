@@ -1,2 +1,3 @@
+# IntelliJ IDEA
 /.idea
-/imageproxy.iml
+*.iml

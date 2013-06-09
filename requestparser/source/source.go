@@ -1,15 +1,15 @@
 package source
 
 import (
-	"github.com/pierrre/imageproxy"
+	"github.com/pierrre/imageserver"
 	"net/http"
 )
 
 type SourceRequestParser struct {
 }
 
-func (parser *SourceRequestParser) ParseRequest(request *http.Request) (parameters imageproxy.Parameters, err error) {
-	parameters = make(imageproxy.Parameters)
+func (parser *SourceRequestParser) ParseRequest(request *http.Request) (parameters imageserver.Parameters, err error) {
+	parameters = make(imageserver.Parameters)
 
 	query := request.URL.Query()
 

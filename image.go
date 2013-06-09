@@ -1,4 +1,4 @@
-package imageproxy
+package imageserver
 
 import (
 	"bytes"

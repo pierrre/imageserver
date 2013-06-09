@@ -2,12 +2,12 @@ package chain
 
 import (
 	"fmt"
-	"github.com/pierrre/imageproxy"
+	"github.com/pierrre/imageserver"
 )
 
-type ChainCache []imageproxy.Cache
+type ChainCache []imageserver.Cache
 
-func (cache ChainCache) Get(key string) (*imageproxy.Image, error) {
+func (cache ChainCache) Get(key string) (*imageserver.Image, error) {
 	for i, c := range cache {
 		image, err := c.Get(key)
 		if err == nil {
@@ -20,7 +20,7 @@ func (cache ChainCache) Get(key string) (*imageproxy.Image, error) {
 	return nil, fmt.Errorf("Image not found in chained cache")
 }
 
-func (cache ChainCache) setCaches(key string, image *imageproxy.Image, indexLimit int) {
+func (cache ChainCache) setCaches(key string, image *imageserver.Image, indexLimit int) {
 	for i := 0; i < indexLimit; i++ {
 		go func(i int) {
 			cache[i].Set(key, image)
@@ -28,9 +28,9 @@ func (cache ChainCache) setCaches(key string, image *imageproxy.Image, indexLimi
 	}
 }
 
-func (cache ChainCache) Set(key string, image *imageproxy.Image) (err error) {
+func (cache ChainCache) Set(key string, image *imageserver.Image) (err error) {
 	for _, c := range cache {
-		go func(c imageproxy.Cache) {
+		go func(c imageserver.Cache) {
 			c.Set(key, image)
 		}(c)
 	}

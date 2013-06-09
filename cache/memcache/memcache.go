@@ -2,19 +2,19 @@ package memcache
 
 import (
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
-	"github.com/pierrre/imageproxy"
+	"github.com/pierrre/imageserver"
 )
 
 type MemcacheCache struct {
 	Memcache *memcache_impl.Client
 }
 
-func (cache *MemcacheCache) Get(key string) (image *imageproxy.Image, err error) {
+func (cache *MemcacheCache) Get(key string) (image *imageserver.Image, err error) {
 	item, err := cache.Memcache.Get(key)
 	if err != nil {
 		return
 	}
-	image = &imageproxy.Image{}
+	image = &imageserver.Image{}
 	err = image.Unserialize(item.Value)
 	if err != nil {
 		image = nil
@@ -22,7 +22,7 @@ func (cache *MemcacheCache) Get(key string) (image *imageproxy.Image, err error)
 	return
 }
 
-func (cache *MemcacheCache) Set(key string, image *imageproxy.Image) (err error) {
+func (cache *MemcacheCache) Set(key string, image *imageserver.Image) (err error) {
 	serialized, err := image.Serialize()
 	if err != nil {
 		return
