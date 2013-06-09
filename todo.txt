@@ -1,6 +1,7 @@
 thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
 error management
 status not changed / cache
+redis cache
 
 source provider:
     - http
