@@ -2,6 +2,16 @@ thread count problem with system calls http://misfra.me/post/52148362774/callbac
 error management
 status not changed / cache
 
+source provider:
+    - http
+    - dispatch (uri scheme)
+    - limit concurrent
+    - timeout
+converter -> processor
+processor:
+    - chain
+    - limit concurrent
+    - timeout
 regroup requests
 source + converter timeout?
 config?
