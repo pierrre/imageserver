@@ -46,6 +46,7 @@ func main() {
 					"jpeg",
 					"png",
 					"bmp",
+					"gif",
 				},
 				DefaultQualities: map[string]string{
 					"jpeg": "85",
