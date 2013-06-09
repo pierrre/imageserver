@@ -12,42 +12,13 @@ import (
 )
 
 type Server struct {
-	HttpServer    *http.Server
-	RequestParser RequestParser
-	Cache         Cache
-	SourceCache   Cache
-	Converter     Converter
+	Cache       Cache
+	SourceCache Cache
+	Converter   Converter
 }
 
-func (server *Server) Run() {
-	serveMux := http.NewServeMux()
-	serveMux.HandleFunc("/", server.handleHttpRequest)
-	server.HttpServer.Handler = serveMux
-	server.HttpServer.ListenAndServe()
-}
-
-func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	image, err := server.getImage(request)
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	server.sendImage(writer, image)
-}
-
-func (server *Server) getImage(request *http.Request) (image *Image, err error) {
-	if request.Method != "GET" {
-		err = fmt.Errorf("Invalid request method")
-		return
-	}
-
-	parameters, err := server.RequestParser.ParseRequest(request)
-	if err != nil {
-		return
-	}
-
-	cacheKey := hashCacheKey(fmt.Sprint(parameters))
+func (server *Server) GetImage(parameters Parameters) (image *Image, err error) {
+	cacheKey := server.hashCacheKey(fmt.Sprint(parameters))
 
 	if server.Cache != nil {
 		image, err = server.Cache.Get(cacheKey)
@@ -81,7 +52,7 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 		return
 	}
 
-	cacheKey := hashCacheKey(source)
+	cacheKey := server.hashCacheKey(source)
 
 	if server.SourceCache != nil {
 		image, _ = server.SourceCache.Get(cacheKey)
@@ -146,15 +117,7 @@ func (server *Server) convertImage(sourceImage *Image, parameters Parameters) (i
 	return
 }
 
-func (server *Server) sendImage(writer http.ResponseWriter, image *Image) {
-	if len(image.Type) > 0 {
-		writer.Header().Set("Content-Type", "image/"+image.Type)
-	}
-
-	writer.Write(image.Data)
-}
-
-func hashCacheKey(key string) string {
+func (server *Server) hashCacheKey(key string) string {
 	hash := md5.New()
 	io.WriteString(hash, key)
 	data := hash.Sum(nil)

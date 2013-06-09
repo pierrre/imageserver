@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-type SourceRequestParser struct {
+type SourceParser struct {
 }
 
-func (parser *SourceRequestParser) ParseRequest(request *http.Request) (parameters imageserver.Parameters, err error) {
+func (parser *SourceParser) Parse(request *http.Request) (parameters imageserver.Parameters, err error) {
 	parameters = make(imageserver.Parameters)
 
 	query := request.URL.Query()

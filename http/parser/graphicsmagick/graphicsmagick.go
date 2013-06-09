@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-type GraphicsMagickRequestParser struct {
+type GraphicsMagickParser struct {
 }
 
-func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (parameters imageserver.Parameters, err error) {
+func (parser *GraphicsMagickParser) Parse(request *http.Request) (parameters imageserver.Parameters, err error) {
 	parameters = make(imageserver.Parameters)
 
 	query := request.URL.Query()
@@ -69,7 +69,7 @@ func (parser *GraphicsMagickRequestParser) ParseRequest(request *http.Request) (
 	return
 }
 
-func (parser *GraphicsMagickRequestParser) parseDimension(query url.Values, parameters imageserver.Parameters, dimensionName string) error {
+func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters imageserver.Parameters, dimensionName string) error {
 	dimensionString := query.Get(dimensionName)
 	if len(dimensionString) > 0 {
 		dimension, err := strconv.Atoi(dimensionString)
@@ -84,7 +84,7 @@ func (parser *GraphicsMagickRequestParser) parseDimension(query url.Values, para
 	return nil
 }
 
-func (parser *GraphicsMagickRequestParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameter := query.Get(parameterName)
 	if len(parameter) > 0 {
 		parser.setParameter(parameters, parameterName, parameter)
@@ -92,7 +92,7 @@ func (parser *GraphicsMagickRequestParser) parseString(query url.Values, paramet
 	return nil
 }
 
-func (parser *GraphicsMagickRequestParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameterString := query.Get(parameterName)
 	if len(parameterString) > 0 {
 		var parameter bool
@@ -109,6 +109,6 @@ func (parser *GraphicsMagickRequestParser) parseBool(query url.Values, parameter
 	return nil
 }
 
-func (parser *GraphicsMagickRequestParser) setParameter(parameters imageserver.Parameters, key string, value interface{}) {
+func (parser *GraphicsMagickParser) setParameter(parameters imageserver.Parameters, key string, value interface{}) {
 	parameters.Set("gm."+key, value)
 }
