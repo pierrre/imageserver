@@ -12,6 +12,7 @@ import (
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
 	imageserver_http_parser_merge "github.com/pierrre/imageserver/http/parser/merge"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
+	imageserver_source_cache "github.com/pierrre/imageserver/source/cache"
 	imageserver_source_http "github.com/pierrre/imageserver/source/http"
 	"net/http"
 	"time"
@@ -38,11 +39,13 @@ func main() {
 				Prefix: "converted_",
 				Cache:  cache,
 			},
-			SourceCache: &imageserver_cache_prefix.PrefixCache{
-				Prefix: "source_",
-				Cache:  cache,
+			Source: &imageserver_source_cache.CacheSource{
+				Cache: &imageserver_cache_prefix.PrefixCache{
+					Prefix: "source_",
+					Cache:  cache,
+				},
+				Source: &imageserver_source_http.HttpSource{},
 			},
-			Source: &imageserver_source_http.HttpSource{},
 			Converter: &imageserver_converter_graphicsmagick.GraphicsMagickConverter{
 				Executable: "/usr/local/bin/gm",
 				AllowedFormats: []string{

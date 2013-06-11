@@ -61,6 +61,5 @@ func (parameters Parameters) Hash() string {
 	hash := sha256.New()
 	io.WriteString(hash, fmt.Sprint(parameters))
 	data := hash.Sum(nil)
-	hexaData := hex.EncodeToString(data)
-	return hexaData
+	return hex.EncodeToString(data)
 }

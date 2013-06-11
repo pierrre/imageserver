@@ -1,16 +1,9 @@
 package imageserver
 
-import (
-	"crypto/md5"
-	"encoding/hex"
-	"io"
-)
-
 type Server struct {
-	Cache       Cache
-	SourceCache Cache
-	Source      Source
-	Converter   Converter
+	Cache     Cache
+	Source    Source
+	Converter Converter
 }
 
 func (server *Server) GetImage(parameters Parameters) (image *Image, err error) {
@@ -48,24 +41,9 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 		return
 	}
 
-	cacheKey := server.hashCacheKey(sourceId) //TODO cache source provider
-
-	if server.SourceCache != nil {
-		image, _ = server.SourceCache.Get(cacheKey)
-		if image != nil {
-			return
-		}
-	}
-
 	image, err = server.Source.Get(sourceId)
 	if err != nil {
 		return
-	}
-
-	if server.SourceCache != nil {
-		go func() {
-			_ = server.SourceCache.Set(cacheKey, image)
-		}()
 	}
 
 	return
@@ -79,12 +57,4 @@ func (server *Server) convertImage(sourceImage *Image, parameters Parameters) (i
 	}
 
 	return
-}
-
-func (server *Server) hashCacheKey(key string) string {
-	hash := md5.New()
-	io.WriteString(hash, key)
-	data := hash.Sum(nil)
-	hashedKey := hex.EncodeToString(data)
-	return hashedKey
 }
