@@ -8,6 +8,7 @@ source provider:
     - dispatch (uri scheme)
     - limit concurrent
     - timeout
+    - cache
 converter -> processor
 processor:
     - chain
