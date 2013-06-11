@@ -3,19 +3,13 @@ package imageserver
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"regexp"
 )
-
-var sourceContentTypeHeaderRegexp, _ = regexp.Compile("^image/(.+)$")
 
 type Server struct {
 	Cache       Cache
 	SourceCache Cache
+	Source      Source
 	Converter   Converter
 }
 
@@ -49,13 +43,12 @@ func (server *Server) GetImage(parameters Parameters) (image *Image, err error) 
 }
 
 func (server *Server) getSourceImage(parameters Parameters) (image *Image, err error) {
-	//TODO source provider
-	source, err := parameters.GetString("source")
+	sourceId, err := parameters.GetString("source")
 	if err != nil {
 		return
 	}
 
-	cacheKey := server.hashCacheKey(source) //TODO cache source provider
+	cacheKey := server.hashCacheKey(sourceId) //TODO cache source provider
 
 	if server.SourceCache != nil {
 		image, _ = server.SourceCache.Get(cacheKey)
@@ -64,38 +57,7 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 		}
 	}
 
-	sourceUrl, err := url.ParseRequestURI(source)
-	if err != nil {
-		return
-	}
-	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
-		err = fmt.Errorf("Invalid source scheme")
-		return
-	}
-	source = sourceUrl.String()
-
-	response, err := http.Get(source)
-	if err != nil {
-		return
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != 200 {
-		err = fmt.Errorf("Error while downloading source")
-		return
-	}
-
-	image = &Image{}
-
-	contentType := response.Header.Get("Content-Type")
-	if len(contentType) > 0 {
-		matches := sourceContentTypeHeaderRegexp.FindStringSubmatch(contentType)
-		if matches != nil && len(matches) == 2 {
-			image.Type = matches[1]
-		}
-	}
-
-	image.Data, err = ioutil.ReadAll(response.Body)
+	image, err = server.Source.Get(sourceId)
 	if err != nil {
 		return
 	}
