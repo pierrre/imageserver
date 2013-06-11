@@ -1,5 +1,9 @@
 package imageserver
 
+import (
+	"fmt"
+)
+
 type Server struct {
 	Cache     Cache
 	Source    Source
@@ -36,8 +40,9 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 }
 
 func (server *Server) getSource(parameters Parameters) (image *Image, err error) {
-	sourceId, err := parameters.GetString("source")
-	if err != nil {
+	sourceId, _ := parameters.GetString("source")
+	if len(sourceId) == 0 {
+		err = fmt.Errorf("Source is missing")
 		return
 	}
 
