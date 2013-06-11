@@ -11,6 +11,8 @@ import (
 	"regexp"
 )
 
+var sourceContentTypeHeaderRegexp, _ = regexp.Compile("^image/(.+)$")
+
 type Server struct {
 	Cache       Cache
 	SourceCache Cache
@@ -87,8 +89,7 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 
 	contentType := response.Header.Get("Content-Type")
 	if len(contentType) > 0 {
-		r, _ := regexp.Compile("image/(.+)")
-		matches := r.FindStringSubmatch(contentType)
+		matches := sourceContentTypeHeaderRegexp.FindStringSubmatch(contentType)
 		if matches != nil && len(matches) == 2 {
 			image.Type = matches[1]
 		}
