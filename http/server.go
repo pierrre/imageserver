@@ -43,7 +43,7 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	image, err := server.ImageServer.GetImage(parameters)
+	image, err := server.ImageServer.Get(parameters)
 
 	if err != nil {
 		server.sendError(writer, err)

@@ -6,7 +6,7 @@ type Server struct {
 	Converter Converter
 }
 
-func (server *Server) GetImage(parameters Parameters) (image *Image, err error) {
+func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 	cacheKey := parameters.Hash()
 
 	if server.Cache != nil {
@@ -16,12 +16,12 @@ func (server *Server) GetImage(parameters Parameters) (image *Image, err error) 
 		}
 	}
 
-	sourceImage, err := server.getSourceImage(parameters)
+	sourceImage, err := server.getSource(parameters)
 	if err != nil {
 		return
 	}
 
-	image, err = server.convertImage(sourceImage, parameters)
+	image, err = server.convert(sourceImage, parameters)
 	if err != nil {
 		return
 	}
@@ -35,7 +35,7 @@ func (server *Server) GetImage(parameters Parameters) (image *Image, err error) 
 	return
 }
 
-func (server *Server) getSourceImage(parameters Parameters) (image *Image, err error) {
+func (server *Server) getSource(parameters Parameters) (image *Image, err error) {
 	sourceId, err := parameters.GetString("source")
 	if err != nil {
 		return
@@ -49,7 +49,7 @@ func (server *Server) getSourceImage(parameters Parameters) (image *Image, err e
 	return
 }
 
-func (server *Server) convertImage(sourceImage *Image, parameters Parameters) (image *Image, err error) {
+func (server *Server) convert(sourceImage *Image, parameters Parameters) (image *Image, err error) {
 	if server.Converter != nil {
 		image, err = server.Converter.Convert(sourceImage, parameters)
 	} else {
