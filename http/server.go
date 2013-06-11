@@ -12,7 +12,7 @@ type Server struct {
 	ImageServer imageserver.Server
 }
 
-func (server *Server) Run() {
+func (server *Server) Serve() {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc("/", server.handleHttpRequest)
 	server.HttpServer.Handler = serveMux

@@ -54,5 +54,5 @@ func main() {
 			},
 		},
 	}
-	server.Run()
+	server.Serve()
 }
