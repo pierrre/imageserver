@@ -13,6 +13,7 @@ import (
 	imageserver_http_parser_merge "github.com/pierrre/imageserver/http/parser/merge"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -53,6 +54,7 @@ func main() {
 				},
 			},
 		},
+		ExpiresDuration: time.Duration(7 * 24 * time.Hour),
 	}
 	server.Serve()
 }

@@ -4,12 +4,17 @@ import (
 	"fmt"
 	"github.com/pierrre/imageserver"
 	"net/http"
+	"time"
 )
+
+var expiresLocation, _ = time.LoadLocation("GMT")
 
 type Server struct {
 	HttpServer  *http.Server
 	Parser      Parser
 	ImageServer *imageserver.Server
+
+	ExpiresDuration time.Duration
 }
 
 func (server *Server) Serve() {
@@ -49,6 +54,15 @@ func (server *Server) getImage(request *http.Request) (image *imageserver.Image,
 func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image) {
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
+	}
+
+	writer.Header().Set("Cache-Control", "public")
+
+	if server.ExpiresDuration != 0 {
+		t := time.Now()
+		t = t.Add(server.ExpiresDuration)
+		t = t.In(expiresLocation)
+		writer.Header().Set("Expires", t.Format(time.RFC1123))
 	}
 
 	writer.Write(image.Data)
