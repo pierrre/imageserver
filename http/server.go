@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"github.com/pierrre/imageserver"
 	"net/http"
+	"regexp"
 	"time"
 )
+
+var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresLocation, _ = time.LoadLocation("GMT")
 
@@ -25,33 +28,47 @@ func (server *Server) Serve() {
 }
 
 func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
-	image, err := server.getImage(request)
+	if request.Method != "GET" {
+		server.sendError(writer, fmt.Errorf("Invalid request method"))
+		return
+	}
+
+	parameters, err := server.Parser.Parse(request)
+	if err != nil {
+		server.sendError(writer, err)
+		return
+	}
+
+	if server.checkNotModified(writer, request, parameters) {
+		return
+	}
+
+	image, err := server.ImageServer.GetImage(parameters)
 
 	if err != nil {
 		server.sendError(writer, err)
 		return
 	}
 
-	server.sendImage(writer, image)
+	server.sendImage(writer, image, parameters)
 }
 
-func (server *Server) getImage(request *http.Request) (image *imageserver.Image, err error) {
-	if request.Method != "GET" {
-		err = fmt.Errorf("Invalid request method")
-		return
+func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
+	inmHeader := request.Header.Get("If-None-Match")
+	if len(inmHeader) > 0 {
+		matches := inmHeaderRegexp.FindStringSubmatch(inmHeader)
+		if matches != nil && len(matches) == 2 {
+			inm := matches[1]
+			if inm == parameters.Hash() {
+				writer.WriteHeader(304)
+				return true
+			}
+		}
 	}
-
-	parameters, err := server.Parser.Parse(request)
-	if err != nil {
-		return
-	}
-
-	image, err = server.ImageServer.GetImage(parameters)
-
-	return
+	return false
 }
 
-func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image) {
+func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image, parameters imageserver.Parameters) {
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
 	}
@@ -64,6 +81,8 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 		t = t.In(expiresLocation)
 		writer.Header().Set("Expires", t.Format(time.RFC1123))
 	}
+
+	writer.Header().Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
 
 	writer.Write(image.Data)
 }
