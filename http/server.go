@@ -10,7 +10,7 @@ import (
 
 var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
-var expiresLocation, _ = time.LoadLocation("GMT")
+var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 type Server struct {
 	HttpServer  *http.Server
@@ -78,7 +78,7 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 	if server.ExpiresDuration != 0 {
 		t := time.Now()
 		t = t.Add(server.ExpiresDuration)
-		t = t.In(expiresLocation)
+		t = t.In(expiresHeaderLocation)
 		writer.Header().Set("Expires", t.Format(time.RFC1123))
 	}
 
