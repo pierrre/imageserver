@@ -18,7 +18,7 @@ type Server struct {
 }
 
 func (server *Server) GetImage(parameters Parameters) (image *Image, err error) {
-	cacheKey := server.hashCacheKey(fmt.Sprint(parameters))
+	cacheKey := parameters.Hash()
 
 	if server.Cache != nil {
 		image, err = server.Cache.Get(cacheKey)
@@ -47,12 +47,13 @@ func (server *Server) GetImage(parameters Parameters) (image *Image, err error) 
 }
 
 func (server *Server) getSourceImage(parameters Parameters) (image *Image, err error) {
+	//TODO source provider
 	source, err := parameters.GetString("source")
 	if err != nil {
 		return
 	}
 
-	cacheKey := server.hashCacheKey(source)
+	cacheKey := server.hashCacheKey(source) //TODO cache source provider
 
 	if server.SourceCache != nil {
 		image, _ = server.SourceCache.Get(cacheKey)

@@ -1,7 +1,10 @@
 package imageserver
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 )
 
 type Parameters map[string]interface{}
@@ -52,4 +55,12 @@ func (parameters Parameters) GetBool(key string) (value bool, err error) {
 		err = fmt.Errorf("Not a bool")
 	}
 	return
+}
+
+func (parameters Parameters) Hash() string {
+	hash := sha256.New()
+	io.WriteString(hash, fmt.Sprint(parameters))
+	data := hash.Sum(nil)
+	hexaData := hex.EncodeToString(data)
+	return hexaData
 }
