@@ -23,15 +23,15 @@ func main() {
 		},
 	}
 
-	server := imageserver_http.Server{
-		HttpServer: http.Server{
+	server := &imageserver_http.Server{
+		HttpServer: &http.Server{
 			Addr: ":8080",
 		},
-		Parser: imageserver_http_parser_merge.MergeParser{
+		Parser: &imageserver_http_parser_merge.MergeParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
-		ImageServer: imageserver.Server{
+		ImageServer: &imageserver.Server{
 			Cache: &imageserver_cache_prefix.PrefixCache{
 				Prefix: "converted_",
 				Cache:  cache,

@@ -7,9 +7,9 @@ import (
 )
 
 type Server struct {
-	HttpServer  http.Server
+	HttpServer  *http.Server
 	Parser      Parser
-	ImageServer imageserver.Server
+	ImageServer *imageserver.Server
 }
 
 func (server *Server) Serve() {
