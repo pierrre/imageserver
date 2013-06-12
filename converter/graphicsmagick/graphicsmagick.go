@@ -47,6 +47,11 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageserver.Image
 		return
 	}
 
+	if len(arguments) == 1 {
+		image = sourceImage
+		return
+	}
+
 	tempDir, err := ioutil.TempDir(converter.TempDir, "imageserver_")
 	if err != nil {
 		return
@@ -78,7 +83,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageserver.Image
 	image.Data = data
 	image.Type = format
 
-	return image, nil
+	return
 }
 
 func (converter *GraphicsMagickConverter) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
@@ -205,6 +210,10 @@ func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, par
 
 	quality, _ := parameters.GetString("gm.quality")
 
+	if len(quality) == 0 && len(arguments) == 1 {
+		return
+	}
+
 	if len(quality) == 0 && converter.DefaultQualities != nil {
 		if q, ok := converter.DefaultQualities[format]; ok {
 			quality = q
@@ -229,6 +238,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, par
 				return
 			}
 		}
+
 		arguments = append(arguments, "-quality", quality)
 	}
 
