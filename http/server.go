@@ -5,6 +5,7 @@ import (
 	"github.com/pierrre/imageserver"
 	"net/http"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -69,6 +70,8 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 }
 
 func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image, parameters imageserver.Parameters) {
+	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
+
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
 	}
