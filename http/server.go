@@ -61,7 +61,7 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 		if matches != nil && len(matches) == 2 {
 			inm := matches[1]
 			if inm == parameters.Hash() {
-				writer.WriteHeader(304)
+				writer.WriteHeader(http.StatusNotModified)
 				return true
 			}
 		}
