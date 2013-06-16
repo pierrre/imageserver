@@ -1,5 +1,5 @@
 package imageserver
 
 type Processor interface {
-	Process(image *Image, parameters Parameters) (*Image, error)
+	Process(inImage *Image, parameters Parameters) (image *Image, err error)
 }

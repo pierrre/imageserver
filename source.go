@@ -1,5 +1,5 @@
 package imageserver
 
 type Source interface {
-	Get(sourceId string) (*Image, error)
+	Get(sourceId string) (image *Image, err error)
 }
