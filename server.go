@@ -7,7 +7,7 @@ import (
 type Server struct {
 	Cache     Cache
 	Source    Source
-	Converter Converter
+	Processor Processor
 }
 
 func (server *Server) Get(parameters Parameters) (image *Image, err error) {
@@ -25,7 +25,7 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 		return
 	}
 
-	image, err = server.convert(sourceImage, parameters)
+	image, err = server.process(sourceImage, parameters)
 	if err != nil {
 		return
 	}
@@ -54,9 +54,9 @@ func (server *Server) getSource(parameters Parameters) (image *Image, err error)
 	return
 }
 
-func (server *Server) convert(sourceImage *Image, parameters Parameters) (image *Image, err error) {
-	if server.Converter != nil {
-		image, err = server.Converter.Convert(sourceImage, parameters)
+func (server *Server) process(sourceImage *Image, parameters Parameters) (image *Image, err error) {
+	if server.Processor != nil {
+		image, err = server.Processor.Process(sourceImage, parameters)
 	} else {
 		image = sourceImage
 	}

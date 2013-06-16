@@ -10,14 +10,14 @@ import (
 	"strconv"
 )
 
-type GraphicsMagickConverter struct {
+type GraphicsMagickProcessor struct {
 	Executable       string
 	TempDir          string
 	AllowedFormats   []string
 	DefaultQualities map[string]string
 }
 
-func (converter *GraphicsMagickConverter) Convert(sourceImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	var arguments []string
 
 	arguments = append(arguments, "mogrify")
@@ -86,7 +86,7 @@ func (converter *GraphicsMagickConverter) Convert(sourceImage *imageserver.Image
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
+func (converter *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
 	arguments = in
 
 	width, _ = parameters.GetInt("gm.width")
@@ -134,7 +134,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsResize(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsBackground(in []string, parameters imageserver.Parameters) (arguments []string, err error) {
+func (converter *GraphicsMagickProcessor) buildArgumentsBackground(in []string, parameters imageserver.Parameters) (arguments []string, err error) {
 	arguments = in
 
 	background, _ := parameters.GetString("gm.background")
@@ -158,7 +158,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsBackground(in []string, 
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsExtent(in []string, parameters imageserver.Parameters, width int, height int) (arguments []string, err error) {
+func (converter *GraphicsMagickProcessor) buildArgumentsExtent(in []string, parameters imageserver.Parameters, width int, height int) (arguments []string, err error) {
 	arguments = in
 
 	if width != 0 && height != 0 {
@@ -171,7 +171,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsExtent(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
+func (converter *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
 	arguments = in
 
 	format, _ = parameters.GetString("gm.format")
@@ -205,7 +205,7 @@ func (converter *GraphicsMagickConverter) buildArgumentsFormat(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickConverter) buildArgumentsQuality(in []string, parameters imageserver.Parameters, format string) (arguments []string, err error) {
+func (converter *GraphicsMagickProcessor) buildArgumentsQuality(in []string, parameters imageserver.Parameters, format string) (arguments []string, err error) {
 	arguments = in
 
 	quality, _ := parameters.GetString("gm.quality")
