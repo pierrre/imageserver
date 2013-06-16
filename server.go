@@ -14,7 +14,7 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 	cacheKey := parameters.Hash()
 
 	if server.Cache != nil {
-		image, err = server.Cache.Get(cacheKey)
+		image, err = server.Cache.Get(cacheKey, parameters)
 		if err == nil {
 			return
 		}
@@ -32,7 +32,7 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 
 	if server.Cache != nil {
 		go func() {
-			_ = server.Cache.Set(cacheKey, image)
+			_ = server.Cache.Set(cacheKey, image, parameters)
 		}()
 	}
 
@@ -46,7 +46,7 @@ func (server *Server) getSource(parameters Parameters) (image *Image, err error)
 		return
 	}
 
-	image, err = server.Source.Get(sourceId)
+	image, err = server.Source.Get(sourceId, parameters)
 	if err != nil {
 		return
 	}

@@ -14,7 +14,7 @@ var sourceContentTypeHeaderRegexp, _ = regexp.Compile("^image/(.+)$")
 type HttpSource struct {
 }
 
-func (source *HttpSource) Get(sourceId string) (image *imageserver.Image, err error) {
+func (source *HttpSource) Get(sourceId string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	sourceId, err = source.validate(sourceId)
 	if err != nil {
 		return

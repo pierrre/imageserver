@@ -16,7 +16,7 @@ func New(capacity uint64) *MemoryCache {
 	}
 }
 
-func (cache *MemoryCache) Get(key string) (image *imageserver.Image, err error) {
+func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
 		err = fmt.Errorf("Image not found")
@@ -31,7 +31,7 @@ func (cache *MemoryCache) Get(key string) (image *imageserver.Image, err error) 
 	return
 }
 
-func (cache *MemoryCache) Set(key string, image *imageserver.Image) (err error) {
+func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
 	item := &item{
 		image: image,
 	}

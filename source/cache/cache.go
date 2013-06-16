@@ -12,21 +12,21 @@ type CacheSource struct {
 	Source imageserver.Source
 }
 
-func (source *CacheSource) Get(sourceId string) (image *imageserver.Image, err error) {
+func (source *CacheSource) Get(sourceId string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	cacheKey := source.getCacheKey(sourceId)
 
-	image, e := source.Cache.Get(cacheKey)
+	image, e := source.Cache.Get(cacheKey, parameters)
 	if e == nil {
 		return
 	}
 
-	image, err = source.Source.Get(sourceId)
+	image, err = source.Source.Get(sourceId, parameters)
 	if err != nil {
 		return
 	}
 
 	go func() {
-		_ = source.Cache.Set(cacheKey, image)
+		_ = source.Cache.Set(cacheKey, image, parameters)
 	}()
 
 	return

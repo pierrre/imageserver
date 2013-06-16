@@ -9,7 +9,7 @@ type MemcacheCache struct {
 	Memcache *memcache_impl.Client
 }
 
-func (cache *MemcacheCache) Get(key string) (image *imageserver.Image, err error) {
+func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	item, err := cache.Memcache.Get(key)
 	if err != nil {
 		return
@@ -22,7 +22,7 @@ func (cache *MemcacheCache) Get(key string) (image *imageserver.Image, err error
 	return
 }
 
-func (cache *MemcacheCache) Set(key string, image *imageserver.Image) (err error) {
+func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
 	serialized, err := image.Serialize()
 	if err != nil {
 		return
