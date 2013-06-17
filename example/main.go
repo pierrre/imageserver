@@ -59,7 +59,7 @@ func main() {
 				},
 			},
 		},
-		ExpiresDuration: time.Duration(7 * 24 * time.Hour),
+		Expire: time.Duration(7 * 24 * time.Hour),
 	}
 	server.Serve()
 }
