@@ -11,9 +11,7 @@ import (
 type GraphicsMagickParser struct {
 }
 
-func (parser *GraphicsMagickParser) Parse(request *http.Request) (parameters imageserver.Parameters, err error) {
-	parameters = make(imageserver.Parameters)
-
+func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) (err error) {
 	query := request.URL.Query()
 
 	err = parser.parseDimension(query, parameters, "width")
