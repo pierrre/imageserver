@@ -15,7 +15,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 		return
 	}
 	image = &imageserver.Image{}
-	err = image.Unserialize(item.Value)
+	err = image.Unmarshal(item.Value)
 	if err != nil {
 		image = nil
 	}
@@ -23,13 +23,13 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 }
 
 func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
-	serialized, err := image.Serialize()
+	data, err := image.Marshal()
 	if err != nil {
 		return
 	}
 	item := &memcache_impl.Item{
 		Key:   key,
-		Value: serialized,
+		Value: data,
 	}
 	err = cache.Memcache.Set(item)
 	return

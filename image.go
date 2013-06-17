@@ -10,8 +10,8 @@ type Image struct {
 	Data []byte
 }
 
-func (image *Image) Serialize() (serialized []byte, err error) {
-	buffer := bytes.NewBuffer([]byte{})
+func (image *Image) Marshal() (serialized []byte, err error) {
+	buffer := bytes.NewBuffer(make([]byte, 0))
 	encoder := gob.NewEncoder(buffer)
 	err = encoder.Encode(image)
 	if err != nil {
@@ -21,7 +21,7 @@ func (image *Image) Serialize() (serialized []byte, err error) {
 	return
 }
 
-func (image *Image) Unserialize(data []byte) error {
+func (image *Image) Unmarshal(data []byte) error {
 	buffer := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(buffer)
 	err := decoder.Decode(image)

@@ -12,12 +12,12 @@ type RedisCache struct {
 func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	conn := redis.Pool.Get()
 	defer conn.Close()
-	serialized, err := redigo.Bytes(conn.Do("GET", key))
+	data, err := redigo.Bytes(conn.Do("GET", key))
 	if err != nil {
 		return
 	}
 	image = &imageserver.Image{}
-	err = image.Unserialize(serialized)
+	err = image.Unmarshal(data)
 	if err != nil {
 		image = nil
 		return
@@ -26,13 +26,13 @@ func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (ima
 }
 
 func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
-	serialized, err := image.Serialize()
+	data, err := image.Marshal()
 	if err != nil {
 		return
 	}
 	conn := redis.Pool.Get()
 	defer conn.Close()
-	_, err = conn.Do("SET", key, serialized)
+	_, err = conn.Do("SET", key, data)
 	if err != nil {
 		return
 	}
