@@ -18,7 +18,7 @@ type Server struct {
 	Parser      Parser
 	ImageServer *imageserver.Server
 
-	Expires time.Duration
+	Expire time.Duration
 }
 
 func (server *Server) Serve() {
@@ -78,9 +78,9 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 
 	writer.Header().Set("Cache-Control", "public")
 
-	if server.Expires != 0 {
+	if server.Expire != 0 {
 		t := time.Now()
-		t = t.Add(server.Expires)
+		t = t.Add(server.Expire)
 		t = t.In(expiresHeaderLocation)
 		writer.Header().Set("Expires", t.Format(time.RFC1123))
 	}
