@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"fmt"
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	"strconv"
