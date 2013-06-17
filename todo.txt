@@ -1,16 +1,13 @@
 thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
 error management
-redis cache
 
 source provider:
     - dispatch (uri scheme)
     - limit concurrent
     - timeout
-converter -> processor
 processor:
     - chain
     - limit concurrent
     - timeout
 regroup requests
-source + converter timeout?
 config?
