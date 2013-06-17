@@ -1,12 +1,12 @@
 package main
 
 import (
-	memcache_impl "github.com/bradfitz/gomemcache/memcache"
+	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache_chain "github.com/pierrre/imageserver/cache/chain"
-	imageserver_cache_memcache "github.com/pierrre/imageserver/cache/memcache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_prefix "github.com/pierrre/imageserver/cache/prefix"
+	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
 	imageserver_http_parser_merge "github.com/pierrre/imageserver/http/parser/merge"
@@ -21,8 +21,14 @@ import (
 func main() {
 	cache := imageserver_cache_chain.ChainCache{
 		imageserver_cache_memory.New(10 * 1024 * 1024),
-		&imageserver_cache_memcache.MemcacheCache{
-			Memcache: memcache_impl.New("localhost:11211"),
+		&imageserver_cache_redis.RedisCache{
+			Pool: &redigo.Pool{
+				Dial: func() (redigo.Conn, error) {
+					return redigo.Dial("tcp", "localhost:6379")
+				},
+				MaxIdle: 50,
+			},
+			Expire: time.Duration(7 * 24 * time.Hour),
 		},
 	}
 
