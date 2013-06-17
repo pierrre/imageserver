@@ -1,12 +1,17 @@
 package redis
 
 import (
+	"fmt"
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
+	"strconv"
+	"time"
 )
 
 type RedisCache struct {
 	Pool *redigo.Pool
+
+	Expire time.Duration
 }
 
 func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
@@ -16,10 +21,6 @@ func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (ima
 	}
 	image = &imageserver.Image{}
 	err = image.Unmarshal(data)
-	if err != nil {
-		image = nil
-		return
-	}
 	return
 }
 
@@ -35,11 +36,12 @@ func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	if err != nil {
 		return
 	}
+	params := []interface{}{key, data}
+	if redis.Expire != 0 {
+		params = append(params, "EX", strconv.Itoa(int(redis.Expire.Seconds())))
+	}
 	conn := redis.Pool.Get()
 	defer conn.Close()
-	_, err = conn.Do("SET", key, data)
-	if err != nil {
-		return
-	}
+	_, err = conn.Do("SET", params...)
 	return
 }
