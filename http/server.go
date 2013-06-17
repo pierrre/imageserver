@@ -24,6 +24,7 @@ type Server struct {
 func (server *Server) Serve() {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc("/", server.handleHttpRequest)
+	serveMux.HandleFunc("/_ping", server.handleHttpRequestPing)
 	server.HttpServer.Handler = serveMux
 	server.HttpServer.ListenAndServe()
 }
@@ -92,4 +93,8 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
 	http.Error(writer, err.Error(), http.StatusBadRequest)
+}
+
+func (server *Server) handleHttpRequestPing(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(200)
 }
