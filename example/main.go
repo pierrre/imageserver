@@ -42,12 +42,12 @@ func main() {
 		},
 		ImageServer: &imageserver.Server{
 			Cache: &imageserver_cache_prefix.PrefixCache{
-				Prefix: "converted_",
+				Prefix: "processed:",
 				Cache:  cache,
 			},
 			Source: &imageserver_source_cache.CacheSource{
 				Cache: &imageserver_cache_prefix.PrefixCache{
-					Prefix: "source_",
+					Prefix: "source:",
 					Cache:  cache,
 				},
 				Source: &imageserver_source_http.HttpSource{},
