@@ -15,7 +15,9 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 		return
 	}
 	image = &imageserver.Image{}
-	err = image.Unmarshal(item.Value)
+	if err = image.Unmarshal(item.Value); err != nil {
+		image = nil
+	}
 	return
 }
 
