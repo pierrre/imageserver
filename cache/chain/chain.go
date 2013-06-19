@@ -9,8 +9,7 @@ type ChainCache []imageserver.Cache
 
 func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	for i, c := range cache {
-		image, err := c.Get(key, parameters)
-		if err == nil {
+		if image, err := c.Get(key, parameters); err == nil {
 			if i > 0 {
 				cache.setCaches(key, image, parameters, i)
 			}
@@ -28,11 +27,11 @@ func (cache ChainCache) setCaches(key string, image *imageserver.Image, paramete
 	}
 }
 
-func (cache ChainCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
+func (cache ChainCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	for _, c := range cache {
 		go func(c imageserver.Cache) {
 			c.Set(key, image, parameters)
 		}(c)
 	}
-	return
+	return nil
 }
