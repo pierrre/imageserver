@@ -16,7 +16,7 @@ func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*ima
 			return image, nil
 		}
 	}
-	return nil, fmt.Errorf("Image not found in chained cache")
+	return nil, fmt.Errorf("Not found")
 }
 
 func (cache ChainCache) setCaches(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) {
