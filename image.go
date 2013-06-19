@@ -10,14 +10,14 @@ type Image struct {
 	Data []byte
 }
 
-func (image *Image) Marshal() (serialized []byte, err error) {
-	buffer := bytes.NewBuffer(make([]byte, 0))
+func (image *Image) Marshal() (data []byte, err error) {
+	buffer := &bytes.Buffer{}
 	encoder := gob.NewEncoder(buffer)
 	err = encoder.Encode(image)
 	if err != nil {
 		return
 	}
-	serialized = buffer.Bytes()
+	data = buffer.Bytes()
 	return
 }
 
