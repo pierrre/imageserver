@@ -19,15 +19,16 @@ func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (ima
 		return
 	}
 	image = &imageserver.Image{}
-	err = image.Unmarshal(data)
+	if err = image.Unmarshal(data); err != nil {
+		image = nil
+	}
 	return
 }
 
-func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) (data []byte, err error) {
+func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) ([]byte, error) {
 	conn := redis.Pool.Get()
 	defer conn.Close()
-	data, err = redigo.Bytes(conn.Do("GET", key))
-	return
+	return redigo.Bytes(conn.Do("GET", key))
 }
 
 func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
