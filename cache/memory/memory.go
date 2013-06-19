@@ -19,14 +19,10 @@ func New(capacity uint64) *MemoryCache {
 func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		err = fmt.Errorf("Image not found")
+		err = fmt.Errorf("Not found")
 		return
 	}
-	item, ok := value.(*item)
-	if !ok {
-		err = fmt.Errorf("The cache value is not an image")
-		return
-	}
+	item := value.(*item)
 	image = item.image
 	return
 }
