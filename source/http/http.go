@@ -15,27 +15,20 @@ type HttpSource struct {
 }
 
 func (source *HttpSource) Get(sourceId string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
-	sourceId, err = source.validate(sourceId)
-	if err != nil {
+	if sourceId, err = source.validate(sourceId); err != nil {
 		return
 	}
-
 	response, err := source.request(sourceId)
 	if err != nil {
 		return
 	}
 	defer response.Body.Close()
-
-	err = source.checkResponse(response)
-	if err != nil {
+	if err = source.checkResponse(response); err != nil {
 		return
 	}
-
-	image, err = source.createImage(response)
-	if err != nil {
+	if image, err = source.createImage(response); err != nil {
 		return
 	}
-
 	return
 }
 
@@ -44,14 +37,11 @@ func (source *HttpSource) validate(sourceIdIn string) (sourceIdOut string, err e
 	if err != nil {
 		return
 	}
-
 	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
-		err = fmt.Errorf("Invalid source scheme")
+		err = fmt.Errorf("Invalid scheme")
 		return
 	}
-
 	sourceIdOut = sourceUrl.String()
-
 	return
 }
 
@@ -62,22 +52,18 @@ func (source *HttpSource) request(sourceId string) (response *http.Response, err
 
 func (source *HttpSource) checkResponse(response *http.Response) error {
 	if response.StatusCode != 200 {
-		return fmt.Errorf("Error while downloading source")
+		return fmt.Errorf("Error while downloading")
 	}
-
 	return nil
 }
 
 func (source *HttpSource) createImage(response *http.Response) (image *imageserver.Image, err error) {
 	image = &imageserver.Image{}
-
 	source.parseType(response, image)
-
-	err = source.parseData(response, image)
-	if err != nil {
+	if err = source.parseData(response, image); err != nil {
+		image = nil
 		return
 	}
-
 	return
 }
 
