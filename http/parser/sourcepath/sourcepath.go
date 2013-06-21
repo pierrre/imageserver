@@ -14,6 +14,6 @@ func (parser *SourcePathParser) Parse(request *http.Request, parameters imageser
 	s := *parser.Base
 	source := &s
 	source.Path += request.URL.Path
-	parameters.Set("source", source.String())
+	parameters.Set("source", source)
 	return
 }
