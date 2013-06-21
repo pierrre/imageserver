@@ -6,7 +6,7 @@ import (
 
 type Server struct {
 	Cache     Cache
-	Source    Source
+	Provider  Provider
 	Processor Processor
 }
 
@@ -46,7 +46,7 @@ func (server *Server) getSource(parameters Parameters) (image *Image, err error)
 		return
 	}
 
-	image, err = server.Source.Get(sourceId, parameters)
+	image, err = server.Provider.Get(sourceId, parameters)
 	if err != nil {
 		return
 	}
