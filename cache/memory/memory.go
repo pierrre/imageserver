@@ -27,12 +27,12 @@ func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (im
 	return
 }
 
-func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
 	item := &item{
 		image: image,
 	}
 	cache.lru.Set(key, item)
-	return nil
+	return
 }
 
 type item struct {
