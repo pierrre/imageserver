@@ -13,57 +13,36 @@ type GraphicsMagickParser struct {
 
 func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) (err error) {
 	query := request.URL.Query()
-
-	err = parser.parseDimension(query, parameters, "width")
-	if err != nil {
+	if err = parser.parseDimension(query, parameters, "width"); err != nil {
 		return
 	}
-
-	err = parser.parseDimension(query, parameters, "height")
-	if err != nil {
+	if err = parser.parseDimension(query, parameters, "height"); err != nil {
 		return
 	}
-
-	err = parser.parseBool(query, parameters, "fill")
-	if err != nil {
+	if err = parser.parseBool(query, parameters, "fill"); err != nil {
 		return
 	}
-
-	err = parser.parseBool(query, parameters, "ignore_ratio")
-	if err != nil {
+	if err = parser.parseBool(query, parameters, "ignore_ratio"); err != nil {
 		return
 	}
-
-	err = parser.parseBool(query, parameters, "only_shrink_larger")
-	if err != nil {
+	if err = parser.parseBool(query, parameters, "only_shrink_larger"); err != nil {
 		return
 	}
-
-	err = parser.parseBool(query, parameters, "only_enlarge_smaller")
-	if err != nil {
+	if err = parser.parseBool(query, parameters, "only_enlarge_smaller"); err != nil {
 		return
 	}
-
-	err = parser.parseString(query, parameters, "background")
-	if err != nil {
+	if err = parser.parseString(query, parameters, "background"); err != nil {
 		return
 	}
-
-	err = parser.parseBool(query, parameters, "extent")
-	if err != nil {
+	if err = parser.parseBool(query, parameters, "extent"); err != nil {
 		return
 	}
-
-	err = parser.parseString(query, parameters, "format")
-	if err != nil {
+	if err = parser.parseString(query, parameters, "format"); err != nil {
 		return
 	}
-
-	err = parser.parseString(query, parameters, "quality")
-	if err != nil {
+	if err = parser.parseString(query, parameters, "quality"); err != nil {
 		return
 	}
-
 	return
 }
 
