@@ -36,8 +36,7 @@ func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *htt
 	}
 
 	parameters := make(imageserver.Parameters)
-	err := server.Parser.Parse(request, parameters)
-	if err != nil {
+	if err := server.Parser.Parse(request, parameters); err != nil {
 		server.sendError(writer, err)
 		return
 	}
