@@ -61,6 +61,7 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 		if matches != nil && len(matches) == 2 {
 			inm := matches[1]
 			if inm == parameters.Hash() {
+				server.sendHeaderCache(writer, parameters)
 				writer.WriteHeader(http.StatusNotModified)
 				return true
 			}
@@ -70,13 +71,21 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 }
 
 func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image, parameters imageserver.Parameters) {
-	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
+	server.sendHeaderCache(writer, parameters)
 
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
 	}
 
+	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
+
+	writer.Write(image.Data)
+}
+
+func (server *Server) sendHeaderCache(writer http.ResponseWriter, parameters imageserver.Parameters) {
 	writer.Header().Set("Cache-Control", "public")
+
+	writer.Header().Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
 
 	if server.Expire != 0 {
 		t := time.Now()
@@ -84,10 +93,6 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 		t = t.In(expiresHeaderLocation)
 		writer.Header().Set("Expires", t.Format(time.RFC1123))
 	}
-
-	writer.Header().Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
-
-	writer.Write(image.Data)
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
