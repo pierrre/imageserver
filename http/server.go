@@ -14,22 +14,13 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 type Server struct {
-	HttpServer  *http.Server
 	Parser      Parser
 	ImageServer *imageserver.Server
 
 	Expire time.Duration
 }
 
-func (server *Server) Serve() {
-	serveMux := http.NewServeMux()
-	serveMux.HandleFunc("/", server.handleHttpRequest)
-	serveMux.HandleFunc("/_ping", server.handleHttpRequestPing)
-	server.HttpServer.Handler = serveMux
-	server.HttpServer.ListenAndServe()
-}
-
-func (server *Server) handleHttpRequest(writer http.ResponseWriter, request *http.Request) {
+func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" {
 		server.sendError(writer, fmt.Errorf("Invalid request method"))
 		return

@@ -31,41 +31,39 @@ func main() {
 			Expire: time.Duration(7 * 24 * time.Hour),
 		},
 	}
-
-	server := &imageserver_http.Server{
-		HttpServer: &http.Server{
-			Addr: ":8080",
+	imageServer := &imageserver.Server{
+		Cache: &imageserver_cache_prefix.PrefixCache{
+			Prefix: "processed:",
+			Cache:  cache,
 		},
+		Provider: &imageserver_provider_cache.CacheProvider{
+			Cache: &imageserver_cache_prefix.PrefixCache{
+				Prefix: "source:",
+				Cache:  cache,
+			},
+			Provider: &imageserver_provider_http.HttpProvider{},
+		},
+		Processor: &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+			Executable: "/usr/local/bin/gm",
+			AllowedFormats: []string{
+				"jpeg",
+				"png",
+				"bmp",
+				"gif",
+			},
+			DefaultQualities: map[string]string{
+				"jpeg": "85",
+			},
+		},
+	}
+	httpImageServer := &imageserver_http.Server{
 		Parser: &imageserver_http_parser_merge.MergeParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
-		ImageServer: &imageserver.Server{
-			Cache: &imageserver_cache_prefix.PrefixCache{
-				Prefix: "processed:",
-				Cache:  cache,
-			},
-			Provider: &imageserver_provider_cache.CacheProvider{
-				Cache: &imageserver_cache_prefix.PrefixCache{
-					Prefix: "source:",
-					Cache:  cache,
-				},
-				Provider: &imageserver_provider_http.HttpProvider{},
-			},
-			Processor: &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
-				Executable: "/usr/local/bin/gm",
-				AllowedFormats: []string{
-					"jpeg",
-					"png",
-					"bmp",
-					"gif",
-				},
-				DefaultQualities: map[string]string{
-					"jpeg": "85",
-				},
-			},
-		},
-		Expire: time.Duration(7 * 24 * time.Hour),
+		ImageServer: imageServer,
+		Expire:      time.Duration(7 * 24 * time.Hour),
 	}
-	server.Serve()
+	http.HandleFunc("/", httpImageServer.ServeHTTP)
+	http.ListenAndServe(":8080", nil)
 }
