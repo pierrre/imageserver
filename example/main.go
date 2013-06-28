@@ -31,6 +31,7 @@ func main() {
 			Expire: time.Duration(7 * 24 * time.Hour),
 		},
 	}
+
 	imageServer := &imageserver.Server{
 		Cache: &imageserver_cache_prefix.PrefixCache{
 			Prefix: "processed:",
@@ -56,6 +57,7 @@ func main() {
 			},
 		},
 	}
+
 	httpImageServer := &imageserver_http.Server{
 		Parser: &imageserver_http_parser_merge.MergeParser{
 			&imageserver_http_parser_source.SourceParser{},
@@ -64,6 +66,7 @@ func main() {
 		ImageServer: imageServer,
 		Expire:      time.Duration(7 * 24 * time.Hour),
 	}
+
 	http.HandleFunc("/", httpImageServer.ServeHTTP)
 	http.ListenAndServe(":8080", nil)
 }
