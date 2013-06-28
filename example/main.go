@@ -67,6 +67,6 @@ func main() {
 		Expire:      time.Duration(7 * 24 * time.Hour),
 	}
 
-	http.HandleFunc("/", httpImageServer.ServeHTTP)
+	http.Handle("/", httpImageServer)
 	http.ListenAndServe(":8080", nil)
 }
