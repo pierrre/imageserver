@@ -89,7 +89,3 @@ func (server *Server) sendHeaderCache(writer http.ResponseWriter, parameters ima
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
 	http.Error(writer, err.Error(), http.StatusBadRequest)
 }
-
-func (server *Server) handleHttpRequestPing(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(200)
-}
