@@ -13,6 +13,8 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
+var msgInternalError = "Internal error"
+
 type Server struct {
 	Parser      Parser
 	ImageServer *imageserver.Server
@@ -87,5 +89,9 @@ func (server *Server) sendHeaderCache(writer http.ResponseWriter, parameters ima
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
-	http.Error(writer, err.Error(), http.StatusBadRequest)
+	if _, ok := err.(imageserver.Error); ok {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+	} else {
+		http.Error(writer, msgInternalError, http.StatusInternalServerError)
+	}
 }
