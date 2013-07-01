@@ -46,46 +46,55 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 	return
 }
 
-func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters imageserver.Parameters, dimensionName string) error {
-	dimensionString := query.Get(dimensionName)
-	if len(dimensionString) > 0 {
-		dimension, err := strconv.Atoi(dimensionString)
-		if err != nil {
-			return err
-		}
-		if dimension <= 0 {
-			return fmt.Errorf("Invalid %s", dimensionName)
-		}
-		parser.setParameter(parameters, dimensionName, dimension)
+func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters imageserver.Parameters, parameterName string) (err error) {
+	dimensionString := query.Get(parameterName)
+	if len(dimensionString) == 0 {
+		return
 	}
-	return nil
+	dimension, err := strconv.Atoi(dimensionString)
+	if err != nil {
+		err = parser.createParseError(parameterName, "int")
+		return
+	}
+	if dimension <= 0 {
+		err = parser.createError(parameterName, "lower than or equal to zero")
+		return
+	}
+	parser.setParameter(parameters, parameterName, dimension)
+	return
 }
 
-func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) (err error) {
 	parameter := query.Get(parameterName)
-	if len(parameter) > 0 {
-		parser.setParameter(parameters, parameterName, parameter)
+	if len(parameter) == 0 {
+		return
 	}
-	return nil
+	parser.setParameter(parameters, parameterName, parameter)
+	return
 }
 
-func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) (err error) {
 	parameterString := query.Get(parameterName)
-	if len(parameterString) > 0 {
-		var parameter bool
-		switch parameterString {
-		case "0":
-			parameter = false
-		case "1":
-			parameter = true
-		default:
-			return fmt.Errorf("Invalid %s", parameterName)
-		}
-		parser.setParameter(parameters, parameterName, parameter)
+	if len(parameterString) == 0 {
+		return
 	}
-	return nil
+	parameter, err := strconv.ParseBool(parameterString)
+	if err != nil {
+		err = parser.createParseError(parameterName, "bool")
+		return
+	}
+	parser.setParameter(parameters, parameterName, parameter)
+	return
 }
 
 func (parser *GraphicsMagickParser) setParameter(parameters imageserver.Parameters, key string, value interface{}) {
 	parameters.Set("gm."+key, value)
+}
+
+func (parser *GraphicsMagickParser) createError(parameterName string, cause string) *imageserver.Error {
+	return imageserver.NewError(fmt.Sprintf("Invalid %s parameter (%s)", parameterName, cause))
+}
+
+func (parser *GraphicsMagickParser) createParseError(parameterName string, parseType string) *imageserver.Error {
+	return parser.createError(parameterName, fmt.Sprintf("parse %s error", parseType))
 }
