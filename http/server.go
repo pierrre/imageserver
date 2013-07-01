@@ -89,7 +89,7 @@ func (server *Server) sendHeaderCache(writer http.ResponseWriter, parameters ima
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
-	if _, ok := err.(imageserver.Error); ok {
+	if _, ok := err.(*imageserver.Error); ok {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	} else {
 		http.Error(writer, msgInternalError, http.StatusInternalServerError)

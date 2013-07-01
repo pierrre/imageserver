@@ -1,7 +1,15 @@
 package imageserver
 
-type Error string
+type Error struct {
+	text string
+}
 
-func (err Error) Error() string {
-	return string(err)
+func NewError(text string) *Error {
+	return &Error{
+		text: text,
+	}
+}
+
+func (err *Error) Error() string {
+	return err.text
 }
