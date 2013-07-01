@@ -36,6 +36,7 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 func (server *Server) getSource(parameters Parameters) (image *Image, err error) {
 	source, err := parameters.Get("source")
 	if err != nil {
+		err = NewError("Missing source parameter")
 		return
 	}
 
