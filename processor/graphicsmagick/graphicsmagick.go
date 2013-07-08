@@ -10,6 +10,8 @@ import (
 	"strconv"
 )
 
+const tempDirPrefix = "imageserver_"
+
 type GraphicsMagickProcessor struct {
 	Executable       string
 	TempDir          string
@@ -52,7 +54,7 @@ func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return
 	}
 
-	tempDir, err := ioutil.TempDir(converter.TempDir, "imageserver_")
+	tempDir, err := ioutil.TempDir(converter.TempDir, tempDirPrefix)
 	if err != nil {
 		return
 	}
