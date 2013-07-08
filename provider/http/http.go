@@ -39,11 +39,12 @@ func (provider *HttpProvider) getSourceUrl(source interface{}) (sourceUrl *url.U
 	if !ok {
 		sourceUrl, err = url.ParseRequestURI(fmt.Sprint(source))
 		if err != nil {
+			err = imageserver.NewError("Invalid source url")
 			return
 		}
 	}
 	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
-		err = fmt.Errorf("Invalid scheme")
+		err = imageserver.NewError("Invalid source scheme")
 		return
 	}
 	return
@@ -56,7 +57,7 @@ func (provider *HttpProvider) request(sourceUrl *url.URL) (response *http.Respon
 
 func (provider *HttpProvider) checkResponse(response *http.Response) error {
 	if response.StatusCode != 200 {
-		return fmt.Errorf("Error while downloading")
+		return imageserver.NewError(fmt.Sprintf("Error %d while downloading source", response.StatusCode))
 	}
 	return nil
 }
@@ -81,11 +82,11 @@ func (provider *HttpProvider) parseType(response *http.Response, image *imageser
 	}
 }
 
-func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) error {
+func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) (err error) {
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return
 	}
 	image.Data = data
-	return nil
+	return
 }
