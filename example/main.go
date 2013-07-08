@@ -12,6 +12,7 @@ import (
 	imageserver_http_parser_merge "github.com/pierrre/imageserver/http/parser/merge"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
+	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 	"net/http"
@@ -44,7 +45,7 @@ func main() {
 			},
 			Provider: &imageserver_provider_http.HttpProvider{},
 		},
-		Processor: &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "/usr/local/bin/gm",
 			AllowedFormats: []string{
 				"jpeg",
@@ -55,7 +56,7 @@ func main() {
 			DefaultQualities: map[string]string{
 				"jpeg": "85",
 			},
-		},
+		}),
 	}
 
 	httpImageServer := &imageserver_http.Server{
