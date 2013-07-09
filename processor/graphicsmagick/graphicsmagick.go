@@ -70,6 +70,7 @@ func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	cmd := exec.Command(converter.Executable, arguments...)
 	err = cmd.Run()
 	if err != nil {
+		err = imageserver.NewError("Error during execution of GraphicsMagick")
 		return
 	}
 
@@ -93,13 +94,13 @@ func (converter *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 
 	width, _ = parameters.GetInt("gm.width")
 	if width < 0 {
-		err = fmt.Errorf("Invalid width")
+		err = imageserver.NewError("Invalid width parameter")
 		return
 	}
 
 	height, _ = parameters.GetInt("gm.height")
 	if height < 0 {
-		err = fmt.Errorf("Invalid height")
+		err = imageserver.NewError("Invalid height parameter")
 		return
 	}
 
@@ -143,13 +144,13 @@ func (converter *GraphicsMagickProcessor) buildArgumentsBackground(in []string, 
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			err = fmt.Errorf("Invalid background")
+			err = imageserver.NewError("Invalid background parameter")
 			return
 		}
 
 		for _, r := range background {
 			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				err = fmt.Errorf("Invalid background")
+				err = imageserver.NewError("Invalid background parameter")
 				return
 			}
 		}
@@ -193,7 +194,7 @@ func (converter *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 			}
 		}
 		if !ok {
-			err = fmt.Errorf("Invalid format")
+			err = imageserver.NewError("Invalid format parameter")
 			return
 		}
 	}
@@ -223,20 +224,21 @@ func (converter *GraphicsMagickProcessor) buildArgumentsQuality(in []string, par
 	}
 
 	if len(quality) > 0 {
-		qualityInt, e := strconv.Atoi(quality)
-		if e != nil {
-			err = e
+		var qualityInt int
+		qualityInt, err = strconv.Atoi(quality)
+		if err != nil {
+			err = imageserver.NewError("Invalid quality parameter (parse int error)")
 			return
 		}
 
 		if qualityInt < 0 {
-			err = fmt.Errorf("Invalid quality")
+			err = imageserver.NewError("Invalid quality parameter (less than 0)")
 			return
 		}
 
 		if format == "jpeg" {
 			if qualityInt < 0 || qualityInt > 100 {
-				err = fmt.Errorf("Invalid quality")
+				err = imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
 				return
 			}
 		}
