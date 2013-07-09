@@ -19,32 +19,32 @@ type GraphicsMagickProcessor struct {
 	DefaultQualities map[string]string
 }
 
-func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
 	var arguments []string
 
 	arguments = append(arguments, "mogrify")
 
-	arguments, width, height, err := converter.buildArgumentsResize(arguments, parameters)
+	arguments, width, height, err := processor.buildArgumentsResize(arguments, parameters)
 	if err != nil {
 		return
 	}
 
-	arguments, err = converter.buildArgumentsBackground(arguments, parameters)
+	arguments, err = processor.buildArgumentsBackground(arguments, parameters)
 	if err != nil {
 		return
 	}
 
-	arguments, err = converter.buildArgumentsExtent(arguments, parameters, width, height)
+	arguments, err = processor.buildArgumentsExtent(arguments, parameters, width, height)
 	if err != nil {
 		return
 	}
 
-	arguments, format, hasFileExtension, err := converter.buildArgumentsFormat(arguments, parameters, sourceImage)
+	arguments, format, hasFileExtension, err := processor.buildArgumentsFormat(arguments, parameters, sourceImage)
 	if err != nil {
 		return
 	}
 
-	arguments, err = converter.buildArgumentsQuality(arguments, parameters, format)
+	arguments, err = processor.buildArgumentsQuality(arguments, parameters, format)
 	if err != nil {
 		return
 	}
@@ -54,7 +54,7 @@ func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return
 	}
 
-	tempDir, err := ioutil.TempDir(converter.TempDir, tempDirPrefix)
+	tempDir, err := ioutil.TempDir(processor.TempDir, tempDirPrefix)
 	if err != nil {
 		return
 	}
@@ -67,7 +67,7 @@ func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return
 	}
 
-	cmd := exec.Command(converter.Executable, arguments...)
+	cmd := exec.Command(processor.Executable, arguments...)
 	err = cmd.Run()
 	if err != nil {
 		err = imageserver.NewError("Error during execution of GraphicsMagick")
@@ -89,7 +89,7 @@ func (converter *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	return
 }
 
-func (converter *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
 	arguments = in
 
 	width, _ = parameters.GetInt("gm.width")
@@ -137,7 +137,7 @@ func (converter *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickProcessor) buildArgumentsBackground(in []string, parameters imageserver.Parameters) (arguments []string, err error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsBackground(in []string, parameters imageserver.Parameters) (arguments []string, err error) {
 	arguments = in
 
 	background, _ := parameters.GetString("gm.background")
@@ -161,7 +161,7 @@ func (converter *GraphicsMagickProcessor) buildArgumentsBackground(in []string, 
 	return
 }
 
-func (converter *GraphicsMagickProcessor) buildArgumentsExtent(in []string, parameters imageserver.Parameters, width int, height int) (arguments []string, err error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsExtent(in []string, parameters imageserver.Parameters, width int, height int) (arguments []string, err error) {
 	arguments = in
 
 	if width != 0 && height != 0 {
@@ -174,7 +174,7 @@ func (converter *GraphicsMagickProcessor) buildArgumentsExtent(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
 	arguments = in
 
 	format, _ = parameters.GetString("gm.format")
@@ -185,9 +185,9 @@ func (converter *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 		formatSpecified = false
 	}
 
-	if converter.AllowedFormats != nil {
+	if processor.AllowedFormats != nil {
 		ok := false
-		for _, f := range converter.AllowedFormats {
+		for _, f := range processor.AllowedFormats {
 			if f == format {
 				ok = true
 				break
@@ -208,7 +208,7 @@ func (converter *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 	return
 }
 
-func (converter *GraphicsMagickProcessor) buildArgumentsQuality(in []string, parameters imageserver.Parameters, format string) (arguments []string, err error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsQuality(in []string, parameters imageserver.Parameters, format string) (arguments []string, err error) {
 	arguments = in
 
 	quality, _ := parameters.GetString("gm.quality")
@@ -217,8 +217,8 @@ func (converter *GraphicsMagickProcessor) buildArgumentsQuality(in []string, par
 		return
 	}
 
-	if len(quality) == 0 && converter.DefaultQualities != nil {
-		if q, ok := converter.DefaultQualities[format]; ok {
+	if len(quality) == 0 && processor.DefaultQualities != nil {
+		if q, ok := processor.DefaultQualities[format]; ok {
 			quality = q
 		}
 	}
