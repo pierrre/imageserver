@@ -20,6 +20,8 @@ type Server struct {
 	ImageServer *imageserver.Server
 
 	Expire time.Duration
+
+	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters)
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -44,7 +46,7 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	server.sendImage(writer, image, parameters)
+	server.sendImage(writer, request, parameters, image)
 }
 
 func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
@@ -54,7 +56,7 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 		if matches != nil && len(matches) == 2 {
 			inm := matches[1]
 			if inm == parameters.Hash() {
-				server.sendHeaderCache(writer, parameters)
+				server.sendHeader(writer, request, parameters)
 				writer.WriteHeader(http.StatusNotModified)
 				return true
 			}
@@ -63,8 +65,8 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	return false
 }
 
-func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.Image, parameters imageserver.Parameters) {
-	server.sendHeaderCache(writer, parameters)
+func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) {
+	server.sendHeader(writer, request, parameters)
 
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
@@ -75,16 +77,24 @@ func (server *Server) sendImage(writer http.ResponseWriter, image *imageserver.I
 	writer.Write(image.Data)
 }
 
-func (server *Server) sendHeaderCache(writer http.ResponseWriter, parameters imageserver.Parameters) {
-	writer.Header().Set("Cache-Control", "public")
+func (server *Server) sendHeader(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
+	header := writer.Header()
+	if server.HeaderFunc != nil {
+		server.HeaderFunc(header, request, parameters)
+	}
+	server.sendHeaderCache(header, parameters)
+}
 
-	writer.Header().Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
+func (server *Server) sendHeaderCache(header http.Header, parameters imageserver.Parameters) {
+	header.Set("Cache-Control", "public")
+
+	header.Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
 
 	if server.Expire != 0 {
 		t := time.Now()
 		t = t.Add(server.Expire)
 		t = t.In(expiresHeaderLocation)
-		writer.Header().Set("Expires", t.Format(time.RFC1123))
+		header.Set("Expires", t.Format(time.RFC1123))
 	}
 }
 
