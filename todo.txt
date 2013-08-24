@@ -1,13 +1,18 @@
-thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
-error management
+more tests
+
+cache:
+	- groupcache
 
 source provider:
     - dispatch (uri scheme)
     - limit concurrent
     - timeout
+	
 processor:
     - chain
-    - limit concurrent
     - timeout
+	- native
+	
 regroup requests
-config?
+
+thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
