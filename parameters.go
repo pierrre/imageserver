@@ -7,6 +7,9 @@ import (
 	"io"
 )
 
+// Parameters used for processor, cache, ...
+//
+// This type is a wrapper around map and provides getter and hash methods
 type Parameters map[string]interface{}
 
 func (parameters Parameters) Set(key string, value interface{}) {
@@ -57,6 +60,7 @@ func (parameters Parameters) GetBool(key string) (value bool, err error) {
 	return
 }
 
+// Hash content with sha256 algorithm and returns a string
 func (parameters Parameters) Hash() string {
 	hash := sha256.New()
 	io.WriteString(hash, fmt.Sprint(parameters))
