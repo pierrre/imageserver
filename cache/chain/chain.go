@@ -7,18 +7,18 @@ import (
 
 type ChainCache []imageserver.Cache
 
-func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	for i, c := range cache {
-		image, err = c.Get(key, parameters)
+		image, err := c.Get(key, parameters)
 		if err == nil {
 			if i > 0 {
 				cache.setCaches(key, image, parameters, i)
 			}
-			return
+			return image, nil
 		}
 	}
-	err = fmt.Errorf("Not found")
-	return
+
+	return nil, fmt.Errorf("Not found")
 }
 
 func (cache ChainCache) setCaches(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) {
@@ -29,11 +29,11 @@ func (cache ChainCache) setCaches(key string, image *imageserver.Image, paramete
 	}
 }
 
-func (cache ChainCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
+func (cache ChainCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	for _, c := range cache {
 		go func(c imageserver.Cache) {
 			c.Set(key, image, parameters)
 		}(c)
 	}
-	return
+	return nil
 }

@@ -19,44 +19,43 @@ type GraphicsMagickProcessor struct {
 	DefaultQualities map[string]string
 }
 
-func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	var arguments []string
 
 	arguments = append(arguments, "mogrify")
 
 	arguments, width, height, err := processor.buildArgumentsResize(arguments, parameters)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	arguments, err = processor.buildArgumentsBackground(arguments, parameters)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	arguments, err = processor.buildArgumentsExtent(arguments, parameters, width, height)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	arguments, format, hasFileExtension, err := processor.buildArgumentsFormat(arguments, parameters, sourceImage)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	arguments, err = processor.buildArgumentsQuality(arguments, parameters, format)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	if len(arguments) == 1 {
-		image = sourceImage
-		return
+		return sourceImage, nil
 	}
 
 	tempDir, err := ioutil.TempDir(processor.TempDir, tempDirPrefix)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer os.RemoveAll(tempDir)
 
@@ -64,14 +63,13 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	arguments = append(arguments, file)
 	err = ioutil.WriteFile(file, sourceImage.Data, os.FileMode(0600))
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	cmd := exec.Command(processor.Executable, arguments...)
 	err = cmd.Run()
 	if err != nil {
-		err = imageserver.NewError("Error during execution of GraphicsMagick")
-		return
+		return nil, imageserver.NewError("Error during execution of GraphicsMagick")
 	}
 
 	if hasFileExtension {
@@ -79,14 +77,14 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	}
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	image = &imageserver.Image{}
+	image := &imageserver.Image{}
 	image.Data = data
 	image.Type = format
 
-	return
+	return image, nil
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
@@ -137,33 +135,27 @@ func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 	return
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsBackground(in []string, parameters imageserver.Parameters) (arguments []string, err error) {
-	arguments = in
-
+func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments []string, parameters imageserver.Parameters) ([]string, error) {
 	background, _ := parameters.GetString("gm.background")
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			err = imageserver.NewError("Invalid background parameter")
-			return
+			return nil, imageserver.NewError("Invalid background parameter")
 		}
 
 		for _, r := range background {
 			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				err = imageserver.NewError("Invalid background parameter")
-				return
+				return nil, imageserver.NewError("Invalid background parameter")
 			}
 		}
 
 		arguments = append(arguments, "-background", fmt.Sprintf("#%s", background))
 	}
 
-	return
+	return arguments, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsExtent(in []string, parameters imageserver.Parameters, width int, height int) (arguments []string, err error) {
-	arguments = in
-
+func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments []string, parameters imageserver.Parameters, width int, height int) ([]string, error) {
 	if width != 0 && height != 0 {
 		if extent, _ := parameters.GetBool("gm.extent"); extent {
 			arguments = append(arguments, "-gravity", "center")
@@ -171,7 +163,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsExtent(in []string, para
 		}
 	}
 
-	return
+	return arguments, nil
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
@@ -208,13 +200,11 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 	return
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsQuality(in []string, parameters imageserver.Parameters, format string) (arguments []string, err error) {
-	arguments = in
-
+func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments []string, parameters imageserver.Parameters, format string) ([]string, error) {
 	quality, _ := parameters.GetString("gm.quality")
 
 	if len(quality) == 0 && len(arguments) == 1 {
-		return
+		return arguments, nil
 	}
 
 	if len(quality) == 0 && processor.DefaultQualities != nil {
@@ -224,27 +214,23 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(in []string, par
 	}
 
 	if len(quality) > 0 {
-		var qualityInt int
-		qualityInt, err = strconv.Atoi(quality)
+		qualityInt, err := strconv.Atoi(quality)
 		if err != nil {
-			err = imageserver.NewError("Invalid quality parameter (parse int error)")
-			return
+			return nil, imageserver.NewError("Invalid quality parameter (parse int error)")
 		}
 
 		if qualityInt < 0 {
-			err = imageserver.NewError("Invalid quality parameter (less than 0)")
-			return
+			return nil, imageserver.NewError("Invalid quality parameter (less than 0)")
 		}
 
 		if format == "jpeg" {
 			if qualityInt < 0 || qualityInt > 100 {
-				err = imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
-				return
+				return nil, imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
 			}
 		}
 
 		arguments = append(arguments, "-quality", quality)
 	}
 
-	return
+	return arguments, nil
 }

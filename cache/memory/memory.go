@@ -16,23 +16,22 @@ func New(capacity uint64) *MemoryCache {
 	}
 }
 
-func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		err = fmt.Errorf("Not found")
-		return
+		return nil, fmt.Errorf("Not found")
 	}
 	item := value.(*item)
-	image = item.image
-	return
+	image := item.image
+	return image, nil
 }
 
-func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
+func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	item := &item{
 		image: image,
 	}
 	cache.lru.Set(key, item)
-	return
+	return nil
 }
 
 type item struct {

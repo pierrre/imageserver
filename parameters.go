@@ -16,48 +16,52 @@ func (parameters Parameters) Set(key string, value interface{}) {
 	parameters[key] = value
 }
 
-func (parameters Parameters) Get(key string) (value interface{}, err error) {
-	value, ok := parameters[key]
-	if !ok {
-		err = fmt.Errorf("Value not found")
+func (parameters Parameters) Get(key string) (interface{}, error) {
+	value, found := parameters[key]
+	if !found {
+		err := fmt.Errorf("Value not found")
+		return nil, err
 	}
-	return
+	return value, nil
 }
 
-func (parameters Parameters) GetString(key string) (value string, err error) {
+func (parameters Parameters) GetString(key string) (string, error) {
 	v, err := parameters.Get(key)
 	if err != nil {
-		return
+		return "", err
 	}
 	value, ok := v.(string)
 	if !ok {
 		err = fmt.Errorf("Not a string")
+		return "", err
 	}
-	return
+	return value, nil
 }
 
-func (parameters Parameters) GetInt(key string) (value int, err error) {
+func (parameters Parameters) GetInt(key string) (int, error) {
 	v, err := parameters.Get(key)
 	if err != nil {
-		return
+		return 0, err
 	}
 	value, ok := v.(int)
 	if !ok {
 		err = fmt.Errorf("Not an int")
+		return 0, err
 	}
-	return
+	return value, nil
 }
 
-func (parameters Parameters) GetBool(key string) (value bool, err error) {
+func (parameters Parameters) GetBool(key string) (bool, error) {
 	v, err := parameters.Get(key)
 	if err != nil {
-		return
+		return false, err
 	}
 	value, ok := v.(bool)
 	if !ok {
 		err = fmt.Errorf("Not a bool")
+		return false, err
 	}
-	return
+	return value, nil
 }
 
 // Hash content with sha256 algorithm and returns a string

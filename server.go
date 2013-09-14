@@ -6,22 +6,23 @@ type Server struct {
 	Processor Processor
 }
 
-func (server *Server) Get(parameters Parameters) (image *Image, err error) {
+func (server *Server) Get(parameters Parameters) (*Image, error) {
 	cacheKey := parameters.Hash()
 
 	if server.Cache != nil {
-		if image, err = server.Cache.Get(cacheKey, parameters); err == nil {
-			return
+		if image, err := server.Cache.Get(cacheKey, parameters); err == nil {
+			return image, nil
 		}
 	}
 
 	sourceImage, err := server.getSource(parameters)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if image, err = server.process(sourceImage, parameters); err != nil {
-		return
+	image, err := server.process(sourceImage, parameters)
+	if err != nil {
+		return nil, err
 	}
 
 	if server.Cache != nil {
@@ -30,29 +31,30 @@ func (server *Server) Get(parameters Parameters) (image *Image, err error) {
 		}()
 	}
 
-	return
+	return image, nil
 }
 
-func (server *Server) getSource(parameters Parameters) (image *Image, err error) {
+func (server *Server) getSource(parameters Parameters) (*Image, error) {
 	source, err := parameters.Get("source")
 	if err != nil {
 		err = NewError("Missing source parameter")
-		return
+		return nil, err
 	}
 
-	if image, err = server.Provider.Get(source, parameters); err != nil {
-		return
+	image, err := server.Provider.Get(source, parameters)
+	if err != nil {
+		return nil, err
 	}
 
-	return
+	return image, nil
 }
 
-func (server *Server) process(sourceImage *Image, parameters Parameters) (image *Image, err error) {
-	if server.Processor != nil {
-		image, err = server.Processor.Process(sourceImage, parameters)
-	} else {
-		image = sourceImage
+func (server *Server) process(sourceImage *Image, parameters Parameters) (*Image, error) {
+	if server.Processor == nil {
+		return sourceImage, nil
 	}
 
-	return
+	image, err := server.Processor.Process(sourceImage, parameters)
+
+	return image, err
 }

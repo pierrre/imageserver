@@ -13,16 +13,16 @@ type RedisCache struct {
 	Expire time.Duration
 }
 
-func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	data, err := redis.getData(key, parameters)
 	if err != nil {
-		return
+		return nil, err
 	}
-	image = &imageserver.Image{}
+	image := &imageserver.Image{}
 	if err = image.Unmarshal(data); err != nil {
-		image = nil
+		return nil, err
 	}
-	return
+	return image, nil
 }
 
 func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) ([]byte, error) {
@@ -31,10 +31,10 @@ func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) 
 	return redigo.Bytes(conn.Do("GET", key))
 }
 
-func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) (err error) {
+func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, err := image.Marshal()
 	if err != nil {
-		return
+		return err
 	}
 	params := []interface{}{key, data}
 	if redis.Expire != 0 {
@@ -43,5 +43,8 @@ func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	conn := redis.Pool.Get()
 	defer conn.Close()
 	_, err = conn.Do("SET", params...)
-	return
+	if err != nil {
+		return err
+	}
+	return nil
 }

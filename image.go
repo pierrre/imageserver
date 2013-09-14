@@ -16,20 +16,20 @@ type Image struct {
 }
 
 // Serialize image to bytes
-func (image *Image) Marshal() (data []byte, err error) {
+func (image *Image) Marshal() ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	encoder := gob.NewEncoder(buffer)
-	if err = encoder.Encode(image); err != nil {
-		return
+	if err := encoder.Encode(image); err != nil {
+		return nil, err
 	}
-	data = buffer.Bytes()
-	return
+	data := buffer.Bytes()
+	return data, nil
 }
 
 // Fill image with serialized bytes
-func (image *Image) Unmarshal(data []byte) (err error) {
+func (image *Image) Unmarshal(data []byte) error {
 	buffer := bytes.NewBuffer(data)
 	decoder := gob.NewDecoder(buffer)
-	err = decoder.Decode(image)
-	return
+	err := decoder.Decode(image)
+	return err
 }

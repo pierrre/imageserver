@@ -14,43 +14,42 @@ var contentTypeRegexp, _ = regexp.Compile("^image/(.+)$")
 type HttpProvider struct {
 }
 
-func (provider *HttpProvider) Get(source interface{}, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (provider *HttpProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	sourceUrl, err := provider.getSourceUrl(source)
 	if err != nil {
-		return
+		return nil, err
 	}
 	response, err := provider.request(sourceUrl)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer response.Body.Close()
 	if err = provider.checkResponse(response); err != nil {
-		return
+		return nil, err
 	}
-	image, err = provider.createImage(response)
+	image, err := provider.createImage(response)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return image, nil
 }
 
-func (provider *HttpProvider) getSourceUrl(source interface{}) (sourceUrl *url.URL, err error) {
+func (provider *HttpProvider) getSourceUrl(source interface{}) (*url.URL, error) {
 	sourceUrl, ok := source.(*url.URL)
 	if !ok {
+		var err error
 		sourceUrl, err = url.ParseRequestURI(fmt.Sprint(source))
 		if err != nil {
-			err = imageserver.NewError("Invalid source url")
-			return
+			return nil, imageserver.NewError("Invalid source url")
 		}
 	}
 	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
-		err = imageserver.NewError("Invalid source scheme")
-		return
+		return nil, imageserver.NewError("Invalid source scheme")
 	}
-	return
+	return sourceUrl, nil
 }
 
-func (provider *HttpProvider) request(sourceUrl *url.URL) (response *http.Response, err error) {
+func (provider *HttpProvider) request(sourceUrl *url.URL) (*http.Response, error) {
 	//TODO optional http client
 	return http.Get(sourceUrl.String())
 }
@@ -62,14 +61,13 @@ func (provider *HttpProvider) checkResponse(response *http.Response) error {
 	return nil
 }
 
-func (provider *HttpProvider) createImage(response *http.Response) (image *imageserver.Image, err error) {
-	image = &imageserver.Image{}
+func (provider *HttpProvider) createImage(response *http.Response) (*imageserver.Image, error) {
+	image := &imageserver.Image{}
 	provider.parseType(response, image)
-	if err = provider.parseData(response, image); err != nil {
-		image = nil
-		return
+	if err := provider.parseData(response, image); err != nil {
+		return nil, err
 	}
-	return
+	return image, nil
 }
 
 func (provider *HttpProvider) parseType(response *http.Response, image *imageserver.Image) {
@@ -82,11 +80,11 @@ func (provider *HttpProvider) parseType(response *http.Response, image *imageser
 	}
 }
 
-func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) (err error) {
+func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) error {
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return
+		return err
 	}
 	image.Data = data
-	return
+	return nil
 }

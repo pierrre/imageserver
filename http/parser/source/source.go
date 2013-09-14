@@ -8,11 +8,11 @@ import (
 type SourceParser struct {
 }
 
-func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) (err error) {
+func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	query := request.URL.Query()
 	source := query.Get("source")
 	if len(source) > 0 {
 		parameters.Set("source", source)
 	}
-	return
+	return nil
 }

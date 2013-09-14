@@ -16,7 +16,7 @@ func New(limit uint, processor imageserver.Processor) imageserver.Processor {
 	}
 }
 
-func (processor *LimitProcessor) Process(inImage *imageserver.Image, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (processor *LimitProcessor) Process(inImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	processor.limitChan <- true
 	defer func() {
 		<-processor.limitChan

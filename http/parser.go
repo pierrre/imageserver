@@ -6,5 +6,5 @@ import (
 )
 
 type Parser interface {
-	Parse(request *http.Request, parameters imageserver.Parameters) (err error)
+	Parse(*http.Request, imageserver.Parameters) error
 }

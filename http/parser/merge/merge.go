@@ -8,12 +8,12 @@ import (
 
 type MergeParser []imageserver_http.Parser
 
-func (parser MergeParser) Parse(request *http.Request, parameters imageserver.Parameters) (err error) {
+func (parser MergeParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	for _, subParser := range parser {
-		err = subParser.Parse(request, parameters)
+		err := subParser.Parse(request, parameters)
 		if err != nil {
-			return
+			return err
 		}
 	}
-	return
+	return nil
 }

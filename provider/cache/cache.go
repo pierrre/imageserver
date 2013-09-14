@@ -13,18 +13,20 @@ type CacheProvider struct {
 	Provider imageserver.Provider
 }
 
-func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (image *imageserver.Image, err error) {
+func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	cacheKey := provider.getCacheKey(source)
-	if image, err = provider.Cache.Get(cacheKey, parameters); err == nil {
-		return
+	image, err := provider.Cache.Get(cacheKey, parameters)
+	if err == nil {
+		return image, nil
 	}
-	if image, err = provider.Provider.Get(source, parameters); err != nil {
-		return
+	image, err = provider.Provider.Get(source, parameters)
+	if err != nil {
+		return nil, err
 	}
 	go func() {
 		_ = provider.Cache.Set(cacheKey, image, parameters)
 	}()
-	return
+	return image, nil
 }
 
 func (provider *CacheProvider) getCacheKey(source interface{}) string {
