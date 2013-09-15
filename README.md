@@ -2,6 +2,7 @@
 An image server written in Go (Golang)
 
 ## Features
+- Http server
 - Resize / convert / process (Graphicsmagick)
 - Cache (Redis, Memcache, in memory)
 - Fully modular
