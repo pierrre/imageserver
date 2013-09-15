@@ -6,6 +6,13 @@ An image server written in Go (Golang)
 - Cache (Redis, Memcache, in memory)
 - Fully modular
 
+## Demo
+`http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png`
+![Normal](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png)
+
+`http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=400&format=jpeg&quality=50`
+![Resized jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=400&format=jpeg&quality=50)
+
 ## Usage / Build
 You have to compile/configure your own image server.
 
