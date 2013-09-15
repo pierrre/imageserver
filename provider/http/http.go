@@ -1,3 +1,4 @@
+// Http provider
 package http
 
 import (
@@ -11,6 +12,13 @@ import (
 
 var contentTypeRegexp, _ = regexp.Compile("^image/(.+)$")
 
+// Returns image from an http source
+//
+// If the source is not an url, the string representation of the source will be used to create one.
+//
+// Returns an error if the http status code is not 200 (OK).
+//
+// The image type is determined by the "Content-Type" header.
 type HttpProvider struct {
 }
 
@@ -55,7 +63,7 @@ func (provider *HttpProvider) request(sourceUrl *url.URL) (*http.Response, error
 }
 
 func (provider *HttpProvider) checkResponse(response *http.Response) error {
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		return imageserver.NewError(fmt.Sprintf("Error %d while downloading source", response.StatusCode))
 	}
 	return nil

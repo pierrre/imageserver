@@ -1,3 +1,4 @@
+// Graphics http parser
 package graphicsmagick
 
 import (
@@ -8,6 +9,11 @@ import (
 	"strconv"
 )
 
+// Parser for GraphicsMagick processor's parameters
+//
+// See GraphicsMagickProcessor source for parameters list.
+//
+// All parameters are prefixed with "gm."
 type GraphicsMagickParser struct {
 }
 

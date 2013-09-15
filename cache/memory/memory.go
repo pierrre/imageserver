@@ -1,3 +1,4 @@
+// In memory cache
 package memory
 
 import (
@@ -6,11 +7,13 @@ import (
 	lru_impl "github.com/pierrre/imageserver/cache/memory/lru"
 )
 
+// Uses an LRU implentation from https://github.com/youtube/vitess/blob/master/go/cache/lru_cache.go
 type MemoryCache struct {
 	lru *lru_impl.LRUCache
 }
 
-func New(capacity uint64) *MemoryCache {
+// The capacity is the maximum cache size (in bytes)
+func New(capacity int64) *MemoryCache {
 	return &MemoryCache{
 		lru: lru_impl.NewLRUCache(capacity),
 	}

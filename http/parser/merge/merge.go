@@ -1,3 +1,4 @@
+// Merge http parser
 package merge
 
 import (
@@ -6,8 +7,10 @@ import (
 	"net/http"
 )
 
+// Merges multiple parsers
 type MergeParser []imageserver_http.Parser
 
+// Calls sequentially each parser
 func (parser MergeParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	for _, subParser := range parser {
 		err := subParser.Parse(request, parameters)

@@ -1,3 +1,4 @@
+// Memcache cache
 package memcache
 
 import (
@@ -5,6 +6,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
+// Uses Brad Fitzpatrick's Memcache client https://github.com/bradfitz/gomemcache
 type MemcacheCache struct {
 	Memcache *memcache_impl.Client
 }

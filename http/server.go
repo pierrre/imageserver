@@ -1,3 +1,4 @@
+// Http image server
 package http
 
 import (
@@ -15,13 +16,25 @@ var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 var msgInternalError = "Internal error"
 
+// Http image server
+//
+// Only GET method is supported.
+//
+// Supports ETag/If-None-Match (status code 304).
+// It doesn't check if the image really exists.
+//
+// Status codes: 200 (everything is ok), 400 (user error), 500 (internal error).
+//
+// If Expire is defined, the "Expires" header is set.
+//
+// The HeaderFunc function allows to set custom headers.
 type Server struct {
 	Parser      Parser
 	ImageServer *imageserver.Server
 
-	Expire time.Duration
+	Expire time.Duration // optional
 
-	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters)
+	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters) // optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {

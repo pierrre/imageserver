@@ -5,14 +5,9 @@ import (
 	"encoding/gob"
 )
 
-// Internal image structure
-//
-// An image is composed of a type (png, jpeg, bmp, gif, ...) and data (slice of byte)
-//
-// This data structure is easy to serialize (cache) and manipulate (processor implementation)
 type Image struct {
-	Type string
-	Data []byte
+	Type string // png, jpeg, bmp, gif, ...
+	Data []byte // raw image data
 }
 
 // Serialize image to bytes

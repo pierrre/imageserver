@@ -1,3 +1,4 @@
+// GraphicsMagick processor
 package graphicsmagick
 
 import (
@@ -12,11 +13,37 @@ import (
 
 const tempDirPrefix = "imageserver_"
 
+// Processes an image with GraphicsMagick command line (mogrify command)
+//
+// All parameters are prefixed with "gm." and are optionals.
+//
+// See GraphicsMagick documentation for more information about arguments.
+//
+// Parameters
+//
+// - width / height: sizes for "-resize" argument (both optionals)
+//
+// - fill: "^" for "-resize" argument
+//
+// - ignore_ratio: "!" for "-resize" argument
+//
+// - only_shrink_larger: ">" for "-resize" argument
+//
+// - only_enlarge_smaller: "<" for "-resize" argument
+//
+// - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
+//
+// - extent: "-extent" parameter, uses width/height parameters and add "-gravity center" argument
+//
+// - format: "-format" parameter
+//
+// - quality: "-quality" parameter
 type GraphicsMagickProcessor struct {
-	Executable       string
-	TempDir          string
-	AllowedFormats   []string
-	DefaultQualities map[string]string
+	Executable string // path to "gm" executable, usually "/usr/bin/gm"
+
+	TempDir          string            // temp directory for image files, optional
+	AllowedFormats   []string          // allowed format list, optional
+	DefaultQualities map[string]string // default qualities by format, optional
 }
 
 func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {

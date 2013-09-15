@@ -1,3 +1,4 @@
+// Source path http parser
 package sourcepath
 
 import (
@@ -6,6 +7,7 @@ import (
 	"net/url"
 )
 
+// Similar to the SourceParser, but takes the request's path, and concatenates it to the base url
 type SourcePathParser struct {
 	Base *url.URL
 }

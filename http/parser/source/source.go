@@ -1,3 +1,4 @@
+// Source http parser
 package source
 
 import (
@@ -5,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Takes the "source" query parameter
 type SourceParser struct {
 }
 

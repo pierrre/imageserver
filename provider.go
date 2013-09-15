@@ -1,6 +1,6 @@
 package imageserver
 
-// Get an image from a source
+// Image provider interface
 type Provider interface {
-	Get(interface{}, Parameters) (*Image, error)
+	Get(source interface{}, parameters Parameters) (*Image, error)
 }

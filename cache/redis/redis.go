@@ -1,3 +1,4 @@
+// Redis cache
 package redis
 
 import (
@@ -7,10 +8,11 @@ import (
 	"time"
 )
 
+// Uses Gary Burd's Redis client https://github.com/garyburd/redigo
 type RedisCache struct {
 	Pool *redigo.Pool
 
-	Expire time.Duration
+	Expire time.Duration // optional
 }
 
 func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {

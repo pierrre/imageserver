@@ -1,11 +1,26 @@
+// Image server
 package imageserver
 
+// Image server
 type Server struct {
-	Cache     Cache
+	Cache     Cache // optional
 	Provider  Provider
-	Processor Processor
+	Processor Processor // optional
 }
 
+// Get an image
+//
+// The "source" parameter is required.
+//
+// Steps
+//
+// - get image from the cache and return it if available
+//
+// - get the image from the provider
+//
+// - process the image
+//
+// - store the image in the cache
 func (server *Server) Get(parameters Parameters) (*Image, error) {
 	cacheKey := parameters.Hash()
 

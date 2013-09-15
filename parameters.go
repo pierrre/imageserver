@@ -7,9 +7,9 @@ import (
 	"io"
 )
 
-// Parameters used for processor, cache, ...
+// Parameters used for provider, processor, cache, ...
 //
-// This type is a wrapper around map and provides getter and hash methods
+// This is a wrapper around map and provides getter and hash methods
 type Parameters map[string]interface{}
 
 func (parameters Parameters) Set(key string, value interface{}) {

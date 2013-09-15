@@ -1,9 +1,11 @@
+// Limit processor
 package limit
 
 import (
 	"github.com/pierrre/imageserver"
 )
 
+// Limit concurrent usage of a processor
 type LimitProcessor struct {
 	limitChan chan bool
 	processor imageserver.Processor

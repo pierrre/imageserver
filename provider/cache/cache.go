@@ -1,3 +1,4 @@
+// Cache provider
 package cache
 
 import (
@@ -8,6 +9,9 @@ import (
 	"io"
 )
 
+// Cache a provider
+//
+// The key used is a sha256 of the source's string representation.
 type CacheProvider struct {
 	Cache    imageserver.Cache
 	Provider imageserver.Provider

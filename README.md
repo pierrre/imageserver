@@ -32,12 +32,14 @@ You have to compile/configure your own image server.
 
 See example: https://github.com/pierrre/imageserver/blob/master/example/main.go
 
+## Documentation
+http://godoc.org/github.com/pierrre/imageserver
+
 ## Help
 - Twitter: @pierredurand87
 - Github issue
 
 ## TODO
-- documentation
 - more tests
 - source provider
     - dispatch (uri scheme)

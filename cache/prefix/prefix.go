@@ -1,9 +1,11 @@
+// Prefix cache
 package prefix
 
 import (
 	"github.com/pierrre/imageserver"
 )
 
+// Concatenate a prefix to the cache key
 type PrefixCache struct {
 	Prefix string
 	Cache  imageserver.Cache
