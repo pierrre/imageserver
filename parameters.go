@@ -19,8 +19,7 @@ func (parameters Parameters) Set(key string, value interface{}) {
 func (parameters Parameters) Get(key string) (interface{}, error) {
 	value, found := parameters[key]
 	if !found {
-		err := fmt.Errorf("Value not found")
-		return nil, err
+		return nil, fmt.Errorf("Value not found")
 	}
 	return value, nil
 }
@@ -32,8 +31,7 @@ func (parameters Parameters) GetString(key string) (string, error) {
 	}
 	value, ok := v.(string)
 	if !ok {
-		err = fmt.Errorf("Not a string")
-		return "", err
+		return "", fmt.Errorf("Not a string")
 	}
 	return value, nil
 }
@@ -45,8 +43,7 @@ func (parameters Parameters) GetInt(key string) (int, error) {
 	}
 	value, ok := v.(int)
 	if !ok {
-		err = fmt.Errorf("Not an int")
-		return 0, err
+		return 0, fmt.Errorf("Not an int")
 	}
 	return value, nil
 }
@@ -58,8 +55,7 @@ func (parameters Parameters) GetBool(key string) (bool, error) {
 	}
 	value, ok := v.(bool)
 	if !ok {
-		err = fmt.Errorf("Not a bool")
-		return false, err
+		return false, fmt.Errorf("Not a bool")
 	}
 	return value, nil
 }
