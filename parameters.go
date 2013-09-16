@@ -60,6 +60,18 @@ func (parameters Parameters) GetBool(key string) (bool, error) {
 	return value, nil
 }
 
+func (parameters Parameters) GetParameters(key string) (Parameters, error) {
+	v, err := parameters.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	value, ok := v.(Parameters)
+	if !ok {
+		return nil, fmt.Errorf("Not a Parameters")
+	}
+	return value, nil
+}
+
 // Hash content with sha256 algorithm and returns a string
 func (parameters Parameters) Hash() string {
 	hash := sha256.New()

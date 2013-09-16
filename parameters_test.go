@@ -41,7 +41,7 @@ func TestGetStringErrorWrongType(t *testing.T) {
 	parameters.Set("foo", 666)
 	_, err := parameters.GetString("foo")
 	if err == nil {
-		t.Fatal(err)
+		t.Fatal("No error")
 	}
 }
 
@@ -62,7 +62,7 @@ func TestGetIntErrorWrongType(t *testing.T) {
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetInt("foo")
 	if err == nil {
-		t.Fatal(err)
+		t.Fatal("No error")
 	}
 }
 
@@ -83,6 +83,24 @@ func TestGetBoolErrorWrongType(t *testing.T) {
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetBool("foo")
 	if err == nil {
+		t.Fatal("No error")
+	}
+}
+
+func TestGetParameters(t *testing.T) {
+	parameters := make(Parameters)
+	parameters.Set("foo", make(Parameters))
+	_, err := parameters.GetParameters("foo")
+	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestGetParametersErrorWrongType(t *testing.T) {
+	parameters := make(Parameters)
+	parameters.Set("foo", "bar")
+	_, err := parameters.GetParameters("foo")
+	if err == nil {
+		t.Fatal("No error")
 	}
 }
