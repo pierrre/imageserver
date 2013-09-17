@@ -18,7 +18,7 @@ const (
 
 // Processes an image with GraphicsMagick command line (mogrify command)
 //
-// All parameters are optionals.
+// All parameters extracted from the "graphicsmagick" node parameter are optionals.
 //
 // See GraphicsMagick documentation for more information about arguments.
 //
