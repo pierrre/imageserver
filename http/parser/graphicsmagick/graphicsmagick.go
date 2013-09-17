@@ -18,6 +18,10 @@ type GraphicsMagickParser struct {
 }
 
 func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+	p := make(imageserver.Parameters)
+	parameters.Set("graphicsmagick", p)
+	parameters = p
+
 	query := request.URL.Query()
 	if err := parser.parseDimension(query, parameters, "width"); err != nil {
 		return err
@@ -64,7 +68,7 @@ func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters 
 	if dimension <= 0 {
 		return parser.createError(parameterName, "lower than or equal to zero")
 	}
-	parser.setParameter(parameters, parameterName, dimension)
+	parameters[parameterName] = dimension
 	return nil
 }
 
@@ -73,7 +77,7 @@ func (parser *GraphicsMagickParser) parseString(query url.Values, parameters ima
 	if len(parameter) == 0 {
 		return nil
 	}
-	parser.setParameter(parameters, parameterName, parameter)
+	parameters[parameterName] = parameter
 	return nil
 }
 
@@ -86,12 +90,8 @@ func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters image
 	if err != nil {
 		return parser.createParseError(parameterName, "bool")
 	}
-	parser.setParameter(parameters, parameterName, parameter)
+	parameters[parameterName] = parameter
 	return nil
-}
-
-func (parser *GraphicsMagickParser) setParameter(parameters imageserver.Parameters, key string, value interface{}) {
-	parameters.Set("gm."+key, value)
 }
 
 func (parser *GraphicsMagickParser) createError(parameterName string, cause string) *imageserver.Error {

@@ -11,11 +11,14 @@ import (
 	"strconv"
 )
 
-const tempDirPrefix = "imageserver_"
+const (
+	globalParameterName = "graphicsmagick"
+	tempDirPrefix       = "imageserver_"
+)
 
 // Processes an image with GraphicsMagick command line (mogrify command)
 //
-// All parameters are prefixed with "gm." and are optionals.
+// All parameters are optionals.
 //
 // See GraphicsMagick documentation for more information about arguments.
 //
@@ -47,6 +50,17 @@ type GraphicsMagickProcessor struct {
 }
 
 func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	if !parameters.Has(globalParameterName) {
+		return sourceImage, nil
+	}
+	parameters, err := parameters.GetParameters(globalParameterName)
+	if err != nil {
+		return nil, err
+	}
+	if parameters.Empty() {
+		return sourceImage, nil
+	}
+
 	var arguments []string
 
 	arguments = append(arguments, "mogrify")
@@ -117,13 +131,13 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
 	arguments = in
 
-	width, _ = parameters.GetInt("gm.width")
+	width, _ = parameters.GetInt("width")
 	if width < 0 {
 		err = imageserver.NewError("Invalid width parameter")
 		return
 	}
 
-	height, _ = parameters.GetInt("gm.height")
+	height, _ = parameters.GetInt("height")
 	if height < 0 {
 		err = imageserver.NewError("Invalid height parameter")
 		return
@@ -140,19 +154,19 @@ func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 		}
 		resize := fmt.Sprintf("%sx%s", widthString, heightString)
 
-		if fill, _ := parameters.GetBool("gm.fill"); fill {
+		if fill, _ := parameters.GetBool("fill"); fill {
 			resize = resize + "^"
 		}
 
-		if ignoreRatio, _ := parameters.GetBool("gm.ignore_ratio"); ignoreRatio {
+		if ignoreRatio, _ := parameters.GetBool("ignore_ratio"); ignoreRatio {
 			resize = resize + "!"
 		}
 
-		if onlyShrinkLarger, _ := parameters.GetBool("gm.only_shrink_larger"); onlyShrinkLarger {
+		if onlyShrinkLarger, _ := parameters.GetBool("only_shrink_larger"); onlyShrinkLarger {
 			resize = resize + ">"
 		}
 
-		if onlyEnlargeSmaller, _ := parameters.GetBool("gm.only_enlarge_smaller"); onlyEnlargeSmaller {
+		if onlyEnlargeSmaller, _ := parameters.GetBool("only_enlarge_smaller"); onlyEnlargeSmaller {
 			resize = resize + "<"
 		}
 
@@ -163,7 +177,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments []string, parameters imageserver.Parameters) ([]string, error) {
-	background, _ := parameters.GetString("gm.background")
+	background, _ := parameters.GetString("background")
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
@@ -184,7 +198,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments []s
 
 func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments []string, parameters imageserver.Parameters, width int, height int) ([]string, error) {
 	if width != 0 && height != 0 {
-		if extent, _ := parameters.GetBool("gm.extent"); extent {
+		if extent, _ := parameters.GetBool("extent"); extent {
 			arguments = append(arguments, "-gravity", "center")
 			arguments = append(arguments, "-extent", fmt.Sprintf("%dx%d", width, height))
 		}
@@ -196,7 +210,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments []strin
 func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
 	arguments = in
 
-	format, _ = parameters.GetString("gm.format")
+	format, _ = parameters.GetString("format")
 
 	formatSpecified := true
 	if len(format) == 0 {
@@ -228,7 +242,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments []string, parameters imageserver.Parameters, format string) ([]string, error) {
-	quality, _ := parameters.GetString("gm.quality")
+	quality, _ := parameters.GetString("quality")
 
 	if len(quality) == 0 && len(arguments) == 1 {
 		return arguments, nil
