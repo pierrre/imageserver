@@ -16,6 +16,11 @@ func (parameters Parameters) Set(key string, value interface{}) {
 	parameters[key] = value
 }
 
+func (parameters Parameters) Has(key string) bool {
+	_, ok := parameters[key]
+	return ok
+}
+
 func (parameters Parameters) Get(key string) (interface{}, error) {
 	value, found := parameters[key]
 	if !found {

@@ -16,6 +16,17 @@ func TestSetGet(t *testing.T) {
 	}
 }
 
+func TestHas(t *testing.T) {
+	parameters := make(Parameters)
+	parameters.Set("foo", "bar")
+	if !parameters.Has("foo") {
+		t.Fatal("Key does not exist")
+	}
+	if parameters.Has("xxx") {
+		t.Fatal("Key exists")
+	}
+}
+
 func TestGetErrorNotFound(t *testing.T) {
 	parameters := make(Parameters)
 	_, err := parameters.Get("foo")
