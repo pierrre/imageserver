@@ -21,6 +21,10 @@ func (parameters Parameters) Has(key string) bool {
 	return ok
 }
 
+func (parameters Parameters) Empty() bool {
+	return len(parameters) == 0
+}
+
 func (parameters Parameters) Get(key string) (interface{}, error) {
 	value, found := parameters[key]
 	if !found {

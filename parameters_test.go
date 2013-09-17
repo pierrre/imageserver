@@ -27,6 +27,17 @@ func TestHas(t *testing.T) {
 	}
 }
 
+func TestEmpty(t *testing.T) {
+	parameters := make(Parameters)
+	if !parameters.Empty() {
+		t.Fatal("Not empty")
+	}
+	parameters.Set("foo", "bar")
+	if parameters.Empty() {
+		t.Fatal("Empty")
+	}
+}
+
 func TestGetErrorNotFound(t *testing.T) {
 	parameters := make(Parameters)
 	_, err := parameters.Get("foo")
