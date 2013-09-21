@@ -52,3 +52,5 @@ http://godoc.org/github.com/pierrre/imageserver
 	- native / imagemagick
 - regroup requests?
 - thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
+- Go 1.2:
+	- Use crypto/sha256.Sum256() new function
