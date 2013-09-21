@@ -9,24 +9,24 @@ An image server written in Go (Golang)
 
 ## Demo
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png
+http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png
 ```
-![Normal](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png)
+![Normal](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png)
 
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=400&format=jpeg&quality=50
+http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=400&format=jpeg&quality=50
 ```
-![Resized jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=400&format=jpeg&quality=50)
+![Resized jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=400&format=jpeg&quality=50)
 
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=200&height=200&fill=1&extent=1
+http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&fill=1&extent=1
 ```
-![Crop](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=200&height=200&fill=1&extent=1)
+![Crop](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&fill=1&extent=1)
 
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=200&height=200&extent=1&background=000000
+http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&extent=1&background=000000
 ```
-![Extent background](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo4w.png&width=200&height=200&extent=1&background=000000)
+![Extent background](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&extent=1&background=000000)
 
 ## Usage / Build
 You have to compile/configure your own image server.
