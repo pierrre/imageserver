@@ -59,7 +59,11 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	server.sendImage(writer, request, parameters, image)
+	if err := server.sendImage(writer, request, parameters, image); err != nil {
+		//TODO log
+		fmt.Println(err)
+		return
+	}
 }
 
 func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
@@ -78,7 +82,7 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	return false
 }
 
-func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) {
+func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
 	server.sendHeader(writer, request, parameters)
 
 	if len(image.Type) > 0 {
@@ -87,7 +91,11 @@ func (server *Server) sendImage(writer http.ResponseWriter, request *http.Reques
 
 	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 
-	writer.Write(image.Data)
+	if _, err := writer.Write(image.Data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (server *Server) sendHeader(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
