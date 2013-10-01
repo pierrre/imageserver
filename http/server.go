@@ -15,7 +15,7 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-var msgInternalError = "Internal error"
+var msgInternalError = "Internal Server Error"
 
 // Http image server
 //
@@ -122,17 +122,23 @@ func (server *Server) sendHeaderCache(header http.Header, parameters imageserver
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
+	var message string
+	var status int
 	var internalErr error
 	if err, ok := err.(*imageserver.Error); ok {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		message = err.Error()
 		internalErr = err.Previous
 	} else {
-		http.Error(writer, msgInternalError, http.StatusInternalServerError)
+		message = msgInternalError
 		internalErr = err
 	}
 	if internalErr != nil {
 		server.logError(internalErr)
+		status = http.StatusInternalServerError
+	} else {
+		status = http.StatusBadRequest
 	}
+	http.Error(writer, message, status)
 }
 
 func (server *Server) logError(err error) {
