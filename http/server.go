@@ -122,12 +122,16 @@ func (server *Server) sendHeaderCache(header http.Header, parameters imageserver
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, err error) {
-	if _, ok := err.(*imageserver.Error); ok {
+	var internalErr error
+	if err, ok := err.(*imageserver.Error); ok {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
+		internalErr = err.Previous
 	} else {
 		http.Error(writer, msgInternalError, http.StatusInternalServerError)
-
-		server.logError(err)
+		internalErr = err
+	}
+	if internalErr != nil {
+		server.logError(internalErr)
 	}
 }
 
