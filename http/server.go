@@ -4,6 +4,7 @@ package http
 import (
 	"fmt"
 	"github.com/pierrre/imageserver"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -34,6 +35,8 @@ type Server struct {
 
 	Expire time.Duration // optional
 
+	Logger *log.Logger // optional
+
 	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters) // optional
 }
 
@@ -60,8 +63,7 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	}
 
 	if err := server.sendImage(writer, request, parameters, image); err != nil {
-		//TODO log
-		fmt.Println(err)
+		server.logError(err)
 		return
 	}
 }
@@ -124,5 +126,13 @@ func (server *Server) sendError(writer http.ResponseWriter, err error) {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	} else {
 		http.Error(writer, msgInternalError, http.StatusInternalServerError)
+
+		server.logError(err)
+	}
+}
+
+func (server *Server) logError(err error) {
+	if server.Logger != nil {
+		server.Logger.Println(err)
 	}
 }

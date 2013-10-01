@@ -15,7 +15,9 @@ import (
 	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
+	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -66,6 +68,7 @@ func main() {
 		},
 		ImageServer: imageServer,
 		Expire:      time.Duration(7 * 24 * time.Hour),
+		Logger:      log.New(os.Stderr, "", log.Ldate|log.Ltime|log.Lmicroseconds|log.Llongfile),
 	}
 
 	http.Handle("/", httpImageServer)
