@@ -110,7 +110,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	cmd := exec.Command(processor.Executable, arguments...)
 	err = cmd.Run()
 	if err != nil {
-		return nil, imageserver.NewError("Error during execution of GraphicsMagick")
+		return nil, imageserver.NewErrorWithPrevious("Error during execution of GraphicsMagick", err)
 	}
 
 	if hasFileExtension {
