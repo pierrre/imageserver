@@ -17,10 +17,16 @@ import (
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 func main() {
+	hostname, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+
 	cache := imageserver_cache_chain.ChainCache{
 		imageserver_cache_memory.New(10 * 1024 * 1024),
 		&imageserver_cache_redis.RedisCache{
@@ -69,6 +75,9 @@ func main() {
 		Expire:      time.Duration(7 * 24 * time.Hour),
 		ErrFunc: func(err error, request *http.Request) {
 			log.Println(err)
+		},
+		HeaderFunc: func(header http.Header, request *http.Request, err error) {
+			header.Set("X-Hostname", hostname)
 		},
 	}
 

@@ -27,6 +27,8 @@ var msgInternalError = "Internal Server Error"
 //
 // If Expire is defined, the "Expires" header is set.
 //
+// The ErrFunc function allows to handler internal errors.
+//
 // The HeaderFunc function allows to set custom headers.
 type Server struct {
 	Parser      Parser
@@ -34,8 +36,8 @@ type Server struct {
 
 	Expire time.Duration // optional
 
-	ErrFunc    func(error, *http.Request)                               //optional
-	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters) // optional
+	ErrFunc    func(error, *http.Request)              //optional
+	HeaderFunc func(http.Header, *http.Request, error) // optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -82,13 +84,13 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 		return false
 	}
 
-	server.setHeader(writer, request, parameters)
+	server.setImageHeaderCommon(writer, request, parameters)
 	writer.WriteHeader(http.StatusNotModified)
 	return true
 }
 
 func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
-	server.setHeader(writer, request, parameters)
+	server.setImageHeaderCommon(writer, request, parameters)
 
 	if len(image.Type) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Type)
@@ -105,17 +107,9 @@ func (server *Server) sendImage(writer http.ResponseWriter, request *http.Reques
 	return nil
 }
 
-func (server *Server) setHeader(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
+func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
 	header := writer.Header()
 
-	server.setHeaderCache(header, parameters)
-
-	if server.HeaderFunc != nil {
-		server.HeaderFunc(header, request, parameters)
-	}
-}
-
-func (server *Server) setHeaderCache(header http.Header, parameters imageserver.Parameters) {
 	header.Set("Cache-Control", "public")
 
 	header.Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
@@ -126,6 +120,8 @@ func (server *Server) setHeaderCache(header http.Header, parameters imageserver.
 		t = t.In(expiresHeaderLocation)
 		header.Set("Expires", t.Format(time.RFC1123))
 	}
+
+	server.callHeaderFunc(header, request, nil)
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, request *http.Request, err error) {
@@ -149,11 +145,19 @@ func (server *Server) sendError(writer http.ResponseWriter, request *http.Reques
 		status = http.StatusBadRequest
 	}
 
+	server.callHeaderFunc(writer.Header(), request, err)
+
 	http.Error(writer, message, status)
 }
 
 func (server *Server) callErrFunc(err error, request *http.Request) {
 	if server.ErrFunc != nil {
 		server.ErrFunc(err, request)
+	}
+}
+
+func (server *Server) callHeaderFunc(header http.Header, request *http.Request, err error) {
+	if server.HeaderFunc != nil {
+		server.HeaderFunc(header, request, err)
 	}
 }
