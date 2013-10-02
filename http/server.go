@@ -41,7 +41,7 @@ type Server struct {
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	if request.Method != "GET" {
+	if request.Method != "GET" && request.Method != "HEAD" {
 		server.sendError(writer, imageserver.NewError("Invalid request method"))
 		return
 	}
@@ -93,8 +93,10 @@ func (server *Server) sendImage(writer http.ResponseWriter, request *http.Reques
 
 	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 
-	if _, err := writer.Write(image.Data); err != nil {
-		return err
+	if request.Method == "GET" {
+		if _, err := writer.Write(image.Data); err != nil {
+			return err
+		}
 	}
 
 	return nil
