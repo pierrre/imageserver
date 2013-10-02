@@ -18,7 +18,7 @@ var msgInternalError = "Internal Server Error"
 
 // Http image server
 //
-// Only GET method is supported.
+// Only GET and HEAD methods are supported.
 //
 // Supports ETag/If-None-Match (status code 304).
 // It doesn't check if the image really exists.
