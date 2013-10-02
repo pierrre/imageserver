@@ -42,7 +42,7 @@ type Server struct {
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" {
-		server.sendError(writer, fmt.Errorf("Invalid request method"))
+		server.sendError(writer, imageserver.NewError("Invalid request method"))
 		return
 	}
 
