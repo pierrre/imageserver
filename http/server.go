@@ -4,7 +4,6 @@ package http
 import (
 	"fmt"
 	"github.com/pierrre/imageserver"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -35,20 +34,19 @@ type Server struct {
 
 	Expire time.Duration // optional
 
-	Logger *log.Logger // optional
-
+	ErrFunc    func(error, *http.Request)                               //optional
 	HeaderFunc func(http.Header, *http.Request, imageserver.Parameters) // optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
-		server.sendError(writer, imageserver.NewError("Invalid request method"))
+		server.sendError(writer, request, imageserver.NewError("Invalid request method"))
 		return
 	}
 
 	parameters := make(imageserver.Parameters)
 	if err := server.Parser.Parse(request, parameters); err != nil {
-		server.sendError(writer, err)
+		server.sendError(writer, request, err)
 		return
 	}
 
@@ -58,30 +56,35 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 
 	image, err := server.ImageServer.Get(parameters)
 	if err != nil {
-		server.sendError(writer, err)
+		server.sendError(writer, request, err)
 		return
 	}
 
 	if err := server.sendImage(writer, request, parameters, image); err != nil {
-		server.logError(err)
+		server.callErrFunc(err, request)
 		return
 	}
 }
 
 func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
 	inmHeader := request.Header.Get("If-None-Match")
-	if len(inmHeader) > 0 {
-		matches := inmHeaderRegexp.FindStringSubmatch(inmHeader)
-		if matches != nil && len(matches) == 2 {
-			inm := matches[1]
-			if inm == parameters.Hash() {
-				server.setHeader(writer, request, parameters)
-				writer.WriteHeader(http.StatusNotModified)
-				return true
-			}
-		}
+	if len(inmHeader) == 0 {
+		return false
 	}
-	return false
+
+	matches := inmHeaderRegexp.FindStringSubmatch(inmHeader)
+	if matches == nil {
+		return false
+	}
+
+	inm := matches[1]
+	if inm != parameters.Hash() {
+		return false
+	}
+
+	server.setHeader(writer, request, parameters)
+	writer.WriteHeader(http.StatusNotModified)
+	return true
 }
 
 func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
@@ -125,7 +128,7 @@ func (server *Server) setHeaderCache(header http.Header, parameters imageserver.
 	}
 }
 
-func (server *Server) sendError(writer http.ResponseWriter, err error) {
+func (server *Server) sendError(writer http.ResponseWriter, request *http.Request, err error) {
 	var message string
 	var status int
 	var internalErr error
@@ -140,7 +143,7 @@ func (server *Server) sendError(writer http.ResponseWriter, err error) {
 	}
 
 	if internalErr != nil {
-		server.logError(internalErr)
+		server.callErrFunc(internalErr, request)
 		status = http.StatusInternalServerError
 	} else {
 		status = http.StatusBadRequest
@@ -149,8 +152,8 @@ func (server *Server) sendError(writer http.ResponseWriter, err error) {
 	http.Error(writer, message, status)
 }
 
-func (server *Server) logError(err error) {
-	if server.Logger != nil {
-		server.Logger.Println(err)
+func (server *Server) callErrFunc(err error, request *http.Request) {
+	if server.ErrFunc != nil {
+		server.ErrFunc(err, request)
 	}
 }

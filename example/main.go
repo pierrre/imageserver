@@ -17,7 +17,6 @@ import (
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -68,7 +67,9 @@ func main() {
 		},
 		ImageServer: imageServer,
 		Expire:      time.Duration(7 * 24 * time.Hour),
-		Logger:      log.New(os.Stderr, "", log.Ldate|log.Ltime|log.Lmicroseconds|log.Llongfile),
+		ErrFunc: func(err error, request *http.Request) {
+			log.Println(err)
+		},
 	}
 
 	http.Handle("/", httpImageServer)
