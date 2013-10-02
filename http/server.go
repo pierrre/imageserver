@@ -14,8 +14,6 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-var msgInternalError = "Internal Server Error"
-
 // Http image server
 //
 // Only GET and HEAD methods are supported.
@@ -125,29 +123,23 @@ func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, request *http.Request, err error) {
+	var code int
 	var message string
-	var status int
-	var internalErr error
 
 	switch err := err.(type) {
 	case *imageserver.Error:
+		code = http.StatusBadRequest
 		message = err.Error()
-		internalErr = err.Previous
 	default:
-		message = msgInternalError
-		internalErr = err
-	}
+		code = http.StatusInternalServerError
+		message = http.StatusText(code)
 
-	if internalErr != nil {
-		server.callErrFunc(internalErr, request)
-		status = http.StatusInternalServerError
-	} else {
-		status = http.StatusBadRequest
+		server.callErrFunc(err, request)
 	}
 
 	server.callHeaderFunc(writer.Header(), request, err)
 
-	http.Error(writer, message, status)
+	http.Error(writer, message, code)
 }
 
 func (server *Server) callErrFunc(err error, request *http.Request) {
