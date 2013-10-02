@@ -129,19 +129,23 @@ func (server *Server) sendError(writer http.ResponseWriter, err error) {
 	var message string
 	var status int
 	var internalErr error
-	if err, ok := err.(*imageserver.Error); ok {
+
+	switch err := err.(type) {
+	case *imageserver.Error:
 		message = err.Error()
 		internalErr = err.Previous
-	} else {
+	default:
 		message = msgInternalError
 		internalErr = err
 	}
+
 	if internalErr != nil {
 		server.logError(internalErr)
 		status = http.StatusInternalServerError
 	} else {
 		status = http.StatusBadRequest
 	}
+
 	http.Error(writer, message, status)
 }
 
