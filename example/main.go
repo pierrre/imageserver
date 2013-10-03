@@ -87,7 +87,7 @@ func main() {
 			}
 			return imageserver_http.NewError(errorCode)
 		},
-		ErrFunc: func(err error, request *http.Request) {
+		ErrorFunc: func(err error, request *http.Request) {
 			log.Println(err)
 		},
 		HeaderFunc: func(header http.Header, request *http.Request, err error) {

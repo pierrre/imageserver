@@ -35,7 +35,7 @@ type Server struct {
 	Expire time.Duration // optional
 
 	RequestFunc func(*http.Request) error               //optional
-	ErrFunc     func(error, *http.Request)              //optional
+	ErrorFunc   func(error, *http.Request)              //optional
 	HeaderFunc  func(http.Header, *http.Request, error) // optional
 }
 
@@ -153,8 +153,8 @@ func (server *Server) sendError(writer http.ResponseWriter, request *http.Reques
 }
 
 func (server *Server) callErrFunc(err error, request *http.Request) {
-	if server.ErrFunc != nil {
-		server.ErrFunc(err, request)
+	if server.ErrorFunc != nil {
+		server.ErrorFunc(err, request)
 	}
 }
 
