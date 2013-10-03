@@ -40,7 +40,7 @@ type Server struct {
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
-		server.sendError(writer, request, imageserver.NewError("Invalid request method"))
+		server.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
 		return
 	}
 
@@ -129,6 +129,9 @@ func (server *Server) sendError(writer http.ResponseWriter, request *http.Reques
 	switch err := err.(type) {
 	case *imageserver.Error:
 		code = http.StatusBadRequest
+		message = err.Error()
+	case *Error:
+		code = err.Code
 		message = err.Error()
 	default:
 		code = http.StatusInternalServerError
