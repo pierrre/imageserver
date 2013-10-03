@@ -18,6 +18,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -73,6 +74,19 @@ func main() {
 		},
 		ImageServer: imageServer,
 		Expire:      time.Duration(7 * 24 * time.Hour),
+		RequestFunc: func(request *http.Request) error {
+			url := request.URL
+			query := url.Query()
+			errorCodeString := query.Get("error")
+			if len(errorCodeString) == 0 {
+				return nil
+			}
+			errorCode, err := strconv.Atoi(errorCodeString)
+			if err != nil {
+				return imageserver.NewError(err.Error())
+			}
+			return imageserver_http.NewError(errorCode)
+		},
 		ErrFunc: func(err error, request *http.Request) {
 			log.Println(err)
 		},

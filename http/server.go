@@ -34,14 +34,21 @@ type Server struct {
 
 	Expire time.Duration // optional
 
-	ErrFunc    func(error, *http.Request)              //optional
-	HeaderFunc func(http.Header, *http.Request, error) // optional
+	RequestFunc func(*http.Request) error               //optional
+	ErrFunc     func(error, *http.Request)              //optional
+	HeaderFunc  func(http.Header, *http.Request, error) // optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
 		server.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
 		return
+	}
+
+	if server.RequestFunc != nil {
+		if err := server.RequestFunc(request); err != nil {
+			server.sendError(writer, request, err)
+		}
 	}
 
 	parameters := make(imageserver.Parameters)
