@@ -35,8 +35,8 @@ type Server struct {
 	Expire time.Duration // optional
 
 	RequestFunc func(*http.Request) error               //optional
-	ErrorFunc   func(error, *http.Request)              //optional
 	HeaderFunc  func(http.Header, *http.Request, error) // optional
+	ErrorFunc   func(error, *http.Request)              //optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
