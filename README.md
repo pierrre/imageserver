@@ -41,8 +41,6 @@ http://godoc.org/github.com/pierrre/imageserver
 - Github issue
 
 ## TODO
-- Improve http methods support (GET & HEAD)
-- Improve errors in http server
 - more tests
 - source provider
     - dispatch (uri scheme)
