@@ -10,7 +10,7 @@ import (
 )
 
 func TestImage(t *testing.T) {
-	i1 := CreateRandomBaseImage(500, 400)
+	i1 := CreateBaseImage(500, 400)
 	buffer1 := new(bytes.Buffer)
 	png.Encode(buffer1, i1)
 	im1 := &Image{
@@ -59,7 +59,7 @@ func TestImage(t *testing.T) {
 	}
 }
 
-func CreateRandomBaseImage(width, height int) *image.NRGBA {
+func CreateBaseImage(width, height int) *image.NRGBA {
 	i := image.NewNRGBA(image.Rect(0, 0, width, height))
 	for y, height := 0, i.Bounds().Dy(); y < height; y++ {
 		for x, width := 0, i.Bounds().Dx(); x < width; x++ {
