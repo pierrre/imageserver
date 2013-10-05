@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSetGet(t *testing.T) {
+func TestParametersSetGet(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	value, err := parameters.Get("foo")
@@ -16,7 +16,7 @@ func TestSetGet(t *testing.T) {
 	}
 }
 
-func TestHas(t *testing.T) {
+func TestParametersHas(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	if !parameters.Has("foo") {
@@ -27,7 +27,7 @@ func TestHas(t *testing.T) {
 	}
 }
 
-func TestEmpty(t *testing.T) {
+func TestParametersEmpty(t *testing.T) {
 	parameters := make(Parameters)
 	if !parameters.Empty() {
 		t.Fatal("Not empty")
@@ -38,7 +38,7 @@ func TestEmpty(t *testing.T) {
 	}
 }
 
-func TestGetErrorNotFound(t *testing.T) {
+func TestParametersGetErrorNotFound(t *testing.T) {
 	parameters := make(Parameters)
 	_, err := parameters.Get("foo")
 	if err == nil {
@@ -46,7 +46,7 @@ func TestGetErrorNotFound(t *testing.T) {
 	}
 }
 
-func TestGetString(t *testing.T) {
+func TestParametersGetString(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	value, err := parameters.GetString("foo")
