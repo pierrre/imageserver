@@ -4,10 +4,10 @@ import (
 	"testing"
 )
 
-func TestServerErrorMissingSource(t *testing.T) {
+func TestServerGetSourceErrorMissingSource(t *testing.T) {
 	server := &Server{}
 	parameters := make(Parameters)
-	_, err := server.Get(parameters)
+	_, err := server.getSource(parameters)
 	if err == nil {
 		t.Fatal("No error")
 	}
