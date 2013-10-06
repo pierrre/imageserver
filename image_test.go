@@ -69,15 +69,15 @@ func CreateBaseImage(width, height int) *image.NRGBA {
 	return i
 }
 
-func randComponent() uint8 {
-	return uint8(rand.Int31n(256))
-}
-
 func randColor() color.RGBA {
 	return color.RGBA{
-		R: randComponent(),
-		G: randComponent(),
-		B: randComponent(),
-		A: randComponent(),
+		R: randColorComponent(),
+		G: randColorComponent(),
+		B: randColorComponent(),
+		A: randColorComponent(),
 	}
+}
+
+func randColorComponent() uint8 {
+	return uint8(rand.Int31n(256))
 }
