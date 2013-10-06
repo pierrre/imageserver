@@ -54,7 +54,7 @@ func main() {
 			Provider: &imageserver_provider_http.HttpProvider{},
 		},
 		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
-			Executable: "/usr/bin/gm",
+			Executable: "gm",
 			AllowedFormats: []string{
 				"jpeg",
 				"png",
