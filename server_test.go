@@ -21,10 +21,7 @@ func (provider *providerSize) Get(source interface{}, parameters Parameters) (*I
 }
 
 func TestServerGetSource(t *testing.T) {
-	server := &Server{
-		Provider: new(providerSize),
-	}
-	_, err := server.getSource(Parameters{
+	_, err := createServer().getSource(Parameters{
 		"source": size{
 			width:  500,
 			height: 400,
@@ -36,10 +33,15 @@ func TestServerGetSource(t *testing.T) {
 }
 
 func TestServerGetSourceErrorMissingSource(t *testing.T) {
-	server := &Server{}
 	parameters := make(Parameters)
-	_, err := server.getSource(parameters)
+	_, err := createServer().getSource(parameters)
 	if err == nil {
 		t.Fatal("No error")
+	}
+}
+
+func createServer() *Server {
+	return &Server{
+		Provider: new(providerSize),
 	}
 }
