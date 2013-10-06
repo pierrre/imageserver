@@ -22,9 +22,9 @@ type Server struct {
 //
 // - store the image in the cache
 func (server *Server) Get(parameters Parameters) (*Image, error) {
-	cacheKey := parameters.Hash()
-
+	var cacheKey string
 	if server.Cache != nil {
+		cacheKey = parameters.Hash()
 		if image, err := server.Cache.Get(cacheKey, parameters); err == nil {
 			return image, nil
 		}
