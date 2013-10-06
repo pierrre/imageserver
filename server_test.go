@@ -20,8 +20,8 @@ func (provider *providerSize) Get(source interface{}, parameters Parameters) (*I
 	return CreateImage(size.width, size.height), nil
 }
 
-func TestServerGetSource(t *testing.T) {
-	_, err := createServer().getSource(Parameters{
+func TestServerGet(t *testing.T) {
+	_, err := createServer().Get(Parameters{
 		"source": size{
 			width:  500,
 			height: 400,
@@ -32,9 +32,9 @@ func TestServerGetSource(t *testing.T) {
 	}
 }
 
-func TestServerGetSourceErrorMissingSource(t *testing.T) {
+func TestServerGetErrorMissingSource(t *testing.T) {
 	parameters := make(Parameters)
-	_, err := createServer().getSource(parameters)
+	_, err := createServer().Get(parameters)
 	if err == nil {
 		t.Fatal("No error")
 	}

@@ -30,14 +30,21 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 		}
 	}
 
-	sourceImage, err := server.getSource(parameters)
+	source, err := parameters.Get("source")
+	if err != nil {
+		return nil, NewError("Missing source parameter")
+	}
+
+	image, err := server.Provider.Get(source, parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	image, err := server.process(sourceImage, parameters)
-	if err != nil {
-		return nil, err
+	if server.Processor != nil {
+		image, err = server.Processor.Process(image, parameters)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if server.Cache != nil {
@@ -47,29 +54,4 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 	}
 
 	return image, nil
-}
-
-func (server *Server) getSource(parameters Parameters) (*Image, error) {
-	source, err := parameters.Get("source")
-	if err != nil {
-		err = NewError("Missing source parameter")
-		return nil, err
-	}
-
-	image, err := server.Provider.Get(source, parameters)
-	if err != nil {
-		return nil, err
-	}
-
-	return image, nil
-}
-
-func (server *Server) process(sourceImage *Image, parameters Parameters) (*Image, error) {
-	if server.Processor == nil {
-		return sourceImage, nil
-	}
-
-	image, err := server.Processor.Process(sourceImage, parameters)
-
-	return image, err
 }
