@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/png"
 	"math/rand"
+	"reflect"
 	"testing"
 )
 
@@ -22,17 +23,8 @@ func TestImage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if image2.Type != image1.Type {
-		t.Fatalf("Types not equals: %s %s", image1.Type, image2.Type)
-	}
-	if len(image2.Data) != len(image1.Data) {
-		t.Fatalf("Data not the same size %d %d", len(image1.Data), len(image2.Data))
-	}
-	for i, b2 := range image2.Data {
-		b1 := image1.Data[i]
-		if b2 != b1 {
-			t.Fatalf("Data not equals at index %d: %d %d", i, b1, b2)
-		}
+	if !reflect.DeepEqual(image2, image1) {
+		t.Fatal("Image not equals")
 	}
 }
 
