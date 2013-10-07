@@ -93,6 +93,9 @@ func main() {
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println(err)
 		},
+		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
+			log.Println(request.Method, request.URL, statusCode, contentSize, err)
+		},
 	}
 
 	http.Handle("/", httpImageServer)

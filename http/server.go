@@ -34,9 +34,10 @@ type Server struct {
 
 	Expire time.Duration // optional
 
-	RequestFunc func(*http.Request) error               // optional
-	HeaderFunc  func(http.Header, *http.Request, error) // optional
-	ErrorFunc   func(error, *http.Request)              // optional
+	RequestFunc  func(request *http.Request) error                                         // optional
+	HeaderFunc   func(header http.Header, request *http.Request, err error)                // optional
+	ErrorFunc    func(err error, request *http.Request)                                    // optional
+	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // optional
 }
 
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -91,7 +92,11 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	}
 
 	server.setImageHeaderCommon(writer, request, parameters)
+
 	writer.WriteHeader(http.StatusNotModified)
+
+	server.callResponseFunc(request, http.StatusNotModified, 0, nil)
+
 	return true
 }
 
@@ -102,13 +107,18 @@ func (server *Server) sendImage(writer http.ResponseWriter, request *http.Reques
 		writer.Header().Set("Content-Type", "image/"+image.Type)
 	}
 
-	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
+	contentLength := len(image.Data)
+	writer.Header().Set("Content-Length", strconv.Itoa(contentLength))
 
+	var contentSize int64
 	if request.Method == "GET" {
+		contentSize = int64(contentLength)
 		if _, err := writer.Write(image.Data); err != nil {
 			return err
 		}
 	}
+
+	server.callResponseFunc(request, http.StatusOK, contentSize, nil)
 
 	return nil
 }
@@ -131,26 +141,28 @@ func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *
 }
 
 func (server *Server) sendError(writer http.ResponseWriter, request *http.Request, err error) {
-	var code int
+	var statusCode int
 	var message string
 
 	switch err := err.(type) {
 	case *imageserver.Error:
-		code = http.StatusBadRequest
+		statusCode = http.StatusBadRequest
 		message = err.Error()
 	case *Error:
-		code = err.Code
+		statusCode = err.Code
 		message = err.Error()
 	default:
-		code = http.StatusInternalServerError
-		message = http.StatusText(code)
+		statusCode = http.StatusInternalServerError
+		message = http.StatusText(statusCode)
 
 		server.callErrFunc(err, request)
 	}
 
 	server.callHeaderFunc(writer.Header(), request, err)
 
-	http.Error(writer, message, code)
+	http.Error(writer, message, statusCode)
+
+	server.callResponseFunc(request, statusCode, int64(len(message)), err)
 }
 
 func (server *Server) callErrFunc(err error, request *http.Request) {
@@ -162,5 +174,11 @@ func (server *Server) callErrFunc(err error, request *http.Request) {
 func (server *Server) callHeaderFunc(header http.Header, request *http.Request, err error) {
 	if server.HeaderFunc != nil {
 		server.HeaderFunc(header, request, err)
+	}
+}
+
+func (server *Server) callResponseFunc(request *http.Request, statusCode int, contentSize int64, err error) {
+	if server.ResponseFunc != nil {
+		server.ResponseFunc(request, statusCode, contentSize, err)
 	}
 }
