@@ -48,6 +48,7 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	if server.RequestFunc != nil {
 		if err := server.RequestFunc(request); err != nil {
 			server.sendError(writer, request, err)
+			return
 		}
 	}
 
