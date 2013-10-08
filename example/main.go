@@ -99,5 +99,8 @@ func main() {
 	}
 
 	http.Handle("/", httpImageServer)
-	http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic(err)
+	}
 }
