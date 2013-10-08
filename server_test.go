@@ -20,6 +20,18 @@ func (provider *providerSize) Get(source interface{}, parameters Parameters) (*I
 	return CreateImage(size.width, size.height), nil
 }
 
+type processorCopy struct{}
+
+func (processor *processorCopy) Process(image *Image, parameters Parameters) (*Image, error) {
+	data := make([]byte, len(image.Data))
+	copy(image.Data, data)
+	return &Image{
+			Type: image.Type,
+			Data: data,
+		},
+		nil
+}
+
 func TestServerGet(t *testing.T) {
 	_, err := createServer().Get(Parameters{
 		"source": size{
@@ -42,6 +54,7 @@ func TestServerGetErrorMissingSource(t *testing.T) {
 
 func createServer() *Server {
 	return &Server{
-		Provider: new(providerSize),
+		Provider:  new(providerSize),
+		Processor: new(processorCopy),
 	}
 }
