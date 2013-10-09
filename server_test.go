@@ -2,12 +2,45 @@ package imageserver
 
 import (
 	"errors"
+	"sync"
 	"testing"
 )
 
 type size struct {
 	width  int
 	height int
+}
+
+type cacheMap struct {
+	mutex sync.RWMutex
+	data  map[string]*Image
+}
+
+func newCacheMap() *cacheMap {
+	return &cacheMap{
+		data: make(map[string]*Image),
+	}
+}
+
+func (cache *cacheMap) Get(key string, parameters Parameters) (*Image, error) {
+	cache.mutex.RLock()
+	defer cache.mutex.RUnlock()
+
+	image, ok := cache.data[key]
+	if !ok {
+		return nil, errors.New("not found")
+	}
+
+	return image, nil
+}
+
+func (cache *cacheMap) Set(key string, image *Image, parameters Parameters) error {
+	cache.mutex.Lock()
+	defer cache.mutex.Unlock()
+
+	cache.data[key] = image
+
+	return nil
 }
 
 type providerSize struct{}
@@ -54,6 +87,7 @@ func TestServerGetErrorMissingSource(t *testing.T) {
 
 func createServer() *Server {
 	return &Server{
+		Cache:     newCacheMap(),
 		Provider:  new(providerSize),
 		Processor: new(processorCopy),
 	}
