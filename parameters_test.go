@@ -12,7 +12,7 @@ func TestParametersSetGet(t *testing.T) {
 		t.Fatal(err)
 	}
 	if value != "bar" {
-		t.Fatal("Not equals")
+		t.Fatal("not equals")
 	}
 }
 
@@ -20,21 +20,21 @@ func TestParametersHas(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	if !parameters.Has("foo") {
-		t.Fatal("Key does not exist")
+		t.Fatal("key does not exist")
 	}
 	if parameters.Has("xxx") {
-		t.Fatal("Key exists")
+		t.Fatal("key exists")
 	}
 }
 
 func TestParametersEmpty(t *testing.T) {
 	parameters := make(Parameters)
 	if !parameters.Empty() {
-		t.Fatal("Not empty")
+		t.Fatal("not empty")
 	}
 	parameters.Set("foo", "bar")
 	if parameters.Empty() {
-		t.Fatal("Empty")
+		t.Fatal("empty")
 	}
 }
 
@@ -54,7 +54,7 @@ func TestParametersGetString(t *testing.T) {
 		t.Fatal(err)
 	}
 	if value != "bar" {
-		t.Fatal("Not equals")
+		t.Fatal("not equals")
 	}
 }
 
@@ -63,7 +63,7 @@ func TestGetStringErrorWrongType(t *testing.T) {
 	parameters.Set("foo", 666)
 	_, err := parameters.GetString("foo")
 	if err == nil {
-		t.Fatal("No error")
+		t.Fatal("no error")
 	}
 }
 
@@ -75,7 +75,7 @@ func TestGetInt(t *testing.T) {
 		t.Fatal(err)
 	}
 	if value != 7 {
-		t.Fatal("Not equals")
+		t.Fatal("not equals")
 	}
 }
 
@@ -84,7 +84,7 @@ func TestGetIntErrorWrongType(t *testing.T) {
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetInt("foo")
 	if err == nil {
-		t.Fatal("No error")
+		t.Fatal("no error")
 	}
 }
 
@@ -105,7 +105,7 @@ func TestGetBoolErrorWrongType(t *testing.T) {
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetBool("foo")
 	if err == nil {
-		t.Fatal("No error")
+		t.Fatal("no error")
 	}
 }
 
@@ -123,6 +123,6 @@ func TestGetParametersErrorWrongType(t *testing.T) {
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetParameters("foo")
 	if err == nil {
-		t.Fatal("No error")
+		t.Fatal("no error")
 	}
 }

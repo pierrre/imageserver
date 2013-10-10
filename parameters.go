@@ -28,7 +28,7 @@ func (parameters Parameters) Empty() bool {
 func (parameters Parameters) Get(key string) (interface{}, error) {
 	value, found := parameters[key]
 	if !found {
-		return nil, fmt.Errorf("Value not found")
+		return nil, fmt.Errorf("value not found")
 	}
 	return value, nil
 }
@@ -40,7 +40,7 @@ func (parameters Parameters) GetString(key string) (string, error) {
 	}
 	value, ok := v.(string)
 	if !ok {
-		return "", fmt.Errorf("Not a string")
+		return "", fmt.Errorf("not a string")
 	}
 	return value, nil
 }
@@ -52,7 +52,7 @@ func (parameters Parameters) GetInt(key string) (int, error) {
 	}
 	value, ok := v.(int)
 	if !ok {
-		return 0, fmt.Errorf("Not an int")
+		return 0, fmt.Errorf("not an int")
 	}
 	return value, nil
 }
@@ -64,7 +64,7 @@ func (parameters Parameters) GetBool(key string) (bool, error) {
 	}
 	value, ok := v.(bool)
 	if !ok {
-		return false, fmt.Errorf("Not a bool")
+		return false, fmt.Errorf("not a bool")
 	}
 	return value, nil
 }
@@ -76,7 +76,7 @@ func (parameters Parameters) GetParameters(key string) (Parameters, error) {
 	}
 	value, ok := v.(Parameters)
 	if !ok {
-		return nil, fmt.Errorf("Not a Parameters")
+		return nil, fmt.Errorf("not a Parameters")
 	}
 	return value, nil
 }

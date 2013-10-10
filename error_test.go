@@ -8,9 +8,9 @@ func TestError(t *testing.T) {
 	text := "foo"
 	err := NewError(text)
 	if err.Text != text {
-		t.Fatal("Invalid text")
+		t.Fatal("invalid text")
 	}
 	if err.Error() != text {
-		t.Fatal("Invalid error message")
+		t.Fatal("invalid error message")
 	}
 }

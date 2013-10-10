@@ -24,7 +24,7 @@ func TestImage(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(image2, image1) {
-		t.Fatal("Image not equals")
+		t.Fatal("image not equals")
 	}
 }
 

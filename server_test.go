@@ -48,7 +48,7 @@ type providerSize struct{}
 func (provider *providerSize) Get(source interface{}, parameters Parameters) (*Image, error) {
 	size, ok := source.(size)
 	if !ok {
-		return nil, errors.New("Source is not a size")
+		return nil, errors.New("source is not a size")
 	}
 	return CreateImage(size.width, size.height), nil
 }
@@ -81,7 +81,7 @@ func TestServerGetErrorMissingSource(t *testing.T) {
 	parameters := make(Parameters)
 	_, err := createServer().Get(parameters)
 	if err == nil {
-		t.Fatal("No error")
+		t.Fatal("no error")
 	}
 }
 

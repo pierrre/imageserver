@@ -22,7 +22,7 @@ func New(capacity int64) *MemoryCache {
 func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		return nil, fmt.Errorf("Not found")
+		return nil, fmt.Errorf("not found")
 	}
 	item := value.(*item)
 	image := item.image
