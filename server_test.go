@@ -43,6 +43,19 @@ func (cache *cacheMap) Set(key string, image *Image, parameters Parameters) erro
 	return nil
 }
 
+type cacheFunc struct {
+	GetFunc func(key string, parameters Parameters) (*Image, error)
+	SetFunc func(key string, image *Image, parameters Parameters) error
+}
+
+func (cache *cacheFunc) Get(key string, parameters Parameters) (*Image, error) {
+	return cache.GetFunc(key, parameters)
+}
+
+func (cache *cacheFunc) Set(key string, image *Image, parameters Parameters) error {
+	return cache.SetFunc(key, image, parameters)
+}
+
 type providerSize struct{}
 
 func (provider *providerSize) Get(source interface{}, parameters Parameters) (*Image, error) {
