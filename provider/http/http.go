@@ -27,18 +27,22 @@ func (provider *HttpProvider) Get(source interface{}, parameters imageserver.Par
 	if err != nil {
 		return nil, err
 	}
+
 	response, err := provider.request(sourceUrl)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
 	if err = provider.checkResponse(response); err != nil {
 		return nil, err
 	}
+
 	image, err := provider.createImage(response)
 	if err != nil {
 		return nil, err
 	}
+
 	return image, nil
 }
 
@@ -51,9 +55,11 @@ func (provider *HttpProvider) getSourceUrl(source interface{}) (*url.URL, error)
 			return nil, imageserver.NewError("Invalid source url")
 		}
 	}
+
 	if sourceUrl.Scheme != "http" && sourceUrl.Scheme != "https" {
 		return nil, imageserver.NewError("Invalid source scheme")
 	}
+
 	return sourceUrl, nil
 }
 
@@ -71,10 +77,13 @@ func (provider *HttpProvider) checkResponse(response *http.Response) error {
 
 func (provider *HttpProvider) createImage(response *http.Response) (*imageserver.Image, error) {
 	image := &imageserver.Image{}
+
 	provider.parseType(response, image)
+
 	if err := provider.parseData(response, image); err != nil {
 		return nil, err
 	}
+
 	return image, nil
 }
 
@@ -83,10 +92,12 @@ func (provider *HttpProvider) parseType(response *http.Response, image *imageser
 	if len(contentType) == 0 {
 		return
 	}
+
 	matches := contentTypeRegexp.FindStringSubmatch(contentType)
 	if matches == nil || len(matches) != 2 {
 		return
 	}
+
 	image.Type = matches[1]
 }
 
@@ -95,6 +106,8 @@ func (provider *HttpProvider) parseData(response *http.Response, image *imageser
 	if err != nil {
 		return err
 	}
+
 	image.Data = data
+
 	return nil
 }
