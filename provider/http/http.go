@@ -70,7 +70,7 @@ func (provider *HttpProvider) request(sourceUrl *url.URL) (*http.Response, error
 
 func (provider *HttpProvider) checkResponse(response *http.Response) error {
 	if response.StatusCode != http.StatusOK {
-		return imageserver.NewError(fmt.Sprintf("Error %d while downloading source", response.StatusCode))
+		return imageserver.NewError(fmt.Sprintf("http status code %d while downloading source", response.StatusCode))
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (provider *HttpProvider) parseType(response *http.Response, image *imageser
 func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) error {
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return imageserver.NewError("error while downloading source")
 	}
 
 	image.Data = data
