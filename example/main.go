@@ -94,7 +94,11 @@ func main() {
 			log.Println(err)
 		},
 		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
-			log.Println(request.Method, request.URL, statusCode, contentSize, err)
+			var errString string
+			if err != nil {
+				errString = err.Error()
+			}
+			log.Println(request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 		},
 	}
 
