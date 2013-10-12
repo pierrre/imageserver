@@ -80,12 +80,14 @@ func (provider *HttpProvider) createImage(response *http.Response) (*imageserver
 
 func (provider *HttpProvider) parseType(response *http.Response, image *imageserver.Image) {
 	contentType := response.Header.Get("Content-Type")
-	if len(contentType) > 0 {
-		matches := contentTypeRegexp.FindStringSubmatch(contentType)
-		if matches != nil && len(matches) == 2 {
-			image.Type = matches[1]
-		}
+	if len(contentType) == 0 {
+		return
 	}
+	matches := contentTypeRegexp.FindStringSubmatch(contentType)
+	if matches == nil || len(matches) != 2 {
+		return
+	}
+	image.Type = matches[1]
 }
 
 func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) error {
