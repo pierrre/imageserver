@@ -2,6 +2,7 @@
 package graphicsmagick
 
 import (
+	"container/list"
 	"fmt"
 	"github.com/pierrre/imageserver"
 	"io/ioutil"
@@ -61,38 +62,38 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return sourceImage, nil
 	}
 
-	var arguments []string
+	arguments := list.New()
 
-	arguments = append(arguments, "mogrify")
-
-	arguments, width, height, err := processor.buildArgumentsResize(arguments, parameters)
+	width, height, err := processor.buildArgumentsResize(arguments, parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	arguments, err = processor.buildArgumentsBackground(arguments, parameters)
+	err = processor.buildArgumentsBackground(arguments, parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	arguments, err = processor.buildArgumentsExtent(arguments, parameters, width, height)
+	err = processor.buildArgumentsExtent(arguments, parameters, width, height)
 	if err != nil {
 		return nil, err
 	}
 
-	arguments, format, hasFileExtension, err := processor.buildArgumentsFormat(arguments, parameters, sourceImage)
+	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, parameters, sourceImage)
 	if err != nil {
 		return nil, err
 	}
 
-	arguments, err = processor.buildArgumentsQuality(arguments, parameters, format)
+	err = processor.buildArgumentsQuality(arguments, parameters, format)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(arguments) == 1 {
+	if arguments.Len() == 0 {
 		return sourceImage, nil
 	}
+
+	arguments.PushFront("mogrify")
 
 	tempDir, err := ioutil.TempDir(processor.TempDir, tempDirPrefix)
 	if err != nil {
@@ -101,19 +102,24 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	defer os.RemoveAll(tempDir)
 
 	file := filepath.Join(tempDir, "image")
-	arguments = append(arguments, file)
+	arguments.PushBack(file)
 	err = ioutil.WriteFile(file, sourceImage.Data, os.FileMode(0600))
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := exec.Command(processor.Executable, arguments...)
+	argumentSlice := make([]string, 0, arguments.Len())
+	for e := arguments.Front(); e != nil; e = e.Next() {
+		argumentSlice = append(argumentSlice, e.Value.(string))
+	}
+
+	cmd := exec.Command(processor.Executable, argumentSlice...)
 	err = cmd.Run()
 	if err != nil {
 		return nil, err
 	}
 
-	if hasFileExtension {
+	if formatSpecified {
 		file = fmt.Sprintf("%s.%s", file, format)
 	}
 	data, err := ioutil.ReadFile(file)
@@ -128,19 +134,15 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	return image, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, parameters imageserver.Parameters) (arguments []string, width int, height int, err error) {
-	arguments = in
-
+func (processor *GraphicsMagickProcessor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
 	width, _ = parameters.GetInt("width")
 	if width < 0 {
-		err = imageserver.NewError("Invalid width parameter")
-		return
+		return 0, 0, imageserver.NewError("Invalid width parameter")
 	}
 
 	height, _ = parameters.GetInt("height")
 	if height < 0 {
-		err = imageserver.NewError("Invalid height parameter")
-		return
+		return 0, 0, imageserver.NewError("Invalid height parameter")
 	}
 
 	if width != 0 || height != 0 {
@@ -170,49 +172,52 @@ func (processor *GraphicsMagickProcessor) buildArgumentsResize(in []string, para
 			resize = resize + "<"
 		}
 
-		arguments = append(arguments, "-resize", resize)
+		arguments.PushBack("-resize")
+		arguments.PushBack(resize)
 	}
 
-	return
+	return width, height, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments []string, parameters imageserver.Parameters) ([]string, error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments *list.List, parameters imageserver.Parameters) error {
 	background, _ := parameters.GetString("background")
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			return nil, imageserver.NewError("Invalid background parameter")
+			return imageserver.NewError("Invalid background parameter")
 		}
 
 		for _, r := range background {
 			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				return nil, imageserver.NewError("Invalid background parameter")
+				return imageserver.NewError("Invalid background parameter")
 			}
 		}
 
-		arguments = append(arguments, "-background", fmt.Sprintf("#%s", background))
+		arguments.PushBack("-background")
+		arguments.PushBack(fmt.Sprintf("#%s", background))
 	}
 
-	return arguments, nil
+	return nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments []string, parameters imageserver.Parameters, width int, height int) ([]string, error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments *list.List, parameters imageserver.Parameters, width int, height int) error {
 	if width != 0 && height != 0 {
 		if extent, _ := parameters.GetBool("extent"); extent {
-			arguments = append(arguments, "-gravity", "center")
-			arguments = append(arguments, "-extent", fmt.Sprintf("%dx%d", width, height))
+			arguments.PushBack("-gravity")
+			arguments.PushBack("center")
+
+			arguments.PushBack("-extent")
+			arguments.PushBack(fmt.Sprintf("%dx%d", width, height))
 		}
 	}
 
-	return arguments, nil
+	return nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, parameters imageserver.Parameters, sourceImage *imageserver.Image) (arguments []string, format string, hasFileExtension bool, err error) {
-	arguments = in
-
+func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.List, parameters imageserver.Parameters, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
 	format, _ = parameters.GetString("format")
 
-	formatSpecified := true
+	formatSpecified = true
 	if len(format) == 0 {
 		format = sourceImage.Type
 		formatSpecified = false
@@ -227,25 +232,23 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(in []string, para
 			}
 		}
 		if !ok {
-			err = imageserver.NewError("Invalid format parameter")
-			return
+			return "", false, imageserver.NewError("Invalid format parameter")
 		}
 	}
 
 	if formatSpecified {
-		arguments = append(arguments, "-format", format)
+		arguments.PushBack("-format")
+		arguments.PushBack(format)
 	}
 
-	hasFileExtension = formatSpecified
-
-	return
+	return format, formatSpecified, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments []string, parameters imageserver.Parameters, format string) ([]string, error) {
+func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.List, parameters imageserver.Parameters, format string) error {
 	quality, _ := parameters.GetString("quality")
 
-	if len(quality) == 0 && len(arguments) == 1 {
-		return arguments, nil
+	if len(quality) == 0 && arguments.Len() == 0 {
+		return nil
 	}
 
 	if len(quality) == 0 && processor.DefaultQualities != nil {
@@ -257,21 +260,22 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments []stri
 	if len(quality) > 0 {
 		qualityInt, err := strconv.Atoi(quality)
 		if err != nil {
-			return nil, imageserver.NewError("Invalid quality parameter (parse int error)")
+			return imageserver.NewError("Invalid quality parameter (parse int error)")
 		}
 
 		if qualityInt < 0 {
-			return nil, imageserver.NewError("Invalid quality parameter (less than 0)")
+			return imageserver.NewError("Invalid quality parameter (less than 0)")
 		}
 
 		if format == "jpeg" {
 			if qualityInt < 0 || qualityInt > 100 {
-				return nil, imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
+				return imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
 			}
 		}
 
-		arguments = append(arguments, "-quality", quality)
+		arguments.PushBack("-quality")
+		arguments.PushBack(quality)
 	}
 
-	return arguments, nil
+	return nil
 }
