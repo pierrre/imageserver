@@ -55,6 +55,7 @@ func main() {
 		},
 		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
+			Timeout:    time.Duration(5 * time.Second),
 			AllowedFormats: []string{
 				"jpeg",
 				"png",

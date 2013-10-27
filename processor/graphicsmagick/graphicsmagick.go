@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
 const (
@@ -45,6 +46,7 @@ const (
 type GraphicsMagickProcessor struct {
 	Executable string // path to "gm" executable, usually "/usr/bin/gm"
 
+	Timeout          time.Duration     // timeout for process, optional
 	TempDir          string            // temp directory for image files, optional
 	AllowedFormats   []string          // allowed format list, optional
 	DefaultQualities map[string]string // default qualities by format, optional
@@ -114,7 +116,8 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	}
 
 	cmd := exec.Command(processor.Executable, argumentSlice...)
-	err = cmd.Run()
+
+	err = processor.runCommandTimeout(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -278,4 +281,39 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.
 	}
 
 	return nil
+}
+
+func (processor *GraphicsMagickProcessor) runCommandTimeout(cmd *exec.Cmd) error {
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	cmdChan := make(chan error)
+	go func() {
+		cmdChan <- cmd.Wait()
+	}()
+
+	var timeoutChan <-chan time.Time
+	if processor.Timeout != 0 {
+		timeoutChan = time.After(processor.Timeout)
+	}
+
+	select {
+	case err = <-cmdChan:
+		if err != nil {
+			return err
+		}
+
+		return nil
+	case <-timeoutChan:
+		err = cmd.Process.Kill()
+		if err != nil {
+			return err
+		}
+
+		<-cmdChan
+
+		return fmt.Errorf("GraphicsMagickProcessor command timeout after %s: %+v", processor.Timeout, cmd)
+	}
 }
