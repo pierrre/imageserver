@@ -111,7 +111,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 
 	cmd := exec.Command(processor.Executable, argumentSlice...)
 
-	err = processor.runCommandTimeout(cmd)
+	err = processor.runCommand(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func (processor *GraphicsMagickProcessor) convertArgumentsToSlice(arguments *lis
 	return argumentSlice
 }
 
-func (processor *GraphicsMagickProcessor) runCommandTimeout(cmd *exec.Cmd) error {
+func (processor *GraphicsMagickProcessor) runCommand(cmd *exec.Cmd) error {
 	err := cmd.Start()
 	if err != nil {
 		return err
