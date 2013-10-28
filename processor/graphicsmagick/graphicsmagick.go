@@ -53,14 +53,11 @@ type GraphicsMagickProcessor struct {
 }
 
 func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	if !parameters.Has(globalParameterName) {
-		return sourceImage, nil
-	}
-	parameters, err := parameters.GetParameters(globalParameterName)
+	parameters, err := processor.getParameters(parameters)
 	if err != nil {
 		return nil, err
 	}
-	if parameters.Empty() {
+	if parameters == nil || parameters.Empty() {
 		return sourceImage, nil
 	}
 
@@ -135,6 +132,14 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	image.Type = format
 
 	return image, nil
+}
+
+func (processor *GraphicsMagickProcessor) getParameters(parameters imageserver.Parameters) (imageserver.Parameters, error) {
+	if !parameters.Has(globalParameterName) {
+		return nil, nil
+	}
+
+	return parameters.GetParameters(globalParameterName)
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
