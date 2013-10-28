@@ -76,7 +76,7 @@ func (provider *HttpProvider) checkResponse(response *http.Response) error {
 }
 
 func (provider *HttpProvider) createImage(response *http.Response) (*imageserver.Image, error) {
-	image := &imageserver.Image{}
+	image := new(imageserver.Image)
 
 	provider.parseType(response, image)
 
