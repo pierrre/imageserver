@@ -124,9 +124,10 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return nil, err
 	}
 
-	image := &imageserver.Image{}
-	image.Data = data
-	image.Type = format
+	image := &imageserver.Image{
+		Type: format,
+		Data: data,
+	}
 
 	return image, nil
 }
