@@ -72,8 +72,8 @@ func (processor *processorCopy) Process(image *Image, parameters Parameters) (*I
 	data := make([]byte, len(image.Data))
 	copy(image.Data, data)
 	return &Image{
-			Type: image.Type,
-			Data: data,
+			Format: image.Format,
+			Data:   data,
 		},
 		nil
 }

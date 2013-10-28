@@ -98,7 +98,7 @@ func (provider *HttpProvider) parseType(response *http.Response, image *imageser
 		return
 	}
 
-	image.Type = matches[1]
+	image.Format = matches[1]
 }
 
 func (provider *HttpProvider) parseData(response *http.Response, image *imageserver.Image) error {

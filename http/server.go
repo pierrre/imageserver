@@ -103,8 +103,8 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
 	server.setImageHeaderCommon(writer, request, parameters)
 
-	if len(image.Type) > 0 {
-		writer.Header().Set("Content-Type", "image/"+image.Type)
+	if len(image.Format) > 0 {
+		writer.Header().Set("Content-Type", "image/"+image.Format)
 	}
 
 	contentLength := len(image.Data)

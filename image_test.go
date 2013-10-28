@@ -33,8 +33,8 @@ func CreateImage(width, height int) *Image {
 	buffer := new(bytes.Buffer)
 	png.Encode(buffer, baseImage)
 	return &Image{
-		Type: "png",
-		Data: buffer.Bytes(),
+		Format: "png",
+		Data:   buffer.Bytes(),
 	}
 }
 

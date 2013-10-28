@@ -125,8 +125,8 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	}
 
 	image := &imageserver.Image{
-		Type: format,
-		Data: data,
+		Format: format,
+		Data:   data,
 	}
 
 	return image, nil
@@ -225,7 +225,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.L
 
 	formatSpecified = true
 	if len(format) == 0 {
-		format = sourceImage.Type
+		format = sourceImage.Format
 		formatSpecified = false
 	}
 

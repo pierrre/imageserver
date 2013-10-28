@@ -6,8 +6,8 @@ import (
 )
 
 type Image struct {
-	Type string // png, jpeg, bmp, gif, ...
-	Data []byte // raw image data
+	Format string // png, jpeg, bmp, gif, ...
+	Data   []byte // raw image data
 }
 
 func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
