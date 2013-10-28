@@ -16,10 +16,12 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 	if err != nil {
 		return nil, err
 	}
-	image := &imageserver.Image{}
-	if err = image.Unmarshal(item.Value); err != nil {
+
+	image, err := imageserver.NewImageUnmarshal(item.Value)
+	if err != nil {
 		return nil, err
 	}
+
 	return image, nil
 }
 
@@ -28,10 +30,12 @@ func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters
 	if err != nil {
 		return err
 	}
+
 	item := &memcache_impl.Item{
 		Key:   key,
 		Value: data,
 	}
 	err = cache.Memcache.Set(item)
+
 	return err
 }

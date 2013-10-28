@@ -10,6 +10,17 @@ type Image struct {
 	Data []byte // raw image data
 }
 
+func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
+	image := new(Image)
+
+	err := image.Unmarshal(marshalledData)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
 // Serialize image to bytes
 func (image *Image) Marshal() ([]byte, error) {
 	buffer := &bytes.Buffer{}
@@ -22,8 +33,8 @@ func (image *Image) Marshal() ([]byte, error) {
 }
 
 // Fill image with serialized bytes
-func (image *Image) Unmarshal(data []byte) error {
-	buffer := bytes.NewBuffer(data)
+func (image *Image) Unmarshal(marshalledData []byte) error {
+	buffer := bytes.NewBuffer(marshalledData)
 	decoder := gob.NewDecoder(buffer)
 	err := decoder.Decode(image)
 	return err
