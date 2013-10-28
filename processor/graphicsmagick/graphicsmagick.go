@@ -107,10 +107,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return nil, err
 	}
 
-	argumentSlice := make([]string, 0, arguments.Len())
-	for e := arguments.Front(); e != nil; e = e.Next() {
-		argumentSlice = append(argumentSlice, e.Value.(string))
-	}
+	argumentSlice := processor.convertArgumentsToSlice(arguments)
 
 	cmd := exec.Command(processor.Executable, argumentSlice...)
 
@@ -286,6 +283,14 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.
 	}
 
 	return nil
+}
+
+func (processor *GraphicsMagickProcessor) convertArgumentsToSlice(arguments *list.List) []string {
+	argumentSlice := make([]string, 0, arguments.Len())
+	for e := arguments.Front(); e != nil; e = e.Next() {
+		argumentSlice = append(argumentSlice, e.Value.(string))
+	}
+	return argumentSlice
 }
 
 func (processor *GraphicsMagickProcessor) runCommandTimeout(cmd *exec.Cmd) error {
