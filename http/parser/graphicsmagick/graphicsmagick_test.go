@@ -1,0 +1,3 @@
+package graphicsmagick
+
+//TODO
