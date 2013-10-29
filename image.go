@@ -5,11 +5,13 @@ import (
 	"encoding/gob"
 )
 
+// Image represents a raw image
 type Image struct {
 	Format string // png, jpeg, bmp, gif, ...
 	Data   []byte // raw image data
 }
 
+// NewImageUnmarshal creates a new Image from serialized bytes
 func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
 	image := new(Image)
 
@@ -21,7 +23,7 @@ func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
 	return image, nil
 }
 
-// Serialize image to bytes
+// Marshal serializes the Image to bytes
 func (image *Image) Marshal() ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	encoder := gob.NewEncoder(buffer)
@@ -32,7 +34,7 @@ func (image *Image) Marshal() ([]byte, error) {
 	return data, nil
 }
 
-// Fill image with serialized bytes
+// Unmarshal unserializes bytes to the Image
 func (image *Image) Unmarshal(marshalledData []byte) error {
 	buffer := bytes.NewBuffer(marshalledData)
 	decoder := gob.NewDecoder(buffer)
