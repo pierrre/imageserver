@@ -14,7 +14,7 @@ type MemcacheCache struct {
 func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	item, err := cache.Memcache.Get(key)
 	if err != nil {
-		return nil, err
+		return nil, imageserver.NewCacheMissError(key, cache, err)
 	}
 
 	image, err := imageserver.NewImageUnmarshal(item.Value)

@@ -2,7 +2,6 @@
 package chain
 
 import (
-	"fmt"
 	"github.com/pierrre/imageserver"
 )
 
@@ -14,15 +13,20 @@ type ChainCache []imageserver.Cache
 func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	for i, c := range cache {
 		image, err := c.Get(key, parameters)
+
 		if err == nil {
 			if i > 0 {
 				cache.setCaches(key, image, parameters, i)
 			}
 			return image, nil
 		}
+
+		if _, ok := err.(*imageserver.CacheMissError); !ok {
+			return nil, err
+		}
 	}
 
-	return nil, fmt.Errorf("not found")
+	return nil, imageserver.NewCacheMissError(key, cache, nil)
 }
 
 func (cache ChainCache) setCaches(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) {

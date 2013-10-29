@@ -25,8 +25,15 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 	var cacheKey string
 	if server.Cache != nil {
 		cacheKey = parameters.Hash()
-		if image, err := server.Cache.Get(cacheKey, parameters); err == nil {
+
+		image, err := server.Cache.Get(cacheKey, parameters)
+
+		if err == nil {
 			return image, nil
+		}
+
+		if _, ok := err.(*CacheMissError); !ok {
+			return nil, err
 		}
 	}
 

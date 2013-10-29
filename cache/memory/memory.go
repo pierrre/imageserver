@@ -2,7 +2,6 @@
 package memory
 
 import (
-	"fmt"
 	"github.com/pierrre/imageserver"
 	lru_impl "github.com/youtube/vitess/go/cache"
 )
@@ -21,7 +20,7 @@ func New(capacity int64) *MemoryCache {
 func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		return nil, fmt.Errorf("not found")
+		return nil, imageserver.NewCacheMissError(key, cache, nil)
 	}
 	item := value.(*item)
 	image := item.image

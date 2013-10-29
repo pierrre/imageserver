@@ -19,17 +19,24 @@ type CacheProvider struct {
 
 func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	cacheKey := provider.getCacheKey(source)
+
 	image, err := provider.Cache.Get(cacheKey, parameters)
 	if err == nil {
 		return image, nil
 	}
+	if _, ok := err.(*imageserver.CacheMissError); !ok {
+		return nil, err
+	}
+
 	image, err = provider.Provider.Get(source, parameters)
 	if err != nil {
 		return nil, err
 	}
+
 	go func() {
 		_ = provider.Cache.Set(cacheKey, image, parameters)
 	}()
+
 	return image, nil
 }
 

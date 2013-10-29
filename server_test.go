@@ -28,7 +28,7 @@ func (cache *cacheMap) Get(key string, parameters Parameters) (*Image, error) {
 
 	image, ok := cache.data[key]
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, NewCacheMissError(key, cache, nil)
 	}
 
 	return image, nil
