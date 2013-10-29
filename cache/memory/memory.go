@@ -3,9 +3,10 @@ package memory
 
 import (
 	"github.com/pierrre/imageserver"
-	lru_impl "github.com/youtube/vitess/go/cache"
+	lru_impl "github.com/pierrre/imageserver/cache/memory/lru"
 )
 
+// Uses an LRU implentation from https://github.com/youtube/vitess/blob/master/go/cache/lru_cache.go
 type MemoryCache struct {
 	lru *lru_impl.LRUCache
 }
