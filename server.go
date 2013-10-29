@@ -1,14 +1,14 @@
-// Image server
+// Package imageserver provides an image server
 package imageserver
 
-// Image server
+// Server represents an image server
 type Server struct {
 	Cache     Cache // optional
 	Provider  Provider
 	Processor Processor // optional
 }
 
-// Get an image
+// Get returns an Image for given Parameters
 //
 // The "source" parameter is required.
 //
