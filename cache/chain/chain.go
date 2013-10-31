@@ -1,10 +1,11 @@
-// Chained cache
+// Package chain provides a chained cache
 package chain
 
 import (
 	"github.com/pierrre/imageserver"
 )
 
+// ChainCache represents a chained cache
 type ChainCache []imageserver.Cache
 
 // Get an image from caches in sequential order
