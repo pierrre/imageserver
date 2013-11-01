@@ -1,6 +1,6 @@
 package imageserver
 
-// Error displayable to the end user.
+// Error represents an error displayable to the end user.
 //
 // It is used in the http server: the errors of this type are displayed, the others are shown as "internal error".
 type Error struct {
