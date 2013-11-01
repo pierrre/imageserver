@@ -1,6 +1,6 @@
 package imageserver
 
-// Provider is the interface that is used by Server to get a source image
+// Provider represents an Image provider
 type Provider interface {
 	Get(source interface{}, parameters Parameters) (*Image, error)
 }

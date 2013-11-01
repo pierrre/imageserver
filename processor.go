@@ -1,6 +1,6 @@
 package imageserver
 
-// Processor represents an image processor
+// Processor represents an Image processor
 type Processor interface {
 	Process(*Image, Parameters) (*Image, error)
 }
