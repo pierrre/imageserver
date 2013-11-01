@@ -32,5 +32,5 @@ func NewCacheMissError(key string, cache Cache, err error) *CacheMissError {
 }
 
 func (err *CacheMissError) Error() string {
-	return fmt.Sprintf("Cache miss [%s] (%s)", err.Key, err.Cache)
+	return fmt.Sprintf("cache miss for key [%s] (%s)", err.Key, err.Cache)
 }
