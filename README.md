@@ -41,7 +41,6 @@ http://godoc.org/github.com/pierrre/imageserver
 - Github issue
 
 ## TODO
-- CacheMissError
 - more tests
 - source provider
     - dispatch (uri scheme)
