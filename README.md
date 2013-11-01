@@ -48,7 +48,6 @@ http://godoc.org/github.com/pierrre/imageserver
     - timeout
 - processor:
     - chain
-    - timeout
 	- native / imagemagick
 - regroup requests?
 - thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
