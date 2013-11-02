@@ -101,7 +101,7 @@ func main() {
 			if err != nil {
 				errString = err.Error()
 			}
-			log.Println(request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
+			log.Println(request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 		},
 	}
 
