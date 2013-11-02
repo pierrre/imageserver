@@ -58,7 +58,7 @@ func TestParametersGetString(t *testing.T) {
 	}
 }
 
-func TestGetStringErrorWrongType(t *testing.T) {
+func TestParametersGetStringErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", 666)
 	_, err := parameters.GetString("foo")
@@ -67,7 +67,7 @@ func TestGetStringErrorWrongType(t *testing.T) {
 	}
 }
 
-func TestGetInt(t *testing.T) {
+func TestParametersGetInt(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", 7)
 	value, err := parameters.GetInt("foo")
@@ -79,7 +79,7 @@ func TestGetInt(t *testing.T) {
 	}
 }
 
-func TestGetIntErrorWrongType(t *testing.T) {
+func TestParametersGetIntErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetInt("foo")
@@ -88,7 +88,7 @@ func TestGetIntErrorWrongType(t *testing.T) {
 	}
 }
 
-func TestGetBool(t *testing.T) {
+func TestParametersGetBool(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", true)
 	value, err := parameters.GetBool("foo")
@@ -100,7 +100,7 @@ func TestGetBool(t *testing.T) {
 	}
 }
 
-func TestGetBoolErrorWrongType(t *testing.T) {
+func TestParametersGetBoolErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetBool("foo")
@@ -109,7 +109,7 @@ func TestGetBoolErrorWrongType(t *testing.T) {
 	}
 }
 
-func TestGetParameters(t *testing.T) {
+func TestParametersGetParameters(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", make(Parameters))
 	_, err := parameters.GetParameters("foo")
@@ -118,7 +118,7 @@ func TestGetParameters(t *testing.T) {
 	}
 }
 
-func TestGetParametersErrorWrongType(t *testing.T) {
+func TestParametersGetParametersErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
 	_, err := parameters.GetParameters("foo")
