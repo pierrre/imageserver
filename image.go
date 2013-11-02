@@ -2,7 +2,9 @@ package imageserver
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
+	"io"
 )
 
 // Image represents a raw image
@@ -40,4 +42,71 @@ func (image *Image) Unmarshal(marshalledData []byte) error {
 	decoder := gob.NewDecoder(buffer)
 	err := decoder.Decode(image)
 	return err
+}
+
+func NewImageUnmarshalBinaryExp(marshalledData []byte) (*Image, error) {
+	image := new(Image)
+
+	err := image.UnmarshalBinaryExp(marshalledData)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
+func (image *Image) MarshalBinaryExp() ([]byte, error) {
+	buffer := new(bytes.Buffer)
+
+	formatBytes := []byte(image.Format)
+	formatLen := uint32(len(formatBytes))
+	err := binary.Write(buffer, binary.LittleEndian, &formatLen)
+	if err != nil {
+		return nil, err
+	}
+	_, err = buffer.Write(formatBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	dataLen := uint32(len(image.Data))
+	err = binary.Write(buffer, binary.LittleEndian, &dataLen)
+	if err != nil {
+		return nil, err
+	}
+	_, err = buffer.Write(image.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
+func (image *Image) UnmarshalBinaryExp(marshalledData []byte) error {
+	reader := bytes.NewReader(marshalledData)
+
+	var formatLen uint32
+	err := binary.Read(reader, binary.LittleEndian, &formatLen)
+	if err != nil {
+		return err
+	}
+	formatBytes := make([]byte, formatLen)
+	_, err = io.ReadFull(reader, formatBytes)
+	if err != nil {
+		return err
+	}
+	image.Format = string(formatBytes)
+
+	var dataLen uint32
+	err = binary.Read(reader, binary.LittleEndian, &dataLen)
+	if err != nil {
+		return err
+	}
+	image.Data = make([]byte, dataLen)
+	_, err = io.ReadFull(reader, image.Data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

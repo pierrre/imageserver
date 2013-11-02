@@ -10,6 +10,78 @@ import (
 	"testing"
 )
 
+func BenchmarkImageMarshalGob(b *testing.B) {
+	image := &Image{
+		Format: "png",
+		Data:   make([]byte, 50*1024),
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := image.Marshal()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkImageMarshalBinaryExp(b *testing.B) {
+	image := &Image{
+		Format: "png",
+		Data:   make([]byte, 50*1024),
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := image.MarshalBinaryExp()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkImageUnmarshalGob(b *testing.B) {
+	image := &Image{
+		Format: "png",
+		Data:   make([]byte, 50*1024),
+	}
+	data, err := image.Marshal()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := NewImageUnmarshal(data)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkImageUnmarshalBinaryExp(b *testing.B) {
+	image := &Image{
+		Format: "png",
+		Data:   make([]byte, 50*1024),
+	}
+	data, err := image.MarshalBinaryExp()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := NewImageUnmarshalBinaryExp(data)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func TestImage(t *testing.T) {
 	image1 := CreateImage(500, 400)
 	data, err := image1.Marshal()
