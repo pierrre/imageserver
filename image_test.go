@@ -17,14 +17,20 @@ func TestImage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	image2 := new(Image)
-	err = image2.Unmarshal(data)
+	image2, err := NewImageUnmarshal(data)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if !reflect.DeepEqual(image2, image1) {
 		t.Fatal("image not equals")
+	}
+}
+
+func TestImageUnmarshalError(t *testing.T) {
+	_, err := NewImageUnmarshal(nil)
+	if err == nil {
+		t.Fatal("no error")
 	}
 }
 
