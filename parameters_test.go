@@ -58,6 +58,14 @@ func TestParametersGetString(t *testing.T) {
 	}
 }
 
+func TestParametersGetStringErrorMiss(t *testing.T) {
+	parameters := make(Parameters)
+	_, err := parameters.GetString("foo")
+	if err == nil {
+		t.Fatal("no miss")
+	}
+}
+
 func TestParametersGetStringErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", 666)
@@ -76,6 +84,14 @@ func TestParametersGetInt(t *testing.T) {
 	}
 	if value != 7 {
 		t.Fatal("not equals")
+	}
+}
+
+func TestParametersGetIntErrorMiss(t *testing.T) {
+	parameters := make(Parameters)
+	_, err := parameters.GetInt("foo")
+	if err == nil {
+		t.Fatal("no miss")
 	}
 }
 
@@ -100,6 +116,14 @@ func TestParametersGetBool(t *testing.T) {
 	}
 }
 
+func TestParametersGetBoolErrorMiss(t *testing.T) {
+	parameters := make(Parameters)
+	_, err := parameters.GetBool("foo")
+	if err == nil {
+		t.Fatal("no miss")
+	}
+}
+
 func TestParametersGetBoolErrorWrongType(t *testing.T) {
 	parameters := make(Parameters)
 	parameters.Set("foo", "bar")
@@ -115,6 +139,14 @@ func TestParametersGetParameters(t *testing.T) {
 	_, err := parameters.GetParameters("foo")
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestParametersGetParametersErrorMiss(t *testing.T) {
+	parameters := make(Parameters)
+	_, err := parameters.GetParameters("foo")
+	if err == nil {
+		t.Fatal("no miss")
 	}
 }
 
