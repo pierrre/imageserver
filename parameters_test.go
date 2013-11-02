@@ -38,11 +38,11 @@ func TestParametersEmpty(t *testing.T) {
 	}
 }
 
-func TestParametersGetErrorNotFound(t *testing.T) {
+func TestParametersGetErrorMiss(t *testing.T) {
 	parameters := make(Parameters)
 	_, err := parameters.Get("foo")
 	if err == nil {
-		t.Fatal(err)
+		t.Fatal("no miss")
 	}
 }
 
