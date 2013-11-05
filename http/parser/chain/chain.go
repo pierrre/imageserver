@@ -1,5 +1,5 @@
-// Merge http parser
-package merge
+// Chain http parser
+package chain
 
 import (
 	"github.com/pierrre/imageserver"
@@ -8,10 +8,10 @@ import (
 )
 
 // Merges multiple parsers
-type MergeParser []imageserver_http.Parser
+type ChainParser []imageserver_http.Parser
 
 // Calls sequentially each parser
-func (parser MergeParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+func (parser ChainParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	for _, subParser := range parser {
 		err := subParser.Parse(request, parameters)
 		if err != nil {
