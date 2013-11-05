@@ -13,11 +13,11 @@ type size struct {
 type providerSize struct{}
 
 func (provider *providerSize) Get(source interface{}, parameters Parameters) (*Image, error) {
-	size, ok := source.(size)
+	s, ok := source.(size)
 	if !ok {
 		return nil, errors.New("source is not a size")
 	}
-	return CreateImage(size.width, size.height), nil
+	return CreateImage(s.width, s.height), nil
 }
 
 type processorCopy struct{}
