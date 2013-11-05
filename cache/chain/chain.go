@@ -21,10 +21,6 @@ func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*ima
 			}
 			return image, nil
 		}
-
-		if _, ok := err.(*imageserver.CacheMissError); !ok {
-			return nil, err
-		}
 	}
 
 	return nil, imageserver.NewCacheMissError(key, cache, nil)

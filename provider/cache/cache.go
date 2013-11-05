@@ -24,9 +24,6 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 	if err == nil {
 		return image, nil
 	}
-	if _, ok := err.(*imageserver.CacheMissError); !ok {
-		return nil, err
-	}
 
 	image, err = provider.Provider.Get(source, parameters)
 	if err != nil {

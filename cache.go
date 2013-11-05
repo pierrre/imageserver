@@ -6,8 +6,7 @@ import (
 
 // Cache represents an Image cache
 //
-// The Get() method MUST return a CacheMissError if it is a cache related problem.
-// The other error types will be treated as "fatal" errors.
+// The Get() method must return a CacheMissError if it is a cache related problem.
 //
 // The "parameters" argument can be used for custom behavior (no-cache, expiration, ...)
 type Cache interface {

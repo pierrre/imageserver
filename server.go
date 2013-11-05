@@ -31,10 +31,6 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 		if err == nil {
 			return image, nil
 		}
-
-		if _, ok := err.(*CacheMissError); !ok {
-			return nil, err
-		}
 	}
 
 	source, err := parameters.Get("source")
