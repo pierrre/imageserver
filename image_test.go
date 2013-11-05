@@ -19,7 +19,7 @@ func BenchmarkImageMarshalGob(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := image.Marshal()
+		_, err := image.MarshalBinary()
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -35,47 +35,7 @@ func BenchmarkImageMarshalBinaryExp(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := image.MarshalBinaryExp()
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func BenchmarkImageUnmarshalGob(b *testing.B) {
-	image := &Image{
-		Format: "png",
-		Data:   make([]byte, 50*1024),
-	}
-	data, err := image.Marshal()
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, err := NewImageUnmarshal(data)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func BenchmarkImageUnmarshalBinaryExp(b *testing.B) {
-	image := &Image{
-		Format: "png",
-		Data:   make([]byte, 50*1024),
-	}
-	data, err := image.MarshalBinaryExp()
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, err := NewImageUnmarshalBinaryExp(data)
+		_, err := image.MarshalBinary()
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -84,12 +44,12 @@ func BenchmarkImageUnmarshalBinaryExp(b *testing.B) {
 
 func TestImage(t *testing.T) {
 	image1 := CreateImage(500, 400)
-	data, err := image1.Marshal()
+	data, err := image1.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	image2, err := NewImageUnmarshal(data)
+	image2, err := NewImageUnmarshalBinary(data)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +60,7 @@ func TestImage(t *testing.T) {
 }
 
 func TestImageUnmarshalError(t *testing.T) {
-	_, err := NewImageUnmarshal(nil)
+	_, err := NewImageUnmarshalBinary(nil)
 	if err == nil {
 		t.Fatal("no error")
 	}

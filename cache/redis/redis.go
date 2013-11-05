@@ -21,7 +21,7 @@ func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*im
 		return nil, imageserver.NewCacheMissError(key, redis, err)
 	}
 
-	image, err := imageserver.NewImageUnmarshal(data)
+	image, err := imageserver.NewImageUnmarshalBinary(data)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) 
 }
 
 func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
-	data, err := image.Marshal()
+	data, err := image.MarshalBinary()
 	if err != nil {
 		return err
 	}

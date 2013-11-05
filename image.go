@@ -3,7 +3,6 @@ package imageserver
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/gob"
 	"io"
 )
 
@@ -13,11 +12,11 @@ type Image struct {
 	Data   []byte // raw image data
 }
 
-// NewImageUnmarshal creates a new Image from serialized bytes
-func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
+// NewImageUnmarshalBinary creates a new Image from serialized bytes
+func NewImageUnmarshalBinary(marshalledData []byte) (*Image, error) {
 	image := new(Image)
 
-	err := image.Unmarshal(marshalledData)
+	err := image.UnmarshalBinary(marshalledData)
 	if err != nil {
 		return nil, err
 	}
@@ -25,37 +24,8 @@ func NewImageUnmarshal(marshalledData []byte) (*Image, error) {
 	return image, nil
 }
 
-// Marshal serializes the Image to bytes
-func (image *Image) Marshal() ([]byte, error) {
-	buffer := &bytes.Buffer{}
-	encoder := gob.NewEncoder(buffer)
-	if err := encoder.Encode(image); err != nil {
-		return nil, err
-	}
-	data := buffer.Bytes()
-	return data, nil
-}
-
-// Unmarshal unserializes bytes to the Image
-func (image *Image) Unmarshal(marshalledData []byte) error {
-	buffer := bytes.NewBuffer(marshalledData)
-	decoder := gob.NewDecoder(buffer)
-	err := decoder.Decode(image)
-	return err
-}
-
-func NewImageUnmarshalBinaryExp(marshalledData []byte) (*Image, error) {
-	image := new(Image)
-
-	err := image.UnmarshalBinaryExp(marshalledData)
-	if err != nil {
-		return nil, err
-	}
-
-	return image, nil
-}
-
-func (image *Image) MarshalBinaryExp() ([]byte, error) {
+// MarshalBinary serializes the Image to bytes
+func (image *Image) MarshalBinary() ([]byte, error) {
 	buffer := new(bytes.Buffer)
 
 	formatBytes := []byte(image.Format)
@@ -82,7 +52,8 @@ func (image *Image) MarshalBinaryExp() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func (image *Image) UnmarshalBinaryExp(marshalledData []byte) error {
+// UnmarshalBinary unserializes bytes to the Image
+func (image *Image) UnmarshalBinary(marshalledData []byte) error {
 	reader := bytes.NewReader(marshalledData)
 
 	var formatLen uint32

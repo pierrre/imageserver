@@ -17,7 +17,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 		return nil, imageserver.NewCacheMissError(key, cache, err)
 	}
 
-	image, err := imageserver.NewImageUnmarshal(item.Value)
+	image, err := imageserver.NewImageUnmarshalBinary(item.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 }
 
 func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
-	data, err := image.Marshal()
+	data, err := image.MarshalBinary()
 	if err != nil {
 		return err
 	}
