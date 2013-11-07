@@ -28,6 +28,9 @@ http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.pn
 ```
 ![Extent background](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&extent=1&background=000000)
 
+## Status
+[![Build Status](https://travis-ci.org/pierrre/imageserver.png?branch=master)](https://travis-ci.org/pierrre/imageserver)
+
 ## Usage / Build
 You have to compile/configure your own image server.
 
