@@ -1,6 +1,8 @@
 package imageserver
 
 import (
+	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -27,6 +29,14 @@ func TestParametersHas(t *testing.T) {
 	}
 }
 
+func TestParametersLen(t *testing.T) {
+	parameters := make(Parameters)
+	parameters.Set("foo", "bar")
+	if parameters.Len() != 1 {
+		t.Fatal("wrong length")
+	}
+}
+
 func TestParametersEmpty(t *testing.T) {
 	parameters := make(Parameters)
 	if !parameters.Empty() {
@@ -35,6 +45,20 @@ func TestParametersEmpty(t *testing.T) {
 	parameters.Set("foo", "bar")
 	if parameters.Empty() {
 		t.Fatal("empty")
+	}
+}
+
+func TestParametersKeys(t *testing.T) {
+	parameters := make(Parameters)
+	parameters.Set("b", "bar")
+	parameters.Set("a", "foo")
+	keys := parameters.Keys()
+	sort.Strings(keys)
+
+	expected := []string{"a", "b"}
+
+	if !reflect.DeepEqual(keys, expected) {
+		t.Fatal("not equals")
 	}
 }
 
@@ -156,5 +180,37 @@ func TestParametersGetParametersErrorWrongType(t *testing.T) {
 	_, err := parameters.GetParameters("foo")
 	if err == nil {
 		t.Fatal("no error")
+	}
+}
+
+func TestParametersStable(t *testing.T) {
+	parameters1 := Parameters{
+		"a": "azerty",
+		"b": []string{
+			"e",
+			"d",
+		},
+		"c": Parameters{
+			"f": "foo",
+			"g": "bar",
+		},
+	}
+	hash1 := parameters1.Hash()
+
+	parameters2 := Parameters{
+		"c": Parameters{
+			"g": "bar",
+			"f": "foo",
+		},
+		"b": []string{
+			"e",
+			"d",
+		},
+		"a": "azerty",
+	}
+	hash2 := parameters2.Hash()
+
+	if hash1 != hash2 {
+		t.Fatal("not equals")
 	}
 }

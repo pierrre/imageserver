@@ -1,10 +1,12 @@
 package imageserver
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"io"
+	"sort"
 )
 
 // Parameters represents parameters used in imageserver package
@@ -25,9 +27,26 @@ func (parameters Parameters) Has(key string) bool {
 	return ok
 }
 
+// Len returns the length
+func (parameters Parameters) Len() int {
+	return len(parameters)
+}
+
 // Empty returns true if parameters is empty and false otherwise
 func (parameters Parameters) Empty() bool {
-	return len(parameters) == 0
+	return parameters.Len() == 0
+}
+
+// Keys returns the keys
+func (parameters Parameters) Keys() []string {
+	length := parameters.Len()
+	keys := make([]string, length)
+	i := 0
+	for key := range parameters {
+		keys[i] = key
+		i++
+	}
+	return keys
 }
 
 // Get returns the value for the key
@@ -112,7 +131,29 @@ func (parameters Parameters) newErrorType(key string, value interface{}, expecte
 // The hash is returned as a hexadecimal string
 func (parameters Parameters) Hash() string {
 	hash := sha256.New()
-	io.WriteString(hash, fmt.Sprint(parameters))
+	io.WriteString(hash, parameters.String())
 	data := hash.Sum(nil)
 	return hex.EncodeToString(data)
+}
+
+// String returns the string representation
+//
+// Keys are sorted alphabetically
+func (parameters Parameters) String() string {
+	keys := parameters.Keys()
+	sort.Strings(keys)
+
+	buffer := new(bytes.Buffer)
+	buffer.WriteString("map[")
+	for i, key := range keys {
+		if i != 0 {
+			buffer.WriteString(" ")
+		}
+		buffer.WriteString(key)
+		buffer.WriteString(":")
+		buffer.WriteString(fmt.Sprint(parameters[key]))
+	}
+	buffer.WriteString("]")
+
+	return buffer.String()
 }
