@@ -10,38 +10,6 @@ import (
 	"testing"
 )
 
-func BenchmarkImageMarshalGob(b *testing.B) {
-	image := &Image{
-		Format: "png",
-		Data:   make([]byte, 50*1024),
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, err := image.MarshalBinary()
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func BenchmarkImageMarshalBinaryExp(b *testing.B) {
-	image := &Image{
-		Format: "png",
-		Data:   make([]byte, 50*1024),
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, err := image.MarshalBinary()
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
 func TestImage(t *testing.T) {
 	image1 := CreateImage(500, 400)
 	data, err := image1.MarshalBinary()
