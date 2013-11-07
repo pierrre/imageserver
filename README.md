@@ -44,7 +44,6 @@ http://godoc.org/github.com/pierrre/imageserver
 - Github issue
 
 ## TODO
-- stable hash for Parameters (sort keys)
 - more tests
 - source provider
     - dispatch (uri scheme)
