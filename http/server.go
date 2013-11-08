@@ -1,4 +1,4 @@
-// Http image server
+// Package http provides an http handler for the imageserver package
 package http
 
 import (
@@ -14,32 +14,25 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-// Http image server
+// Server represents an http handler for imageserver.Server
+type Server struct {
+	Parser      Parser              // parse request to Parameters
+	ImageServer *imageserver.Server // handle image requests
+
+	Expire time.Duration // set the "Expires" header, optional
+
+	RequestFunc  func(request *http.Request) error                                         // allows to handle incoming requests (and eventually return an error), optional
+	HeaderFunc   func(header http.Header, request *http.Request, err error)                // allows to set custom headers, optional
+	ErrorFunc    func(err error, request *http.Request)                                    // allows to handle internal errors, optional
+	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // allows to handle returned responses, optional
+}
+
+// ServeHTTP implements the http handler interface
 //
 // Only GET and HEAD methods are supported.
 //
 // Supports ETag/If-None-Match (status code 304).
 // It doesn't check if the image really exists.
-//
-// Status codes: 200 (everything is ok), 400 (user error), 500 (internal error).
-//
-// If Expire is defined, the "Expires" header is set.
-//
-// The ErrFunc function allows to handler internal errors.
-//
-// The HeaderFunc function allows to set custom headers.
-type Server struct {
-	Parser      Parser
-	ImageServer *imageserver.Server
-
-	Expire time.Duration // optional
-
-	RequestFunc  func(request *http.Request) error                                         // optional
-	HeaderFunc   func(header http.Header, request *http.Request, err error)                // optional
-	ErrorFunc    func(err error, request *http.Request)                                    // optional
-	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // optional
-}
-
 func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
 		server.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
