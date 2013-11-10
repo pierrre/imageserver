@@ -7,7 +7,7 @@ type Error struct {
 	Text string
 }
 
-// NewError creates a new Error
+// NewError creates an Error
 func NewError(text string) *Error {
 	return &Error{
 		Text: text,
