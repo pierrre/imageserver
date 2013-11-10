@@ -53,7 +53,7 @@ func main() {
 				Prefix: "source:",
 				Cache:  cache,
 			},
-			Provider: &imageserver_provider_http.HttpProvider{},
+			Provider: &imageserver_provider_http.HTTPProvider{},
 		},
 		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
