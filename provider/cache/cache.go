@@ -1,4 +1,4 @@
-// Cache provider
+// Package cache provides a cached Image Provider
 package cache
 
 import (
@@ -9,14 +9,16 @@ import (
 	"io"
 )
 
-// Cache a provider
-//
-// The key used is a sha256 of the source's string representation.
+// CacheProvider represents a cached Image Provider
 type CacheProvider struct {
 	Cache    imageserver.Cache
 	Provider imageserver.Provider
 }
 
+// Get returns an Image for a source
+//
+// It caches the image.
+// The cache key used is a sha256 of the source's string representation.
 func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	cacheKey := provider.getCacheKey(source)
 
