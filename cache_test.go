@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-type cacheMap struct {
+type CacheMap struct {
 	mutex sync.RWMutex
 	data  map[string]*Image
 }
 
-func newCacheMap() *cacheMap {
-	return &cacheMap{
+func NewCacheMap() *CacheMap {
+	return &CacheMap{
 		data: make(map[string]*Image),
 	}
 }
 
-func (cache *cacheMap) Get(key string, parameters Parameters) (*Image, error) {
+func (cache *CacheMap) Get(key string, parameters Parameters) (*Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
 
@@ -28,7 +28,7 @@ func (cache *cacheMap) Get(key string, parameters Parameters) (*Image, error) {
 	return image, nil
 }
 
-func (cache *cacheMap) Set(key string, image *Image, parameters Parameters) error {
+func (cache *CacheMap) Set(key string, image *Image, parameters Parameters) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 
@@ -37,22 +37,22 @@ func (cache *cacheMap) Set(key string, image *Image, parameters Parameters) erro
 	return nil
 }
 
-type cacheFunc struct {
+type CacheFunc struct {
 	GetFunc func(key string, parameters Parameters) (*Image, error)
 	SetFunc func(key string, image *Image, parameters Parameters) error
 }
 
-func (cache *cacheFunc) Get(key string, parameters Parameters) (*Image, error) {
+func (cache *CacheFunc) Get(key string, parameters Parameters) (*Image, error) {
 	return cache.GetFunc(key, parameters)
 }
 
-func (cache *cacheFunc) Set(key string, image *Image, parameters Parameters) error {
+func (cache *CacheFunc) Set(key string, image *Image, parameters Parameters) error {
 	return cache.SetFunc(key, image, parameters)
 }
 
 func TestCacheMissError(t *testing.T) {
 	parameters := make(Parameters)
-	cache := newCacheMap()
+	cache := NewCacheMap()
 	_, err := cache.Get("foo", parameters)
 	if err == nil {
 		t.Fatal("no error")

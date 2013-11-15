@@ -54,7 +54,7 @@ func TestServerGetErrorMissingSource(t *testing.T) {
 
 func createServer() *Server {
 	return &Server{
-		Cache:     newCacheMap(),
+		Cache:     NewCacheMap(),
 		Provider:  new(providerSize),
 		Processor: new(processorCopy),
 	}
