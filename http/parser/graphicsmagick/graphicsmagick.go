@@ -1,4 +1,4 @@
-// Graphics http parser
+// Package graphicsmagick provides a GraphicsMagick http Parser
 package graphicsmagick
 
 import (
@@ -9,14 +9,13 @@ import (
 	"strconv"
 )
 
-// Parser for GraphicsMagick processor's parameters
-//
-// See GraphicsMagickProcessor source for parameters list.
-//
-// All parameters are prefixed with "gm."
+// GraphicsMagickParser represents a GraphicsMagick http Parser
 type GraphicsMagickParser struct {
 }
 
+// Parse parses an http Request and fill Parameters for GraphicsMagickProcessor
+//
+// See GraphicsMagickProcessor for parameters list.
 func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	p := make(imageserver.Parameters)
 	parameters.Set("graphicsmagick", p)
@@ -95,7 +94,7 @@ func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters image
 }
 
 func (parser *GraphicsMagickParser) createError(parameterName string, cause string) *imageserver.Error {
-	return imageserver.NewError(fmt.Sprintf("Invalid %s parameter (%s)", parameterName, cause))
+	return imageserver.NewError(fmt.Sprintf("invalid %s parameter (%s)", parameterName, cause))
 }
 
 func (parser *GraphicsMagickParser) createParseError(parameterName string, parseType string) *imageserver.Error {
