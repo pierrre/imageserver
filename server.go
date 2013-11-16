@@ -1,7 +1,7 @@
 // Package imageserver provides an image server
 package imageserver
 
-// Server represents an image server
+// Server represents an Image server
 type Server struct {
 	Cache     Cache // optional
 	Provider  Provider

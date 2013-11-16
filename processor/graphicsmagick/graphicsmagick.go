@@ -1,4 +1,4 @@
-// GraphicsMagick processor
+// Package graphicsmagick provides a GraphicsMagick Image Processor
 package graphicsmagick
 
 import (
@@ -18,7 +18,17 @@ const (
 	tempDirPrefix       = "imageserver_"
 )
 
-// Processes an image with GraphicsMagick command line (mogrify command)
+// GraphicsMagickProcessor represents a GraphicsMagick Image Processor
+type GraphicsMagickProcessor struct {
+	Executable string // path to "gm" executable, usually "/usr/bin/gm"
+
+	Timeout          time.Duration     // timeout for process, optional
+	TempDir          string            // temp directory for image files, optional
+	AllowedFormats   []string          // allowed format list, optional
+	DefaultQualities map[string]string // default qualities by format, optional
+}
+
+// Process processes Image with the GraphicsMagick command line (mogrify command)
 //
 // All parameters are extracted from the "graphicsmagick" node parameter and are optionals.
 //
@@ -43,15 +53,6 @@ const (
 // - format: "-format" parameter
 //
 // - quality: "-quality" parameter
-type GraphicsMagickProcessor struct {
-	Executable string // path to "gm" executable, usually "/usr/bin/gm"
-
-	Timeout          time.Duration     // timeout for process, optional
-	TempDir          string            // temp directory for image files, optional
-	AllowedFormats   []string          // allowed format list, optional
-	DefaultQualities map[string]string // default qualities by format, optional
-}
-
 func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	parameters, err := processor.getParameters(parameters)
 	if err != nil {
@@ -325,6 +326,6 @@ func (processor *GraphicsMagickProcessor) runCommand(cmd *exec.Cmd) error {
 
 		<-cmdChan
 
-		return fmt.Errorf("GraphicsMagickProcessor command timeout after %s: %+v", processor.Timeout, cmd)
+		return fmt.Errorf("command timeout after %s: %+v", processor.Timeout, cmd)
 	}
 }
