@@ -2,5 +2,5 @@ language: go
 
 go:
   - 1.1.2
-  - 1.2rc4
+  - 1.2rc5
   - tip
