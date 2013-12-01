@@ -5,4 +5,7 @@ go:
   - 1.2rc5
   - tip
 
+before_install:
+  - sudo apt-get install graphicsmagick
+
 script: go test -v -bench=. ./...
