@@ -3,9 +3,10 @@ package imageserver
 
 // Server represents an Image server
 type Server struct {
-	Cache     Cache // optional
-	Provider  Provider
-	Processor Processor // optional
+	Cache            Cache            // optional
+	CacheKeyProvider CacheKeyProvider // optional
+	Provider         Provider
+	Processor        Processor // optional
 }
 
 // Get returns an Image for given Parameters
@@ -23,8 +24,8 @@ type Server struct {
 // - store the image in the cache
 func (server *Server) Get(parameters Parameters) (*Image, error) {
 	var cacheKey string
-	if server.Cache != nil {
-		cacheKey = parameters.Hash()
+	if server.Cache != nil && server.CacheKeyProvider != nil {
+		cacheKey = server.CacheKeyProvider.Get(parameters)
 
 		image, err := server.Cache.Get(cacheKey, parameters)
 

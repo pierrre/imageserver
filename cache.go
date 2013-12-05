@@ -1,7 +1,10 @@
 package imageserver
 
 import (
+	"encoding/hex"
 	"fmt"
+	"hash"
+	"io"
 )
 
 // Cache represents an Image cache
@@ -32,4 +35,19 @@ func NewCacheMissError(key string, cache Cache, err error) *CacheMissError {
 
 func (err *CacheMissError) Error() string {
 	return fmt.Sprintf("cache miss for key %s (%s)", err.Key, err.Cache)
+}
+
+type CacheKeyProvider interface {
+	Get(parameters Parameters) string
+}
+
+type HashParametersCacheKeyProvider struct {
+	HashFunc func() hash.Hash
+}
+
+func (cacheKeyProvider *HashParametersCacheKeyProvider) Get(parameters Parameters) string {
+	hash := cacheKeyProvider.HashFunc()
+	io.WriteString(hash, parameters.String())
+	data := hash.Sum(nil)
+	return hex.EncodeToString(data)
 }

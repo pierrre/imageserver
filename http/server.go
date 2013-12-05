@@ -19,7 +19,8 @@ type Server struct {
 	Parser      Parser              // parse request to Parameters
 	ImageServer *imageserver.Server // handle image requests
 
-	Expire time.Duration // set the "Expires" header, optional
+	ETagProvider ETagProvider  // optional
+	Expire       time.Duration // set the "Expires" header, optional
 
 	RequestFunc  func(request *http.Request) error                                         // allows to handle incoming requests (and eventually return an error), optional
 	HeaderFunc   func(header http.Header, request *http.Request, err error)                // allows to set custom headers, optional
@@ -69,6 +70,10 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
+	if server.ETagProvider == nil {
+		return false
+	}
+
 	inmHeader := request.Header.Get("If-None-Match")
 	if len(inmHeader) == 0 {
 		return false
@@ -80,7 +85,8 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	}
 
 	inm := matches[1]
-	if inm != parameters.Hash() {
+	etag := server.ETagProvider.Get(parameters)
+	if inm != etag {
 		return false
 	}
 
@@ -121,7 +127,9 @@ func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *
 
 	header.Set("Cache-Control", "public")
 
-	header.Set("ETag", fmt.Sprintf("\"%s\"", parameters.Hash()))
+	if server.ETagProvider != nil {
+		header.Set("ETag", fmt.Sprintf("\"%s\"", server.ETagProvider.Get(parameters)))
+	}
 
 	if server.Expire != 0 {
 		t := time.Now()

@@ -2,10 +2,7 @@ package imageserver
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"io"
 	"sort"
 )
 
@@ -122,18 +119,6 @@ func (parameters Parameters) GetParameters(key string) (Parameters, error) {
 
 func (parameters Parameters) newErrorType(key string, value interface{}, expectedType string) error {
 	return fmt.Errorf("value %#v for key %s is of type %T instead of %s", value, key, value, expectedType)
-}
-
-// Hash returns a hash of the parameters content
-//
-// The sha256 algorithm is used
-//
-// The hash is returned as a hexadecimal string
-func (parameters Parameters) Hash() string {
-	hash := sha256.New()
-	io.WriteString(hash, parameters.String())
-	data := hash.Sum(nil)
-	return hex.EncodeToString(data)
 }
 
 // String returns the string representation

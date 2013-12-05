@@ -2,17 +2,18 @@
 package cache
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"github.com/pierrre/imageserver"
+	"hash"
 	"io"
 )
 
 // CacheProvider represents a cached Image Provider
 type CacheProvider struct {
-	Cache    imageserver.Cache
-	Provider imageserver.Provider
+	Cache            imageserver.Cache
+	CacheKeyProvider CacheKeyProvider
+	Provider         imageserver.Provider
 }
 
 // Get returns an Image for a source
@@ -20,7 +21,7 @@ type CacheProvider struct {
 // It caches the image.
 // The cache key used is a sha256 of the source's string representation.
 func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	cacheKey := provider.getCacheKey(source)
+	cacheKey := provider.CacheKeyProvider.Get(source, parameters)
 
 	image, err := provider.Cache.Get(cacheKey, parameters)
 	if err == nil {
@@ -39,8 +40,16 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 	return image, nil
 }
 
-func (provider *CacheProvider) getCacheKey(source interface{}) string {
-	hash := sha256.New()
+type CacheKeyProvider interface {
+	Get(source interface{}, parameters imageserver.Parameters) string
+}
+
+type SourceHashCacheKeyProvider struct {
+	HashFunc func() hash.Hash
+}
+
+func (cacheKeyProvider *SourceHashCacheKeyProvider) Get(source interface{}, parameters imageserver.Parameters) string {
+	hash := cacheKeyProvider.HashFunc()
 	io.WriteString(hash, fmt.Sprint(source))
 	data := hash.Sum(nil)
 	return hex.EncodeToString(data)

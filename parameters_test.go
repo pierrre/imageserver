@@ -195,7 +195,6 @@ func TestParametersStable(t *testing.T) {
 			"g": "bar",
 		},
 	}
-	hash1 := parameters1.Hash()
 
 	parameters2 := Parameters{
 		"c": Parameters{
@@ -208,9 +207,8 @@ func TestParametersStable(t *testing.T) {
 		},
 		"a": "azerty",
 	}
-	hash2 := parameters2.Hash()
 
-	if hash1 != hash2 {
+	if parameters1.String() != parameters2.String() {
 		t.Fatal("not equals")
 	}
 }

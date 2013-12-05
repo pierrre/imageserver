@@ -3,6 +3,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache_chain "github.com/pierrre/imageserver/cache/chain"
@@ -48,10 +49,16 @@ func main() {
 			Prefix: "processed:",
 			Cache:  cache,
 		},
+		CacheKeyProvider: &imageserver.HashParametersCacheKeyProvider{
+			HashFunc: sha256.New,
+		},
 		Provider: &imageserver_provider_cache.CacheProvider{
 			Cache: &imageserver_cache_prefix.PrefixCache{
 				Prefix: "source:",
 				Cache:  cache,
+			},
+			CacheKeyProvider: &imageserver_provider_cache.SourceHashCacheKeyProvider{
+				HashFunc: sha256.New,
 			},
 			Provider: &imageserver_provider_http.HTTPProvider{},
 		},
@@ -76,7 +83,10 @@ func main() {
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
 		ImageServer: imageServer,
-		Expire:      time.Duration(7 * 24 * time.Hour),
+		ETagProvider: &imageserver_http.HashParametersETagProvider{
+			HashFunc: sha256.New,
+		},
+		Expire: time.Duration(7 * 24 * time.Hour),
 		RequestFunc: func(request *http.Request) error {
 			url := request.URL
 			query := url.Query()
