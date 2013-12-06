@@ -37,17 +37,11 @@ func (err *CacheMissError) Error() string {
 	return fmt.Sprintf("cache miss for key %s (%s)", err.Key, err.Cache)
 }
 
-type CacheKeyProvider interface {
-	Get(parameters Parameters) string
-}
-
-type HashParametersCacheKeyProvider struct {
-	HashFunc func() hash.Hash
-}
-
-func (cacheKeyProvider *HashParametersCacheKeyProvider) Get(parameters Parameters) string {
-	hash := cacheKeyProvider.HashFunc()
-	io.WriteString(hash, parameters.String())
-	data := hash.Sum(nil)
-	return hex.EncodeToString(data)
+func NewParametersHashCacheKeyFunc(newHashFunc func() hash.Hash) func(parameters Parameters) string {
+	return func(parameters Parameters) string {
+		hash := newHashFunc()
+		io.WriteString(hash, parameters.String())
+		data := hash.Sum(nil)
+		return hex.EncodeToString(data)
+	}
 }

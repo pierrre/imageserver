@@ -49,18 +49,14 @@ func main() {
 			Prefix: "processed:",
 			Cache:  cache,
 		},
-		CacheKeyProvider: &imageserver.HashParametersCacheKeyProvider{
-			HashFunc: sha256.New,
-		},
+		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
 		Provider: &imageserver_provider_cache.CacheProvider{
 			Cache: &imageserver_cache_prefix.PrefixCache{
 				Prefix: "source:",
 				Cache:  cache,
 			},
-			CacheKeyProvider: &imageserver_provider_cache.SourceHashCacheKeyProvider{
-				HashFunc: sha256.New,
-			},
-			Provider: &imageserver_provider_http.HTTPProvider{},
+			CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
+			Provider:     &imageserver_provider_http.HTTPProvider{},
 		},
 		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
@@ -83,10 +79,8 @@ func main() {
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
 		ImageServer: imageServer,
-		ETagProvider: &imageserver_http.HashParametersETagProvider{
-			HashFunc: sha256.New,
-		},
-		Expire: time.Duration(7 * 24 * time.Hour),
+		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
+		Expire:      time.Duration(7 * 24 * time.Hour),
 		RequestFunc: func(request *http.Request) error {
 			url := request.URL
 			query := url.Query()

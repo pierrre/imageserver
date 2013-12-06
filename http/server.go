@@ -2,8 +2,11 @@
 package http
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/pierrre/imageserver"
+	"hash"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -19,8 +22,8 @@ type Server struct {
 	Parser      Parser              // parse request to Parameters
 	ImageServer *imageserver.Server // handle image requests
 
-	ETagProvider ETagProvider  // optional
-	Expire       time.Duration // set the "Expires" header, optional
+	ETagFunc func(parameters imageserver.Parameters) string // optional
+	Expire   time.Duration                                  // set the "Expires" header, optional
 
 	RequestFunc  func(request *http.Request) error                                         // allows to handle incoming requests (and eventually return an error), optional
 	HeaderFunc   func(header http.Header, request *http.Request, err error)                // allows to set custom headers, optional
@@ -70,7 +73,7 @@ func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
-	if server.ETagProvider == nil {
+	if server.ETagFunc == nil {
 		return false
 	}
 
@@ -85,7 +88,7 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	}
 
 	inm := matches[1]
-	etag := server.ETagProvider.Get(parameters)
+	etag := server.ETagFunc(parameters)
 	if inm != etag {
 		return false
 	}
@@ -127,8 +130,8 @@ func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *
 
 	header.Set("Cache-Control", "public")
 
-	if server.ETagProvider != nil {
-		header.Set("ETag", fmt.Sprintf("\"%s\"", server.ETagProvider.Get(parameters)))
+	if server.ETagFunc != nil {
+		header.Set("ETag", fmt.Sprintf("\"%s\"", server.ETagFunc(parameters)))
 	}
 
 	if server.Expire != 0 {
@@ -181,5 +184,14 @@ func (server *Server) callHeaderFunc(header http.Header, request *http.Request, 
 func (server *Server) callResponseFunc(request *http.Request, statusCode int, contentSize int64, err error) {
 	if server.ResponseFunc != nil {
 		server.ResponseFunc(request, statusCode, contentSize, err)
+	}
+}
+
+func NewParametersHashETagFunc(newHashFunc func() hash.Hash) func(parameters imageserver.Parameters) string {
+	return func(parameters imageserver.Parameters) string {
+		hash := newHashFunc()
+		io.WriteString(hash, parameters.String())
+		data := hash.Sum(nil)
+		return hex.EncodeToString(data)
 	}
 }
