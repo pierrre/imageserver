@@ -8,7 +8,6 @@ import (
 	"github.com/pierrre/imageserver"
 	imageserver_cache_chain "github.com/pierrre/imageserver/cache/chain"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
-	imageserver_cache_prefix "github.com/pierrre/imageserver/cache/prefix"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_parser_chain "github.com/pierrre/imageserver/http/parser/chain"
@@ -45,16 +44,10 @@ func main() {
 	}
 
 	imageServer := &imageserver.Server{
-		Cache: &imageserver_cache_prefix.PrefixCache{
-			Prefix: "processed:",
-			Cache:  cache,
-		},
+		Cache:        cache,
 		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
 		Provider: &imageserver_provider_cache.CacheProvider{
-			Cache: &imageserver_cache_prefix.PrefixCache{
-				Prefix: "source:",
-				Cache:  cache,
-			},
+			Cache:        cache,
 			CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
 			Provider:     &imageserver_provider_http.HTTPProvider{},
 		},
