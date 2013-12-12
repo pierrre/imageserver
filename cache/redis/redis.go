@@ -1,4 +1,4 @@
-// Redis cache
+// Package redis provides a Redis Image Cache
 package redis
 
 import (
@@ -8,13 +8,16 @@ import (
 	"time"
 )
 
-// Uses Gary Burd's Redis client https://github.com/garyburd/redigo
+// RedisCache represents a Redis Image Cache
+//
+// It uses Gary Burd's Redis client https://github.com/garyburd/redigo
 type RedisCache struct {
 	Pool *redigo.Pool
 
 	Expire time.Duration // optional
 }
 
+// Get gets an Image from Redis
 func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	data, err := redis.getData(key, parameters)
 	if err != nil {
@@ -36,6 +39,7 @@ func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) 
 	return redigo.Bytes(conn.Do("GET", key))
 }
 
+// Set sets an Image to Redis
 func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, err := image.MarshalBinary()
 	if err != nil {
