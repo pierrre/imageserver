@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
-	imageserver_cache_chain "github.com/pierrre/imageserver/cache/chain"
+	imageserver_cache_list "github.com/pierrre/imageserver/cache/list"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
 	imageserver_http "github.com/pierrre/imageserver/http"
@@ -30,7 +30,7 @@ func main() {
 		panic(err)
 	}
 
-	cache := imageserver_cache_chain.ChainCache{
+	cache := imageserver_cache_list.ListCache{
 		imageserver_cache_memory.New(10 * 1024 * 1024),
 		&imageserver_cache_redis.RedisCache{
 			Pool: &redigo.Pool{
