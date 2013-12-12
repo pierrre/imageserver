@@ -1,4 +1,4 @@
-// Memcache cache
+// Package memcache provides a Memcache Image Cache
 package memcache
 
 import (
@@ -6,11 +6,14 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Uses Brad Fitzpatrick's Memcache client https://github.com/bradfitz/gomemcache
+// MemcacheCache represents a Memcache Image Cache
+//
+// It uses Brad Fitzpatrick's Memcache client https://github.com/bradfitz/gomemcache
 type MemcacheCache struct {
 	Memcache *memcache_impl.Client
 }
 
+// Get gets an Image from Memcache
 func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	item, err := cache.Memcache.Get(key)
 	if err != nil {
@@ -25,6 +28,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 	return image, nil
 }
 
+// Set sets an Image to Memcache
 func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, err := image.MarshalBinary()
 	if err != nil {
