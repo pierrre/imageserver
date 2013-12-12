@@ -40,10 +40,6 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 	return image, nil
 }
 
-type CacheKeyProvider interface {
-	Get(source interface{}, parameters imageserver.Parameters) string
-}
-
 func NewSourceHashCacheKeyFunc(newHashFunc func() hash.Hash) func(source interface{}, parameters imageserver.Parameters) string {
 	return func(source interface{}, parameters imageserver.Parameters) string {
 		hash := newHashFunc()
