@@ -62,7 +62,9 @@ ok  	github.com/pierrre/imageserver/processor/graphicsmagick	443.701s
 ## Usage / Build
 You have to compile/configure your own image server.
 
-See examples: https://github.com/pierrre/imageserver/tree/master/examples
+See examples: 
+- [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
+- [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
 
 ## Documentation
 http://godoc.org/github.com/pierrre/imageserver
