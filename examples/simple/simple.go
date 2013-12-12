@@ -7,8 +7,8 @@ import (
 	"github.com/pierrre/imageserver"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_http_parser_chain "github.com/pierrre/imageserver/http/parser/chain"
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
+	imageserver_http_parser_list "github.com/pierrre/imageserver/http/parser/list"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	httpImageServer := &imageserver_http.Server{
-		Parser: &imageserver_http_parser_chain.ChainParser{
+		Parser: &imageserver_http_parser_list.ListParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
