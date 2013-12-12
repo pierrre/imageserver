@@ -1,4 +1,4 @@
-// Source http parser
+// Package source provides an http Parser that takes the "source" parameter from query
 package source
 
 import (
@@ -6,10 +6,11 @@ import (
 	"net/http"
 )
 
-// Takes the "source" query parameter
+// SourceParser represents an http Parser that takes the "source" parameter from query
 type SourceParser struct {
 }
 
+// Parse parses the http Request and takes the "source" parameter from query
 func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	query := request.URL.Query()
 	source := query.Get("source")
