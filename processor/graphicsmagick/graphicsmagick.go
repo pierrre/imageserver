@@ -53,13 +53,13 @@ type GraphicsMagickProcessor struct {
 // - format: "-format" parameter
 //
 // - quality: "-quality" parameter
-func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (processor *GraphicsMagickProcessor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	parameters, err := processor.getParameters(parameters)
 	if err != nil {
 		return nil, err
 	}
 	if parameters == nil || parameters.Empty() {
-		return sourceImage, nil
+		return image, nil
 	}
 
 	arguments := list.New()
@@ -79,7 +79,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return nil, err
 	}
 
-	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, parameters, sourceImage)
+	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, parameters, image)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 	}
 
 	if arguments.Len() == 0 {
-		return sourceImage, nil
+		return image, nil
 	}
 
 	arguments.PushFront("mogrify")
@@ -103,7 +103,7 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 
 	file := filepath.Join(tempDir, "image")
 	arguments.PushBack(file)
-	err = ioutil.WriteFile(file, sourceImage.Data, os.FileMode(0600))
+	err = ioutil.WriteFile(file, image.Data, os.FileMode(0600))
 	if err != nil {
 		return nil, err
 	}
@@ -125,12 +125,12 @@ func (processor *GraphicsMagickProcessor) Process(sourceImage *imageserver.Image
 		return nil, err
 	}
 
-	image := &imageserver.Image{
+	resultImage := &imageserver.Image{
 		Format: format,
 		Data:   data,
 	}
 
-	return image, nil
+	return resultImage, nil
 }
 
 func (processor *GraphicsMagickProcessor) getParameters(parameters imageserver.Parameters) (imageserver.Parameters, error) {
