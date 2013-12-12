@@ -1,16 +1,16 @@
-// Package chain provides a chained cache
+// Package chain provides a chained Image Cache
 package chain
 
 import (
 	"github.com/pierrre/imageserver"
 )
 
-// ChainCache represents a chained cache
+// ChainCache represents a chained Image Cache
 type ChainCache []imageserver.Cache
 
-// Get gets an image from caches in sequential order
+// Get gets an Image from caches in sequential order
 //
-// If an image is found, previous caches are filled
+// If an Image is found, previous caches are filled
 func (cache ChainCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	for i, c := range cache {
 		image, err := c.Get(key, parameters)
