@@ -1,4 +1,4 @@
-// Source path http parser
+// Package sourcepath provides an http Parser that takes the "source" parameter from the path
 package sourcepath
 
 import (
@@ -7,11 +7,12 @@ import (
 	"net/url"
 )
 
-// Similar to the SourceParser, but takes the request's path, and concatenates it to the base url
+// SourcePathParser represents an http Parser that takes the "source" parameter from the path
 type SourcePathParser struct {
 	Base *url.URL
 }
 
+// Parse takes the "source" parameter from the path
 func (parser *SourcePathParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	s := *parser.Base
 	source := &s
