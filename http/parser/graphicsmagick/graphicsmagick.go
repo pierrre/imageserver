@@ -13,7 +13,7 @@ import (
 type GraphicsMagickParser struct {
 }
 
-// Parse parses an http Request and fill Parameters for GraphicsMagickProcessor
+// Parse parses an http Request for GraphicsMagickProcessor
 //
 // See GraphicsMagickProcessor for parameters list.
 func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
