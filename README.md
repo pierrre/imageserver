@@ -8,25 +8,29 @@ An image server written in Go (Golang)
 - Fully modular
 
 ## Demo
+Normal
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png
+http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/small.jpg
 ```
-![Normal](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png)
+![Normal](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/small.jpg)
 
+Resize animated gif
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=400&format=jpeg&quality=50
+http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/animated.gif&width=300&height=300
 ```
-![Resized jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=400&format=jpeg&quality=50)
+![Resize animated gif](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/animated.gif&width=300&height=300)
 
+Resize and crop
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&fill=1&extent=1
+http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/medium.jpg&width=200&height=200&extent=1&fill=1
 ```
-![Crop](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&fill=1&extent=1)
+![Resize and crop](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/medium.jpg&width=200&height=200&extent=1&fill=1)
 
+Resize jpeg low quality
 ```
-http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&extent=1&background=000000
+http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/large.jpg&width=400&format=jpeg&quality=50
 ```
-![Extent background](http://fuckingfrogs.fr:8080/?source=https://www.google.com/images/srpr/logo6w.png&width=200&height=200&extent=1&background=000000)
+![Resize jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/large.jpg&width=400&format=jpeg&quality=50)
 
 ## Resize benchmark
 ```
