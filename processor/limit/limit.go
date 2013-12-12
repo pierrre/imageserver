@@ -22,10 +22,10 @@ func New(limit uint, processor imageserver.Processor) imageserver.Processor {
 }
 
 // Process forwards the call to the wrapped Image Processor and limits the number of concurrent executions
-func (processor *LimitProcessor) Process(inImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (processor *LimitProcessor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	processor.limitChan <- true
 	defer func() {
 		<-processor.limitChan
 	}()
-	return processor.processor.Process(inImage, parameters)
+	return processor.processor.Process(image, parameters)
 }
