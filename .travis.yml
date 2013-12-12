@@ -6,5 +6,6 @@ go:
 
 before_install:
   - sudo apt-get install graphicsmagick
+  - go get code.google.com/p/go.tools/cmd/cover
 
 script: go test -v -cover -bench=. ./...
