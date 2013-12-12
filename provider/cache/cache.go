@@ -40,6 +40,7 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 	return image, nil
 }
 
+// NewSourceHashCacheKeyFunc returns a function that hashes the source  and returns a Cache key
 func NewSourceHashCacheKeyFunc(newHashFunc func() hash.Hash) func(source interface{}, parameters imageserver.Parameters) string {
 	return func(source interface{}, parameters imageserver.Parameters) string {
 		hash := newHashFunc()

@@ -37,6 +37,7 @@ func (err *CacheMissError) Error() string {
 	return fmt.Sprintf("cache miss for key %s (%s)", err.Key, err.Cache)
 }
 
+// NewParametersHashCacheKeyFunc returns a function that hashes the parameters and returns a Cache key
 func NewParametersHashCacheKeyFunc(newHashFunc func() hash.Hash) func(parameters Parameters) string {
 	return func(parameters Parameters) string {
 		hash := newHashFunc()

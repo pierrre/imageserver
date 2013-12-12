@@ -187,6 +187,7 @@ func (server *Server) callResponseFunc(request *http.Request, statusCode int, co
 	}
 }
 
+// NewParametersHashETagFunc returns a function that hashes the parameters and returns an ETag value
 func NewParametersHashETagFunc(newHashFunc func() hash.Hash) func(parameters imageserver.Parameters) string {
 	return func(parameters imageserver.Parameters) string {
 		hash := newHashFunc()
