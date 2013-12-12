@@ -10,7 +10,7 @@ import (
 type SourceParser struct {
 }
 
-// Parse parses the http Request and takes the "source" parameter from query
+// Parse takes the "source" parameter from query
 func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	query := request.URL.Query()
 	source := query.Get("source")
