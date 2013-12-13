@@ -30,24 +30,12 @@ func (image *Image) MarshalBinary() ([]byte, error) {
 
 	formatBytes := []byte(image.Format)
 	formatLen := uint32(len(formatBytes))
-	err := binary.Write(buffer, binary.LittleEndian, &formatLen)
-	if err != nil {
-		return nil, err
-	}
-	_, err = buffer.Write(formatBytes)
-	if err != nil {
-		return nil, err
-	}
+	binary.Write(buffer, binary.LittleEndian, &formatLen)
+	buffer.Write(formatBytes)
 
 	dataLen := uint32(len(image.Data))
-	err = binary.Write(buffer, binary.LittleEndian, &dataLen)
-	if err != nil {
-		return nil, err
-	}
-	_, err = buffer.Write(image.Data)
-	if err != nil {
-		return nil, err
-	}
+	binary.Write(buffer, binary.LittleEndian, &dataLen)
+	buffer.Write(image.Data)
 
 	return buffer.Bytes(), nil
 }
