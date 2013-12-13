@@ -1,6 +1,7 @@
 package imageserver
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"sync"
 	"testing"
@@ -13,6 +14,14 @@ func TestNewCacheMissError(t *testing.T) {
 
 	err := NewCacheMissError(key, cache, previousErr)
 	err.Error()
+}
+
+func TestNewParametersHashCacheKeyFunc(t *testing.T) {
+	f := NewParametersHashCacheKeyFunc(sha256.New)
+	parameters := Parameters{
+		"foo": "bar",
+	}
+	f(parameters)
 }
 
 type cacheMap struct {
