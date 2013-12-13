@@ -19,22 +19,26 @@ type Cache interface {
 
 // CacheMissError represents a cache miss error (no image found or cache not available)
 type CacheMissError struct {
-	Key   string
-	Cache Cache
-	Err   error
+	Key      string
+	Cache    Cache
+	Previous error
 }
 
 // NewCacheMissError creates a new CacheMissError
-func NewCacheMissError(key string, cache Cache, err error) *CacheMissError {
+func NewCacheMissError(key string, cache Cache, previous error) *CacheMissError {
 	return &CacheMissError{
-		Key:   key,
-		Cache: cache,
-		Err:   err,
+		Key:      key,
+		Cache:    cache,
+		Previous: previous,
 	}
 }
 
 func (err *CacheMissError) Error() string {
-	return fmt.Sprintf("cache miss for key %s (%s)", err.Key, err.Cache)
+	s := fmt.Sprintf("cache miss for key \"%s\"", err.Key)
+	if err.Previous != nil {
+		s = fmt.Sprintf("%s (%s)", s, err.Previous)
+	}
+	return s
 }
 
 // NewParametersHashCacheKeyFunc returns a function that hashes the parameters and returns a Cache key

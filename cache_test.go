@@ -1,9 +1,19 @@
 package imageserver
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 )
+
+func TestNewCacheMissError(t *testing.T) {
+	key := "foobar"
+	cache := newCacheMap()
+	previousErr := fmt.Errorf("not found")
+
+	err := NewCacheMissError(key, cache, previousErr)
+	err.Error()
+}
 
 type cacheMap struct {
 	mutex sync.RWMutex
@@ -48,14 +58,4 @@ func (cache *cacheFunc) Get(key string, parameters Parameters) (*Image, error) {
 
 func (cache *cacheFunc) Set(key string, image *Image, parameters Parameters) error {
 	return cache.SetFunc(key, image, parameters)
-}
-
-func TestCacheMissError(t *testing.T) {
-	parameters := make(Parameters)
-	cache := newCacheMap()
-	_, err := cache.Get("foo", parameters)
-	if err == nil {
-		t.Fatal("no error")
-	}
-	err.Error()
 }
