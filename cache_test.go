@@ -1,8 +1,9 @@
-package imageserver
+package imageserver_test
 
 import (
 	"crypto/sha256"
 	"fmt"
+	. "github.com/pierrre/imageserver"
 	"sync"
 	"testing"
 )

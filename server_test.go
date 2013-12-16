@@ -1,28 +1,14 @@
-package imageserver
+package imageserver_test
 
 import (
-	"errors"
+	. "github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver/testdata"
 	"testing"
 )
 
-type size struct {
-	width  int
-	height int
-}
+type copyProcessor struct{}
 
-type providerSize struct{}
-
-func (provider *providerSize) Get(source interface{}, parameters Parameters) (*Image, error) {
-	s, ok := source.(size)
-	if !ok {
-		return nil, errors.New("source is not a size")
-	}
-	return CreateImage(s.width, s.height), nil
-}
-
-type processorCopy struct{}
-
-func (processor *processorCopy) Process(image *Image, parameters Parameters) (*Image, error) {
+func (processor *copyProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
 	data := make([]byte, len(image.Data))
 	copy(image.Data, data)
 	return &Image{
@@ -33,14 +19,14 @@ func (processor *processorCopy) Process(image *Image, parameters Parameters) (*I
 }
 
 func TestServerGet(t *testing.T) {
-	_, err := createServer().Get(Parameters{
-		"source": size{
-			width:  500,
-			height: 400,
-		},
+	image, err := createServer().Get(Parameters{
+		"source": "medium.jpg",
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+	if image == nil {
+		t.Fatal("image is nil")
 	}
 }
 
@@ -55,7 +41,7 @@ func TestServerGetErrorMissingSource(t *testing.T) {
 func createServer() *Server {
 	return &Server{
 		Cache:     newCacheMap(),
-		Provider:  new(providerSize),
-		Processor: new(processorCopy),
+		Provider:  testdata.Provider,
+		Processor: new(copyProcessor),
 	}
 }

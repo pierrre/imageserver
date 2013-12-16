@@ -1,68 +1,33 @@
-package imageserver
+package imageserver_test
 
 import (
-	"bytes"
-	"image"
-	"image/color"
-	"image/png"
-	"math/rand"
+	. "github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver/testdata"
 	"reflect"
 	"testing"
 )
 
 func TestImage(t *testing.T) {
-	image1 := CreateImage(500, 400)
-	data, err := image1.MarshalBinary()
-	if err != nil {
-		t.Fatal(err)
-	}
+	for _, image := range testdata.Images {
+		data, err := image.MarshalBinary()
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	image2, err := NewImageUnmarshalBinary(data)
-	if err != nil {
-		t.Fatal(err)
-	}
+		newImage, err := NewImageUnmarshalBinary(data)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if !reflect.DeepEqual(image2, image1) {
-		t.Fatal("image not equals")
+		if !reflect.DeepEqual(newImage, image) {
+			t.Fatal("image not equals")
+		}
 	}
 }
 
-func TestImageUnmarshalError(t *testing.T) {
+func TestImageUnmarshalBinaryError(t *testing.T) {
 	_, err := NewImageUnmarshalBinary(nil)
 	if err == nil {
 		t.Fatal("no error")
 	}
-}
-
-func CreateImage(width, height int) *Image {
-	baseImage := CreateBaseImage(width, height)
-	buffer := new(bytes.Buffer)
-	png.Encode(buffer, baseImage)
-	return &Image{
-		Format: "png",
-		Data:   buffer.Bytes(),
-	}
-}
-
-func CreateBaseImage(width, height int) *image.NRGBA {
-	i := image.NewNRGBA(image.Rect(0, 0, width, height))
-	for y, height := 0, i.Bounds().Dy(); y < height; y++ {
-		for x, width := 0, i.Bounds().Dx(); x < width; x++ {
-			i.Set(x, y, randColor())
-		}
-	}
-	return i
-}
-
-func randColor() color.RGBA {
-	return color.RGBA{
-		R: randColorComponent(),
-		G: randColorComponent(),
-		B: randColorComponent(),
-		A: randColorComponent(),
-	}
-}
-
-func randColorComponent() uint8 {
-	return uint8(rand.Int31n(256))
 }
