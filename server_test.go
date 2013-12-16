@@ -31,8 +31,16 @@ func TestServerGet(t *testing.T) {
 }
 
 func TestServerGetErrorMissingSource(t *testing.T) {
-	parameters := make(Parameters)
-	_, err := createServer().Get(parameters)
+	_, err := createServer().Get(Parameters{})
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
+func TestServerGetErrorProvider(t *testing.T) {
+	_, err := createServer().Get(Parameters{
+		"source": "foobar",
+	})
 	if err == nil {
 		t.Fatal("no error")
 	}
