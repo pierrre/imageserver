@@ -26,8 +26,25 @@ func TestImage(t *testing.T) {
 }
 
 func TestImageUnmarshalBinaryError(t *testing.T) {
-	_, err := NewImageUnmarshalBinary(nil)
-	if err == nil {
-		t.Fatal("no error")
+	for _, image := range testdata.Images {
+		data, err := image.MarshalBinary()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		index := -1 // Always truncate 1 byte
+		for _, offset := range []int{
+			4,
+			len(image.Format),
+			4,
+			len(image.Data),
+		} {
+			index += offset
+			errorData := data[0:index]
+			_, err = NewImageUnmarshalBinary(errorData)
+			if err == nil {
+				t.Fatal("no error")
+			}
+		}
 	}
 }
