@@ -1,8 +1,11 @@
 package imageserver_test
 
 import (
+	"crypto/sha256"
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
+	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -30,6 +33,31 @@ func TestServerGet(t *testing.T) {
 	}
 }
 
+func TestServerGetWithCache(t *testing.T) {
+	server := createServer()
+	server.Cache = newCacheMap()
+	server.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
+
+	image, err := server.Get(Parameters{
+		"source": "medium.jpg",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runtime.Gosched() // TRICK: we yield this goroutine in order to fill the cache (it's set in another goroutine)
+
+	sameImage, err := server.Get(Parameters{
+		"source": "medium.jpg",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(image, sameImage) {
+		t.Fatal("not equals")
+	}
+}
+
 func TestServerGetErrorMissingSource(t *testing.T) {
 	_, err := createServer().Get(Parameters{})
 	if err == nil {
@@ -48,7 +76,6 @@ func TestServerGetErrorProvider(t *testing.T) {
 
 func createServer() *Server {
 	return &Server{
-		Cache:     newCacheMap(),
 		Provider:  testdata.Provider,
 		Processor: new(copyProcessor),
 	}
