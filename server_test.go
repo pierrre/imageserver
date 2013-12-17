@@ -9,18 +9,6 @@ import (
 	"testing"
 )
 
-type copyProcessor struct{}
-
-func (processor *copyProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
-	data := make([]byte, len(image.Data))
-	copy(image.Data, data)
-	return &Image{
-			Format: image.Format,
-			Data:   data,
-		},
-		nil
-}
-
 func TestServerGet(t *testing.T) {
 	image, err := createServer().Get(Parameters{
 		"source": "medium.jpg",
@@ -74,9 +62,41 @@ func TestServerGetErrorProvider(t *testing.T) {
 	}
 }
 
+func TestServerGetErrorProcessor(t *testing.T) {
+	server := &Server{
+		Provider:  testdata.Provider,
+		Processor: new(errorProcessor),
+	}
+
+	_, err := server.Get(Parameters{
+		"source": "medium.jpg",
+	})
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func createServer() *Server {
 	return &Server{
 		Provider:  testdata.Provider,
 		Processor: new(copyProcessor),
 	}
+}
+
+type copyProcessor struct{}
+
+func (processor *copyProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
+	data := make([]byte, len(image.Data))
+	copy(image.Data, data)
+	return &Image{
+			Format: image.Format,
+			Data:   data,
+		},
+		nil
+}
+
+type errorProcessor struct{}
+
+func (processor *errorProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
+	return nil, NewError("error")
 }
