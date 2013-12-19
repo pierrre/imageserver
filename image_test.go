@@ -49,29 +49,65 @@ func TestImageUnmarshalBinaryError(t *testing.T) {
 	}
 }
 
-func BenchmarkMarshalBinarySmall(b *testing.B) {
-	benchmarkMarshalBinary(b, testdata.Small)
+func BenchmarkImageMarshalBinarySmall(b *testing.B) {
+	benchmarkImageMarshalBinary(b, testdata.Small)
 }
 
-func BenchmarkMarshalBinaryMedium(b *testing.B) {
-	benchmarkMarshalBinary(b, testdata.Medium)
+func BenchmarkImageMarshalBinaryMedium(b *testing.B) {
+	benchmarkImageMarshalBinary(b, testdata.Medium)
 }
 
-func BenchmarkMarshalBinaryLarge(b *testing.B) {
-	benchmarkMarshalBinary(b, testdata.Large)
+func BenchmarkImageMarshalBinaryLarge(b *testing.B) {
+	benchmarkImageMarshalBinary(b, testdata.Large)
 }
 
-func BenchmarkMarshalBinaryHuge(b *testing.B) {
-	benchmarkMarshalBinary(b, testdata.Huge)
+func BenchmarkImageMarshalBinaryHuge(b *testing.B) {
+	benchmarkImageMarshalBinary(b, testdata.Huge)
 }
 
-func BenchmarkMarshalBinaryAnimated(b *testing.B) {
-	benchmarkMarshalBinary(b, testdata.Animated)
+func BenchmarkImageMarshalBinaryAnimated(b *testing.B) {
+	benchmarkImageMarshalBinary(b, testdata.Animated)
 }
 
-func benchmarkMarshalBinary(b *testing.B, image *Image) {
+func benchmarkImageMarshalBinary(b *testing.B, image *Image) {
 	for i := 0; i < b.N; i++ {
 		_, err := image.MarshalBinary()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkNewImageUnmarshalBinarySmall(b *testing.B) {
+	benchmarkNewImageUnmarshalBinary(b, testdata.Small)
+}
+
+func BenchmarkNewImageUnmarshalBinaryMedium(b *testing.B) {
+	benchmarkNewImageUnmarshalBinary(b, testdata.Medium)
+}
+
+func BenchmarkNewImageUnmarshalBinaryLarge(b *testing.B) {
+	benchmarkNewImageUnmarshalBinary(b, testdata.Large)
+}
+
+func BenchmarkNewImageUnmarshalBinaryHuge(b *testing.B) {
+	benchmarkNewImageUnmarshalBinary(b, testdata.Huge)
+}
+
+func BenchmarkNewImageUnmarshalBinaryAnimated(b *testing.B) {
+	benchmarkNewImageUnmarshalBinary(b, testdata.Animated)
+}
+
+func benchmarkNewImageUnmarshalBinary(b *testing.B, image *Image) {
+	data, err := image.MarshalBinary()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := NewImageUnmarshalBinary(data)
 		if err != nil {
 			b.Fatal(err)
 		}
