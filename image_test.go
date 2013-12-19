@@ -48,3 +48,32 @@ func TestImageUnmarshalBinaryError(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkMarshalBinarySmall(b *testing.B) {
+	benchmarkMarshalBinary(b, testdata.Small)
+}
+
+func BenchmarkMarshalBinaryMedium(b *testing.B) {
+	benchmarkMarshalBinary(b, testdata.Medium)
+}
+
+func BenchmarkMarshalBinaryLarge(b *testing.B) {
+	benchmarkMarshalBinary(b, testdata.Large)
+}
+
+func BenchmarkMarshalBinaryHuge(b *testing.B) {
+	benchmarkMarshalBinary(b, testdata.Huge)
+}
+
+func BenchmarkMarshalBinaryAnimated(b *testing.B) {
+	benchmarkMarshalBinary(b, testdata.Animated)
+}
+
+func benchmarkMarshalBinary(b *testing.B, image *Image) {
+	for i := 0; i < b.N; i++ {
+		_, err := image.MarshalBinary()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
