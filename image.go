@@ -3,6 +3,7 @@ package imageserver
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -41,8 +42,8 @@ func (image *Image) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary unserializes bytes to the Image
-func (image *Image) UnmarshalBinary(marshalledData []byte) error {
-	reader := bytes.NewReader(marshalledData)
+func (image *Image) UnmarshalBinary(data []byte) error {
+	reader := bytes.NewReader(data)
 
 	var formatLen uint32
 	err := binary.Read(reader, binary.LittleEndian, &formatLen)
@@ -66,6 +67,55 @@ func (image *Image) UnmarshalBinary(marshalledData []byte) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+// NewImageUnmarshalBinaryOptimized creates a new Image from serialized bytes
+func NewImageUnmarshalBinaryOptimized(data []byte) (*Image, error) {
+	image := new(Image)
+
+	err := image.UnmarshalBinaryOptimized(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
+// UnmarshalBinaryOptimized unserializes bytes to the Image
+func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
+	dataStart, dataEnd := 0, 0
+
+	dataEnd += 4
+	if dataEnd > len(data) {
+		return fmt.Errorf("end of data")
+	}
+	var formatLen uint32
+	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &formatLen)
+	dataStart = dataEnd
+
+	dataEnd += int(formatLen)
+	if dataEnd > len(data) {
+		return fmt.Errorf("end of data")
+	}
+	image.Format = string(data[dataStart:dataEnd])
+	dataStart = dataEnd
+
+	dataEnd += 4
+	if dataEnd > len(data) {
+		return fmt.Errorf("end of data")
+	}
+	var dataLen uint32
+	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &dataLen)
+	dataStart = dataEnd
+
+	dataEnd += int(dataLen)
+	if dataEnd > len(data) {
+		return fmt.Errorf("end of data")
+	}
+	image.Data = data[dataStart:dataEnd]
+	dataStart = dataEnd
 
 	return nil
 }
