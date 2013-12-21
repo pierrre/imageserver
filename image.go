@@ -86,40 +86,40 @@ func NewImageUnmarshalBinaryOptimized(data []byte) (*Image, error) {
 // UnmarshalBinaryOptimized unserializes bytes to the Image
 func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
 	dataStart, dataEnd := 0, 0
-
-	dataEnd += 4
-	if dataEnd > len(data) {
-		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
+	readData := func(length int) ([]byte, error) {
+		dataStart = dataEnd
+		dataEnd += length
+		if dataEnd > len(data) {
+			return nil, fmt.Errorf("unexpected end of data at index %d instead of %d", len(data), dataEnd)
+		}
+		return data[dataStart:dataEnd], nil
 	}
-	var formatLen uint32
-	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &formatLen)
-	dataStart = dataEnd
 
-	dataEnd += int(formatLen)
-	if dataEnd > len(data) {
-		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
+	var imageFormatLength uint32
+	if d, err := readData(4); err == nil {
+		binary.Read(bytes.NewReader(d), binary.LittleEndian, &imageFormatLength)
+	} else {
+		return err
 	}
-	image.Format = string(data[dataStart:dataEnd])
-	dataStart = dataEnd
 
-	dataEnd += 4
-	if dataEnd > len(data) {
-		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
+	if d, err := readData(int(imageFormatLength)); err == nil {
+		image.Format = string(d)
+	} else {
+		return err
 	}
-	var dataLen uint32
-	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &dataLen)
-	dataStart = dataEnd
 
-	dataEnd += int(dataLen)
-	if dataEnd > len(data) {
-		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
+	var imageDataLength uint32
+	if d, err := readData(4); err == nil {
+		binary.Read(bytes.NewReader(d), binary.LittleEndian, &imageDataLength)
+	} else {
+		return err
 	}
-	image.Data = data[dataStart:dataEnd]
-	dataStart = dataEnd
+
+	if d, err := readData(int(imageDataLength)); err == nil {
+		image.Data = d
+	} else {
+		return err
+	}
 
 	return nil
-}
-
-func newImageUnmarshalBinaryErrorEndOfData(index int, expected int) error {
-	return fmt.Errorf("unexpected end of data at index %d instead of %d", index, expected)
 }
