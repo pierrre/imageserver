@@ -89,7 +89,7 @@ func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
 
 	dataEnd += 4
 	if dataEnd > len(data) {
-		return fmt.Errorf("end of data")
+		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
 	}
 	var formatLen uint32
 	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &formatLen)
@@ -97,14 +97,14 @@ func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
 
 	dataEnd += int(formatLen)
 	if dataEnd > len(data) {
-		return fmt.Errorf("end of data")
+		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
 	}
 	image.Format = string(data[dataStart:dataEnd])
 	dataStart = dataEnd
 
 	dataEnd += 4
 	if dataEnd > len(data) {
-		return fmt.Errorf("end of data")
+		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
 	}
 	var dataLen uint32
 	binary.Read(bytes.NewReader(data[dataStart:dataEnd]), binary.LittleEndian, &dataLen)
@@ -112,10 +112,14 @@ func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
 
 	dataEnd += int(dataLen)
 	if dataEnd > len(data) {
-		return fmt.Errorf("end of data")
+		return newImageUnmarshalBinaryErrorEndOfData(len(data), dataEnd)
 	}
 	image.Data = data[dataStart:dataEnd]
 	dataStart = dataEnd
 
 	return nil
+}
+
+func newImageUnmarshalBinaryErrorEndOfData(index int, expected int) error {
+	return fmt.Errorf("unexpected end of data at index %d instead of %d", index, expected)
 }
