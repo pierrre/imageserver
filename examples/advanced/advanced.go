@@ -4,6 +4,8 @@ package main
 
 import (
 	"crypto/sha256"
+	//_ "expvar"
+	"flag"
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache_list "github.com/pierrre/imageserver/cache/list"
@@ -19,12 +21,17 @@ import (
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 	"log"
 	"net/http"
+	//_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
 )
 
 func main() {
+	var verbose bool
+	flag.BoolVar(&verbose, "verbose", false, "Verbose")
+	flag.Parse()
+
 	hostname, err := os.Hostname()
 	if err != nil {
 		panic(err)
@@ -91,14 +98,18 @@ func main() {
 			header.Set("X-Hostname", hostname)
 		},
 		ErrorFunc: func(err error, request *http.Request) {
-			log.Println(err)
+			if verbose {
+				log.Println(err)
+			}
 		},
 		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
-			var errString string
-			if err != nil {
-				errString = err.Error()
+			if verbose {
+				var errString string
+				if err != nil {
+					errString = err.Error()
+				}
+				log.Println(request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 			}
-			log.Println(request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 		},
 	}
 
