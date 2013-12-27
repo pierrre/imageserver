@@ -129,4 +129,6 @@ func benchmarkResize(b *testing.B, image *imageserver.Image, workerCount int) {
 		}()
 	}
 	wg.Wait()
+
+	b.SetBytes(int64(len(image.Data)))
 }

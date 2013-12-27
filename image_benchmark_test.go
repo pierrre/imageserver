@@ -33,6 +33,8 @@ func benchmarkImageMarshalBinary(b *testing.B, image *Image) {
 			b.Fatal(err)
 		}
 	}
+
+	b.SetBytes(int64(len(image.Data)))
 }
 
 func BenchmarkImageUnmarshalBinarySmall(b *testing.B) {
@@ -69,6 +71,8 @@ func benchmarkImageUnmarshalBinary(b *testing.B, image *Image) {
 			b.Fatal(err)
 		}
 	}
+
+	b.SetBytes(int64(len(data)))
 }
 
 func BenchmarkImageUnmarshalBinaryOptimizedSmall(b *testing.B) {
@@ -105,4 +109,6 @@ func benchmarkImageUnmarshalBinaryOptimized(b *testing.B, image *Image) {
 			b.Fatal(err)
 		}
 	}
+
+	b.SetBytes(int64(len(data)))
 }
