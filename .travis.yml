@@ -6,6 +6,7 @@ go:
 
 before_install:
   - sudo apt-get install graphicsmagick
+  - sudo apt-get install redis-server
   - go get code.google.com/p/go.tools/cmd/cover
 
 script:
