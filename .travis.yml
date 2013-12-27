@@ -4,9 +4,11 @@ go:
   - 1.2
   - tip
 
+services:
+  - redis-server
+
 before_install:
   - sudo apt-get install graphicsmagick
-  - sudo apt-get install redis-server
   - go get -v code.google.com/p/go.tools/cmd/cover
 
 script:
