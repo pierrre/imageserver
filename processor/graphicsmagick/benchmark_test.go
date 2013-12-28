@@ -9,93 +9,109 @@ import (
 
 // Worker 1
 
-func BenchmarkResizeSmallWorker1(b *testing.B) {
-	benchmarkResize(b, testdata.Small, 1)
+func BenchmarkResizeWorker1Small(b *testing.B) {
+	benchmarkResizeWorker1(b, testdata.Small)
 }
 
-func BenchmarkResizeMediumWorker1(b *testing.B) {
-	benchmarkResize(b, testdata.Medium, 1)
+func BenchmarkResizeWorker1Medium(b *testing.B) {
+	benchmarkResizeWorker1(b, testdata.Medium)
 }
 
-func BenchmarkResizeLargeWorker1(b *testing.B) {
-	benchmarkResize(b, testdata.Large, 1)
+func BenchmarkResizeWorker1Large(b *testing.B) {
+	benchmarkResizeWorker1(b, testdata.Large)
 }
 
-func BenchmarkResizeHugeWorker1(b *testing.B) {
-	benchmarkResize(b, testdata.Huge, 1)
+func BenchmarkResizeWorker1Huge(b *testing.B) {
+	benchmarkResizeWorker1(b, testdata.Huge)
 }
 
-func BenchmarkResizeAnimatedWorker1(b *testing.B) {
-	benchmarkResize(b, testdata.Animated, 1)
+func BenchmarkResizeWorker1Animated(b *testing.B) {
+	benchmarkResizeWorker1(b, testdata.Animated)
+}
+
+func benchmarkResizeWorker1(b *testing.B, image *imageserver.Image) {
+	benchmarkResize(b, 1, image)
 }
 
 // Worker 2
 
-func BenchmarkResizeSmallWorker2(b *testing.B) {
-	benchmarkResize(b, testdata.Small, 2)
+func BenchmarkResizeWorker2Small(b *testing.B) {
+	benchmarkResizeWorker2(b, testdata.Small)
 }
 
-func BenchmarkResizeMediumWorker2(b *testing.B) {
-	benchmarkResize(b, testdata.Medium, 2)
+func BenchmarkResizeWorker2Medium(b *testing.B) {
+	benchmarkResizeWorker2(b, testdata.Medium)
 }
 
-func BenchmarkResizeLargeWorker2(b *testing.B) {
-	benchmarkResize(b, testdata.Large, 2)
+func BenchmarkResizeWorker2Large(b *testing.B) {
+	benchmarkResizeWorker2(b, testdata.Large)
 }
 
-func BenchmarkResizeHugeWorker2(b *testing.B) {
-	benchmarkResize(b, testdata.Huge, 2)
+func BenchmarkResizeWorker2Huge(b *testing.B) {
+	benchmarkResizeWorker2(b, testdata.Huge)
 }
 
-func BenchmarkResizeAnimatedWorker2(b *testing.B) {
-	benchmarkResize(b, testdata.Animated, 2)
+func BenchmarkResizeWorker2Animated(b *testing.B) {
+	benchmarkResizeWorker2(b, testdata.Animated)
+}
+
+func benchmarkResizeWorker2(b *testing.B, image *imageserver.Image) {
+	benchmarkResize(b, 2, image)
 }
 
 // Worker 4
 
-func BenchmarkResizeSmallWorker4(b *testing.B) {
-	benchmarkResize(b, testdata.Small, 4)
+func BenchmarkResizeWorker4Small(b *testing.B) {
+	benchmarkResizeWorker4(b, testdata.Small)
 }
 
-func BenchmarkResizeMediumWorker4(b *testing.B) {
-	benchmarkResize(b, testdata.Medium, 4)
+func BenchmarkResizeWorker4Medium(b *testing.B) {
+	benchmarkResizeWorker4(b, testdata.Medium)
 }
 
-func BenchmarkResizeLargeWorker4(b *testing.B) {
-	benchmarkResize(b, testdata.Large, 4)
+func BenchmarkResizeWorker4Large(b *testing.B) {
+	benchmarkResizeWorker4(b, testdata.Large)
 }
 
-func BenchmarkResizeHugeWorker4(b *testing.B) {
-	benchmarkResize(b, testdata.Huge, 4)
+func BenchmarkResizeWorker4Huge(b *testing.B) {
+	benchmarkResizeWorker4(b, testdata.Huge)
 }
 
-func BenchmarkResizeAnimatedWorker4(b *testing.B) {
-	benchmarkResize(b, testdata.Animated, 4)
+func BenchmarkResizeWorker4Animated(b *testing.B) {
+	benchmarkResizeWorker4(b, testdata.Animated)
+}
+
+func benchmarkResizeWorker4(b *testing.B, image *imageserver.Image) {
+	benchmarkResize(b, 4, image)
 }
 
 // Worker 8
 
-func BenchmarkResizeSmallWorker8(b *testing.B) {
-	benchmarkResize(b, testdata.Small, 8)
+func BenchmarkResizeWorker8Small(b *testing.B) {
+	benchmarkResizeWorker8(b, testdata.Small)
 }
 
-func BenchmarkResizeMediumWorker8(b *testing.B) {
-	benchmarkResize(b, testdata.Medium, 8)
+func BenchmarkResizeWorker8Medium(b *testing.B) {
+	benchmarkResizeWorker8(b, testdata.Medium)
 }
 
-func BenchmarkResizeLargeWorker8(b *testing.B) {
-	benchmarkResize(b, testdata.Large, 8)
+func BenchmarkResizeWorker8Large(b *testing.B) {
+	benchmarkResizeWorker8(b, testdata.Large)
 }
 
-func BenchmarkResizeHugeWorker8(b *testing.B) {
-	benchmarkResize(b, testdata.Huge, 8)
+func BenchmarkResizeWorker8Huge(b *testing.B) {
+	benchmarkResizeWorker8(b, testdata.Huge)
 }
 
-func BenchmarkResizeAnimatedWorker8(b *testing.B) {
-	benchmarkResize(b, testdata.Animated, 8)
+func BenchmarkResizeWorker8Animated(b *testing.B) {
+	benchmarkResizeWorker8(b, testdata.Animated)
 }
 
-func benchmarkResize(b *testing.B, image *imageserver.Image, workerCount int) {
+func benchmarkResizeWorker8(b *testing.B, image *imageserver.Image) {
+	benchmarkResize(b, 8, image)
+}
+
+func benchmarkResize(b *testing.B, workerCount int, image *imageserver.Image) {
 	parameters := imageserver.Parameters{
 		"graphicsmagick": imageserver.Parameters{
 			"width":  100,
