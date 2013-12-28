@@ -1,4 +1,5 @@
-package test
+// Package cachetest provides utilities for cache testing
+package cachetest
 
 import (
 	"github.com/pierrre/imageserver"
@@ -7,6 +8,7 @@ import (
 	"testing"
 )
 
+// CacheTestGetSet is a helper to test cache Get()/Set()
 func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.Image) {
 	key := "test"
 	parameters := make(imageserver.Parameters)
@@ -26,6 +28,7 @@ func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.I
 	}
 }
 
+// CacheTestGetSetAllImages is a helper to test cache Get()/Set() with all images from test data
 func CacheTestGetSetAllImages(t *testing.T, cache imageserver.Cache) {
 	for _, image := range testdata.Images {
 		CacheTestGetSet(t, cache, image)
