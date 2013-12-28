@@ -18,10 +18,10 @@ type RedisCache struct {
 }
 
 // Get gets an Image from Redis
-func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	data, err := redis.getData(key, parameters)
+func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	data, err := cache.getData(key, parameters)
 	if err != nil {
-		return nil, imageserver.NewCacheMissError(key, redis, err)
+		return nil, imageserver.NewCacheMissError(key, cache, err)
 	}
 
 	image, err := imageserver.NewImageUnmarshalBinary(data)
@@ -32,15 +32,15 @@ func (redis *RedisCache) Get(key string, parameters imageserver.Parameters) (*im
 	return image, nil
 }
 
-func (redis *RedisCache) getData(key string, parameters imageserver.Parameters) ([]byte, error) {
-	conn := redis.Pool.Get()
+func (cache *RedisCache) getData(key string, parameters imageserver.Parameters) ([]byte, error) {
+	conn := cache.Pool.Get()
 	defer conn.Close()
 
 	return redigo.Bytes(conn.Do("GET", key))
 }
 
 // Set sets an Image to Redis
-func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, err := image.MarshalBinary()
 	if err != nil {
 		return err
@@ -48,11 +48,11 @@ func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters im
 
 	params := []interface{}{key, data}
 
-	if redis.Expire != 0 {
-		params = append(params, "EX", strconv.Itoa(int(redis.Expire.Seconds())))
+	if cache.Expire != 0 {
+		params = append(params, "EX", strconv.Itoa(int(cache.Expire.Seconds())))
 	}
 
-	conn := redis.Pool.Get()
+	conn := cache.Pool.Get()
 	defer conn.Close()
 
 	_, err = conn.Do("SET", params...)
@@ -61,4 +61,8 @@ func (redis *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	}
 
 	return nil
+}
+
+func (cache *RedisCache) Close() error {
+	return cache.Pool.Close()
 }
