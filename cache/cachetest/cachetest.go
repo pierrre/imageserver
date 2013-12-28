@@ -34,3 +34,17 @@ func CacheTestGetSetAllImages(t *testing.T, cache imageserver.Cache) {
 		CacheTestGetSet(t, cache, image)
 	}
 }
+
+// CacheTestGetSet is a helper to test cache Get() with a "cache miss" error
+func CacheTestGetErrorMiss(t *testing.T, cache imageserver.Cache) {
+	key := "unknown"
+	parameters := make(imageserver.Parameters)
+
+	_, err := cache.Get(key, parameters)
+	if err == nil {
+		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.CacheMissError); !ok {
+		t.Fatal("invalid error type")
+	}
+}

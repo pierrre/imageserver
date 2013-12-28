@@ -17,6 +17,13 @@ func TestGetSet(t *testing.T) {
 	}
 }
 
+func TestGetErrorMiss(t *testing.T) {
+	cache := createTestCache()
+	defer cache.Close()
+
+	cachetest.CacheTestGetErrorMiss(t, cache)
+}
+
 func createTestCache() *RedisCache {
 	return &RedisCache{
 		Pool: &redigo.Pool{
