@@ -10,7 +10,9 @@ services:
 before_install:
   - sudo apt-get install graphicsmagick
   - go get -v code.google.com/p/go.tools/cmd/cover
+  - go get -v github.com/golang/lint/golint
 
 script:
   - go test -v -cover ./...
   - go test -v -run=Benchmark -bench=. -benchmem ./...
+  - golint .
