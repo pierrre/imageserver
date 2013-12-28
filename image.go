@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 )
 
 // Image represents a raw image
@@ -43,48 +42,6 @@ func (image *Image) MarshalBinary() ([]byte, error) {
 
 // UnmarshalBinary unserializes bytes to the Image
 func (image *Image) UnmarshalBinary(data []byte) error {
-	reader := bytes.NewReader(data)
-
-	var formatLen uint32
-	err := binary.Read(reader, binary.LittleEndian, &formatLen)
-	if err != nil {
-		return err
-	}
-	formatBytes := make([]byte, formatLen)
-	_, err = io.ReadFull(reader, formatBytes)
-	if err != nil {
-		return err
-	}
-	image.Format = string(formatBytes)
-
-	var dataLen uint32
-	err = binary.Read(reader, binary.LittleEndian, &dataLen)
-	if err != nil {
-		return err
-	}
-	image.Data = make([]byte, dataLen)
-	_, err = io.ReadFull(reader, image.Data)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// NewImageUnmarshalBinaryOptimized creates a new Image from serialized bytes
-func NewImageUnmarshalBinaryOptimized(data []byte) (*Image, error) {
-	image := new(Image)
-
-	err := image.UnmarshalBinaryOptimized(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return image, nil
-}
-
-// UnmarshalBinaryOptimized unserializes bytes to the Image
-func (image *Image) UnmarshalBinaryOptimized(data []byte) error {
 	dataStart, dataEnd := 0, 0
 	readData := func(length int) ([]byte, error) {
 		dataStart = dataEnd
