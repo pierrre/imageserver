@@ -30,16 +30,13 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 
 // Set sets an Image to Memcache
 func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
-	data, err := image.MarshalBinary()
-	if err != nil {
-		return err
-	}
+	data, _ := image.MarshalBinary()
 
 	item := &memcache_impl.Item{
 		Key:   key,
 		Value: data,
 	}
-	err = cache.Memcache.Set(item)
+	err := cache.Memcache.Set(item)
 
 	return err
 }

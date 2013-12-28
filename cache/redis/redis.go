@@ -41,10 +41,7 @@ func (cache *RedisCache) getData(key string, parameters imageserver.Parameters) 
 
 // Set sets an Image to Redis
 func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
-	data, err := image.MarshalBinary()
-	if err != nil {
-		return err
-	}
+	data, _ := image.MarshalBinary()
 
 	params := []interface{}{key, data}
 
@@ -55,7 +52,7 @@ func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	conn := cache.Pool.Get()
 	defer conn.Close()
 
-	_, err = conn.Do("SET", params...)
+	_, err := conn.Do("SET", params...)
 	if err != nil {
 		return err
 	}

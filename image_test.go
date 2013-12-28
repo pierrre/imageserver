@@ -9,10 +9,7 @@ import (
 
 func TestImage(t *testing.T) {
 	for _, image := range testdata.Images {
-		data, err := image.MarshalBinary()
-		if err != nil {
-			t.Fatal(err)
-		}
+		data, _ := image.MarshalBinary()
 
 		newImage, err := NewImageUnmarshalBinary(data)
 		if err != nil {
@@ -27,10 +24,7 @@ func TestImage(t *testing.T) {
 
 func TestImageUnmarshalBinaryError(t *testing.T) {
 	for _, image := range testdata.Images {
-		data, err := image.MarshalBinary()
-		if err != nil {
-			t.Fatal(err)
-		}
+		data, _ := image.MarshalBinary()
 
 		index := -1 // Always truncate 1 byte
 		for _, offset := range []int{
@@ -41,7 +35,7 @@ func TestImageUnmarshalBinaryError(t *testing.T) {
 		} {
 			index += offset
 			errorData := data[0:index]
-			_, err = NewImageUnmarshalBinary(errorData)
+			_, err := NewImageUnmarshalBinary(errorData)
 			if err == nil {
 				t.Fatal("no error")
 			}

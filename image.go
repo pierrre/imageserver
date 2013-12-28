@@ -25,6 +25,8 @@ func NewImageUnmarshalBinary(marshalledData []byte) (*Image, error) {
 }
 
 // MarshalBinary serializes the Image to bytes
+//
+// It's very unlikely that it returns an error (impossible?)
 func (image *Image) MarshalBinary() ([]byte, error) {
 	buffer := new(bytes.Buffer)
 

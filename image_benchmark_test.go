@@ -28,10 +28,7 @@ func BenchmarkImageMarshalBinaryAnimated(b *testing.B) {
 
 func benchmarkImageMarshalBinary(b *testing.B, image *Image) {
 	for i := 0; i < b.N; i++ {
-		_, err := image.MarshalBinary()
-		if err != nil {
-			b.Fatal(err)
-		}
+		image.MarshalBinary()
 	}
 
 	b.SetBytes(int64(len(image.Data)))
@@ -58,10 +55,7 @@ func BenchmarkImageUnmarshalBinaryAnimated(b *testing.B) {
 }
 
 func benchmarkImageUnmarshalBinary(b *testing.B, image *Image) {
-	data, err := image.MarshalBinary()
-	if err != nil {
-		b.Fatal(err)
-	}
+	data, _ := image.MarshalBinary()
 
 	b.ResetTimer()
 
