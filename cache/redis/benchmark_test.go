@@ -1,7 +1,6 @@
 package redis
 
 import (
-	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
 	"sync"
@@ -119,17 +118,8 @@ func BenchmarkGetAnimatedWorker16(b *testing.B) {
 }
 
 func benchmarkGet(b *testing.B, image *imageserver.Image, workerCount int) {
-	pool := &redigo.Pool{
-		Dial: func() (redigo.Conn, error) {
-			return redigo.Dial("tcp", "localhost:6379")
-		},
-		MaxIdle: 50,
-	}
-	defer pool.Close()
-
-	cache := &RedisCache{
-		Pool: pool,
-	}
+	cache := createTestCache()
+	defer cache.Close()
 
 	key := "test"
 	parameters := make(imageserver.Parameters)
