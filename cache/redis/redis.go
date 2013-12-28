@@ -60,6 +60,7 @@ func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	return nil
 }
 
+// Close closes the underlying Redigo pool
 func (cache *RedisCache) Close() error {
 	return cache.Pool.Close()
 }
