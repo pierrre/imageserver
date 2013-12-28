@@ -4,13 +4,17 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 	cache_test "github.com/pierrre/imageserver/cache/test"
 	"testing"
+	"time"
 )
 
 func TestGetSet(t *testing.T) {
 	cache := createTestCache()
 	defer cache.Close()
 
-	cache_test.CacheTestGetSetAllImages(t, cache)
+	for _, expire := range []time.Duration{0, 1 * time.Minute} {
+		cache.Expire = expire
+		cache_test.CacheTestGetSetAllImages(t, cache)
+	}
 }
 
 func createTestCache() *RedisCache {
