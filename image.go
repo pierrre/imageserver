@@ -82,3 +82,24 @@ func (image *Image) UnmarshalBinary(data []byte) error {
 
 	return nil
 }
+
+// ImageEqual compares two images and returns true if they are equal
+func ImageEqual(image1, image2 *Image) bool {
+	if image1 == image2 {
+		return true
+	}
+
+	if image1 == nil || image2 == nil {
+		return false
+	}
+
+	if image1.Format != image2.Format {
+		return false
+	}
+
+	if !bytes.Equal(image1.Data, image2.Data) {
+		return false
+	}
+
+	return true
+}
