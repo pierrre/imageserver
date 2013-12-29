@@ -43,6 +43,15 @@ func (cache *RedisCache) getData(key string) ([]byte, error) {
 func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, _ := image.MarshalBinary()
 
+	err := cache.setData(key, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cache *RedisCache) setData(key string, data []byte) error {
 	params := []interface{}{key, data}
 
 	if cache.Expire != 0 {
