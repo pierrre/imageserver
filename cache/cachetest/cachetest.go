@@ -8,17 +8,26 @@ import (
 	"testing"
 )
 
+const (
+	// KeyValid is a valid cache key (with content)
+	KeyValid = "test"
+	// KeyMiss is an invalid cache key (without content)
+	KeyMiss = "unknown"
+)
+
+var (
+	// ParametersEmpty is an empty Parameters
+	ParametersEmpty = make(imageserver.Parameters)
+)
+
 // CacheTestGetSet is a helper to test cache Get()/Set()
 func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.Image) {
-	key := "test"
-	parameters := make(imageserver.Parameters)
-
-	err := cache.Set(key, image, parameters)
+	err := cache.Set(KeyValid, image, ParametersEmpty)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	newImage, err := cache.Get(key, parameters)
+	newImage, err := cache.Get(KeyValid, ParametersEmpty)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,12 +44,9 @@ func CacheTestGetSetAllImages(t *testing.T, cache imageserver.Cache) {
 	}
 }
 
-// CacheTestGetSet is a helper to test cache Get() with a "cache miss" error
+// CacheTestGetErrorMiss is a helper to test cache Get() with a "cache miss" error
 func CacheTestGetErrorMiss(t *testing.T, cache imageserver.Cache) {
-	key := "unknown"
-	parameters := make(imageserver.Parameters)
-
-	_, err := cache.Get(key, parameters)
+	_, err := cache.Get(KeyMiss, ParametersEmpty)
 	if err == nil {
 		t.Fatal("no error")
 	}
