@@ -45,6 +45,24 @@ func TestSetErrorAddress(t *testing.T) {
 	}
 }
 
+func TestGetErrorUnmarshal(t *testing.T) {
+	cache := createTestCache()
+	defer cache.Close()
+
+	data, _ := testdata.Medium.MarshalBinary()
+	data = data[:len(data)-1]
+
+	err := cache.setData(cachetest.KeyValid, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func createTestCache() *RedisCache {
 	return createTestCacheWithRedigoPool(createTestRedigoPool())
 }
