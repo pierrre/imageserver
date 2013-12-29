@@ -4,7 +4,6 @@ package cachetest
 import (
 	"github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
-	"reflect"
 	"testing"
 )
 
@@ -32,7 +31,7 @@ func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.I
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(newImage, image) {
+	if !imageserver.ImageEqual(newImage, image) {
 		t.Fatal("image not equals")
 	}
 }

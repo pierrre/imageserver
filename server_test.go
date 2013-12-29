@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
-	"reflect"
 	"runtime"
 	"testing"
 )
@@ -41,7 +40,7 @@ func TestServerGetWithCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(image, sameImage) {
+	if !ImageEqual(image, sameImage) {
 		t.Fatal("not equals")
 	}
 }

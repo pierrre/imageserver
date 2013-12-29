@@ -3,7 +3,6 @@ package imageserver_test
 import (
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
-	"reflect"
 	"testing"
 )
 
@@ -16,7 +15,7 @@ func TestImage(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if !reflect.DeepEqual(newImage, image) {
+		if !ImageEqual(newImage, image) {
 			t.Fatal("image not equals")
 		}
 	}
