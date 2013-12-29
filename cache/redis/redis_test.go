@@ -3,6 +3,7 @@ package redis
 import (
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver/cache/cachetest"
+	"github.com/pierrre/imageserver/testdata"
 	"testing"
 	"time"
 )
@@ -24,13 +25,49 @@ func TestGetErrorMiss(t *testing.T) {
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
+func TestGetErrorAddress(t *testing.T) {
+	cache := createTestCacheInvalidAddress()
+	defer cache.Close()
+
+	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
+func TestSetErrorAddress(t *testing.T) {
+	cache := createTestCacheInvalidAddress()
+	defer cache.Close()
+
+	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func createTestCache() *RedisCache {
+	return createTestCacheWithRedigoPool(createTestRedigoPool())
+}
+
+func createTestCacheInvalidAddress() *RedisCache {
+	return createTestCacheWithRedigoPool(createTestRedigoPoolWithAddress("localhost:16379"))
+}
+
+func createTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
 	return &RedisCache{
-		Pool: &redigo.Pool{
-			Dial: func() (redigo.Conn, error) {
-				return redigo.Dial("tcp", "localhost:6379")
-			},
-			MaxIdle: 50,
+		Pool: pool,
+	}
+}
+
+func createTestRedigoPool() *redigo.Pool {
+	return createTestRedigoPoolWithAddress("localhost:6379")
+}
+
+func createTestRedigoPoolWithAddress(address string) *redigo.Pool {
+	return &redigo.Pool{
+		Dial: func() (redigo.Conn, error) {
+			return redigo.Dial("tcp", address)
 		},
+		MaxIdle: 50,
 	}
 }
