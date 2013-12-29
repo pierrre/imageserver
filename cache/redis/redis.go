@@ -19,7 +19,7 @@ type RedisCache struct {
 
 // Get gets an Image from Redis
 func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	data, err := cache.getData(key, parameters)
+	data, err := cache.getData(key)
 	if err != nil {
 		return nil, imageserver.NewCacheMissError(key, cache, err)
 	}
@@ -32,7 +32,7 @@ func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*im
 	return image, nil
 }
 
-func (cache *RedisCache) getData(key string, parameters imageserver.Parameters) ([]byte, error) {
+func (cache *RedisCache) getData(key string) ([]byte, error) {
 	conn := cache.Pool.Get()
 	defer conn.Close()
 
