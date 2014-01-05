@@ -8,6 +8,7 @@ import (
 // AsyncCache represent an asynchronous cache
 type AsyncCache struct {
 	imageserver.Cache
+
 	ErrFunc func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters)
 }
 
