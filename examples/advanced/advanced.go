@@ -66,7 +66,7 @@ func main() {
 			Cache:        cache,
 			CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
 		},
-		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+		Processor: imageserver_processor_limit.New(&imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
 			Timeout:    time.Duration(10 * time.Second),
 			AllowedFormats: []string{
@@ -78,7 +78,7 @@ func main() {
 			DefaultQualities: map[string]string{
 				"jpeg": "85",
 			},
-		}),
+		}, 16),
 	}
 
 	httpImageServer := &imageserver_http.Server{
