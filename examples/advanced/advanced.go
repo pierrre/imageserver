@@ -38,47 +38,54 @@ func main() {
 		panic(err)
 	}
 
-	cache := imageserver_cache_list.ListCache{
-		imageserver_cache_memory.New(10 * 1024 * 1024),
-		&imageserver_cache_async.AsyncCache{
-			Cache: &imageserver_cache_redis.RedisCache{
-				Pool: &redigo.Pool{
-					Dial: func() (redigo.Conn, error) {
-						return redigo.Dial("tcp", "localhost:6379")
-					},
-					MaxIdle: 50,
-				},
-				Expire: time.Duration(7 * 24 * time.Hour),
+	var cache imageserver.Cache = &imageserver_cache_redis.RedisCache{
+		Pool: &redigo.Pool{
+			Dial: func() (redigo.Conn, error) {
+				return redigo.Dial("tcp", "localhost:6379")
 			},
-			ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
-				if verbose {
-					log.Println(err)
-				}
-			},
+			MaxIdle: 50,
+		},
+		Expire: time.Duration(7 * 24 * time.Hour),
+	}
+	cache = &imageserver_cache_async.AsyncCache{
+		Cache: cache,
+		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
+			if verbose {
+				log.Println(err)
+			}
 		},
 	}
+	cache = imageserver_cache_list.ListCache{
+		imageserver_cache_memory.New(10 * 1024 * 1024),
+		cache,
+	}
+
+	provider := &imageserver_provider_cache.CacheProvider{
+		Provider:     &imageserver_provider_http.HTTPProvider{},
+		Cache:        cache,
+		CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
+	}
+
+	var processor imageserver.Processor = &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+		Executable: "gm",
+		Timeout:    time.Duration(10 * time.Second),
+		AllowedFormats: []string{
+			"jpeg",
+			"png",
+			"bmp",
+			"gif",
+		},
+		DefaultQualities: map[string]string{
+			"jpeg": "85",
+		},
+	}
+	processor = imageserver_processor_limit.New(processor, 16)
 
 	imageServer := &imageserver.Server{
 		Cache:        cache,
 		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
-		Provider: &imageserver_provider_cache.CacheProvider{
-			Provider:     &imageserver_provider_http.HTTPProvider{},
-			Cache:        cache,
-			CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
-		},
-		Processor: imageserver_processor_limit.New(&imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
-			Executable: "gm",
-			Timeout:    time.Duration(10 * time.Second),
-			AllowedFormats: []string{
-				"jpeg",
-				"png",
-				"bmp",
-				"gif",
-			},
-			DefaultQualities: map[string]string{
-				"jpeg": "85",
-			},
-		}, 16),
+		Provider:     provider,
+		Processor:    processor,
 	}
 
 	httpImageServer := &imageserver_http.Server{
