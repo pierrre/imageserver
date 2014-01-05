@@ -62,9 +62,9 @@ func main() {
 		Cache:        cache,
 		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
 		Provider: &imageserver_provider_cache.CacheProvider{
+			Provider:     &imageserver_provider_http.HTTPProvider{},
 			Cache:        cache,
 			CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
-			Provider:     &imageserver_provider_http.HTTPProvider{},
 		},
 		Processor: imageserver_processor_limit.New(16, &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
