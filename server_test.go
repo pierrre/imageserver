@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
-	"runtime"
 	"testing"
 )
 
@@ -31,8 +30,6 @@ func TestServerGetWithCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	runtime.Gosched() // TRICK: we yield this goroutine in order to fill the cache (it's set in another goroutine)
 
 	sameImage, err := server.Get(Parameters{
 		"source": "medium.jpg",
