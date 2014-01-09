@@ -38,7 +38,8 @@ func main() {
 		panic(err)
 	}
 
-	var cache imageserver.Cache = &imageserver_cache_redis.RedisCache{
+	var cache imageserver.Cache
+	cache = &imageserver_cache_redis.RedisCache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
 				return redigo.Dial("tcp", "localhost:6379")
@@ -66,7 +67,8 @@ func main() {
 		CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
 	}
 
-	var processor imageserver.Processor = &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+	var processor imageserver.Processor
+	processor = &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 		Executable: "gm",
 		Timeout:    time.Duration(10 * time.Second),
 		AllowedFormats: []string{
