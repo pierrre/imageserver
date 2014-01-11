@@ -5,6 +5,7 @@ go:
   - tip
 
 services:
+  - memcached
   - redis-server
 
 before_install:
