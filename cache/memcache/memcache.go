@@ -10,17 +10,17 @@ import (
 //
 // It uses Brad Fitzpatrick's Memcache client https://github.com/bradfitz/gomemcache
 type MemcacheCache struct {
-	Memcache *memcache_impl.Client
+	Client *memcache_impl.Client
 }
 
 // Get gets an Image from Memcache
 func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	item, err := cache.Memcache.Get(key)
+	data, err := cache.getData(key)
 	if err != nil {
-		return nil, imageserver.NewCacheMissError(key, cache, err)
+		return nil, err
 	}
 
-	image, err := imageserver.NewImageUnmarshalBinary(item.Value)
+	image, err := imageserver.NewImageUnmarshalBinary(data)
 	if err != nil {
 		return nil, err
 	}
@@ -28,15 +28,35 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 	return image, nil
 }
 
+func (cache *MemcacheCache) getData(key string) ([]byte, error) {
+	item, err := cache.Client.Get(key)
+	if err != nil {
+		return nil, imageserver.NewCacheMissError(key, cache, err)
+	}
+
+	return item.Value, nil
+}
+
 // Set sets an Image to Memcache
 func (cache *MemcacheCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, _ := image.MarshalBinary()
 
-	item := &memcache_impl.Item{
+	err := cache.setData(key, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cache *MemcacheCache) setData(key string, data []byte) error {
+	err := cache.Client.Set(&memcache_impl.Item{
 		Key:   key,
 		Value: data,
+	})
+	if err != nil {
+		return err
 	}
-	err := cache.Memcache.Set(item)
 
-	return err
+	return nil
 }
