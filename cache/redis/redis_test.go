@@ -64,11 +64,11 @@ func TestGetErrorUnmarshal(t *testing.T) {
 }
 
 func createTestCache() *RedisCache {
-	return createTestCacheWithRedigoPool(createTestRedigoPool())
+	return createTestCacheWithRedigoPool(createTestRedigoPool("localhost:6379"))
 }
 
 func createTestCacheInvalidAddress() *RedisCache {
-	return createTestCacheWithRedigoPool(createTestRedigoPoolWithAddress("localhost:16379"))
+	return createTestCacheWithRedigoPool(createTestRedigoPool("localhost:16379"))
 }
 
 func createTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
@@ -77,11 +77,7 @@ func createTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
 	}
 }
 
-func createTestRedigoPool() *redigo.Pool {
-	return createTestRedigoPoolWithAddress("localhost:6379")
-}
-
-func createTestRedigoPoolWithAddress(address string) *redigo.Pool {
+func createTestRedigoPool(address string) *redigo.Pool {
 	return &redigo.Pool{
 		Dial: func() (redigo.Conn, error) {
 			return redigo.Dial("tcp", address)
