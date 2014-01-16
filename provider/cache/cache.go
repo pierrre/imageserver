@@ -33,10 +33,8 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 		return nil, err
 	}
 
-	err = provider.Cache.Set(cacheKey, image, parameters)
-	if err != nil {
-		return nil, err
-	}
+	provider.Cache.Set(cacheKey, image, parameters)
+	// TODO handle errors properly
 
 	return image, nil
 }

@@ -52,10 +52,8 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 	}
 
 	if server.Cache != nil {
-		err = server.Cache.Set(cacheKey, image, parameters)
-		if err != nil {
-			return nil, err
-		}
+		server.Cache.Set(cacheKey, image, parameters)
+		// TODO handle errors properly
 	}
 
 	return image, nil
