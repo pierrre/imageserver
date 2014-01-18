@@ -3,6 +3,7 @@ package imageserver_test
 import (
 	"crypto/sha256"
 	. "github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver/cache/cachetest"
 	"github.com/pierrre/imageserver/testdata"
 	"testing"
 )
@@ -21,7 +22,7 @@ func TestServerGet(t *testing.T) {
 
 func TestServerGetWithCache(t *testing.T) {
 	server := createServer()
-	server.Cache = newCacheMap()
+	server.Cache = cachetest.NewCacheMap()
 	server.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
 
 	image, err := server.Get(Parameters{

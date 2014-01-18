@@ -4,6 +4,7 @@ package cachetest
 import (
 	"github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
+	"sync"
 	"testing"
 )
 
@@ -52,4 +53,36 @@ func CacheTestGetErrorMiss(t *testing.T, cache imageserver.Cache) {
 	if _, ok := err.(*imageserver.CacheMissError); !ok {
 		t.Fatal("invalid error type")
 	}
+}
+
+type CacheMap struct {
+	mutex sync.RWMutex
+	data  map[string]*imageserver.Image
+}
+
+func NewCacheMap() *CacheMap {
+	return &CacheMap{
+		data: make(map[string]*imageserver.Image),
+	}
+}
+
+func (cache *CacheMap) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	cache.mutex.RLock()
+	defer cache.mutex.RUnlock()
+
+	image, ok := cache.data[key]
+	if !ok {
+		return nil, imageserver.NewCacheMissError(key, cache, nil)
+	}
+
+	return image, nil
+}
+
+func (cache *CacheMap) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+	cache.mutex.Lock()
+	defer cache.mutex.Unlock()
+
+	cache.data[key] = image
+
+	return nil
 }
