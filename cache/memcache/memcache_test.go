@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 
 	// maximum object size is only 1MB
 	for _, image := range []*imageserver.Image{
@@ -22,13 +22,13 @@ func TestGetSet(t *testing.T) {
 }
 
 func TestGetErrorMiss(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
 func TestGetErrorServer(t *testing.T) {
-	cache := createTestCacheInvalidServer()
+	cache := newTestCacheInvalidServer()
 
 	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
 	if err == nil {
@@ -37,7 +37,7 @@ func TestGetErrorServer(t *testing.T) {
 }
 
 func TestSetErrorServer(t *testing.T) {
-	cache := createTestCacheInvalidServer()
+	cache := newTestCacheInvalidServer()
 
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
 	if err == nil {
@@ -46,7 +46,7 @@ func TestSetErrorServer(t *testing.T) {
 }
 
 func TestGetErrorUnmarshal(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 
 	data, _ := testdata.Medium.MarshalBinary()
 	data = data[:len(data)-1]
@@ -62,20 +62,20 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func createTestCache() *MemcacheCache {
-	return createTestCacheWithClient(createTestClient("localhost:11211"))
+func newTestCache() *MemcacheCache {
+	return newTestCacheWithClient(newTestClient("localhost:11211"))
 }
 
-func createTestCacheInvalidServer() *MemcacheCache {
-	return createTestCacheWithClient(createTestClient("localhost:11311"))
+func newTestCacheInvalidServer() *MemcacheCache {
+	return newTestCacheWithClient(newTestClient("localhost:11311"))
 }
 
-func createTestCacheWithClient(client *memcache_impl.Client) *MemcacheCache {
+func newTestCacheWithClient(client *memcache_impl.Client) *MemcacheCache {
 	return &MemcacheCache{
 		Client: client,
 	}
 }
 
-func createTestClient(server string) *memcache_impl.Client {
+func newTestClient(server string) *memcache_impl.Client {
 	return memcache_impl.New(server)
 }

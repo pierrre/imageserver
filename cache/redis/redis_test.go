@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 	defer cache.Close()
 
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
@@ -19,14 +19,14 @@ func TestGetSet(t *testing.T) {
 }
 
 func TestGetErrorMiss(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 	defer cache.Close()
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
 func TestGetErrorAddress(t *testing.T) {
-	cache := createTestCacheInvalidAddress()
+	cache := newTestCacheInvalidAddress()
 	defer cache.Close()
 
 	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
@@ -36,7 +36,7 @@ func TestGetErrorAddress(t *testing.T) {
 }
 
 func TestSetErrorAddress(t *testing.T) {
-	cache := createTestCacheInvalidAddress()
+	cache := newTestCacheInvalidAddress()
 	defer cache.Close()
 
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
@@ -46,7 +46,7 @@ func TestSetErrorAddress(t *testing.T) {
 }
 
 func TestGetErrorUnmarshal(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 	defer cache.Close()
 
 	data, _ := testdata.Medium.MarshalBinary()
@@ -63,21 +63,21 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func createTestCache() *RedisCache {
-	return createTestCacheWithRedigoPool(createTestRedigoPool("localhost:6379"))
+func newTestCache() *RedisCache {
+	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:6379"))
 }
 
-func createTestCacheInvalidAddress() *RedisCache {
-	return createTestCacheWithRedigoPool(createTestRedigoPool("localhost:16379"))
+func newTestCacheInvalidAddress() *RedisCache {
+	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:16379"))
 }
 
-func createTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
+func newTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
 	return &RedisCache{
 		Pool: pool,
 	}
 }
 
-func createTestRedigoPool(address string) *redigo.Pool {
+func newTestRedigoPool(address string) *redigo.Pool {
 	return &redigo.Pool{
 		Dial: func() (redigo.Conn, error) {
 			return redigo.Dial("tcp", address)

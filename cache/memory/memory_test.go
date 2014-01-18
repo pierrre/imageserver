@@ -6,17 +6,17 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 
 	cachetest.CacheTestGetSetAllImages(t, cache)
 }
 
 func TestGetErrorMiss(t *testing.T) {
-	cache := createTestCache()
+	cache := newTestCache()
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
-func createTestCache() *MemoryCache {
+func newTestCache() *MemoryCache {
 	return New(20 * 1024 * 1024)
 }
