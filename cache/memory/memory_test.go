@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"github.com/pierrre/imageserver/cache/cachetest"
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"testing"
 )
 

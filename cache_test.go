@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	. "github.com/pierrre/imageserver"
-	"github.com/pierrre/imageserver/cache/cachetest"
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"testing"
 )
 

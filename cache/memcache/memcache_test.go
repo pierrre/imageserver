@@ -3,7 +3,7 @@ package memcache
 import (
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageserver"
-	"github.com/pierrre/imageserver/cache/cachetest"
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 	"testing"
 )

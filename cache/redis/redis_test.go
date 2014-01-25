@@ -2,7 +2,7 @@ package redis
 
 import (
 	redigo "github.com/garyburd/redigo/redis"
-	"github.com/pierrre/imageserver/cache/cachetest"
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 	"testing"
 	"time"

@@ -1,4 +1,4 @@
-package cachetest
+package _test
 
 import (
 	"github.com/pierrre/imageserver"

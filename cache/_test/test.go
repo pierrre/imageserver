@@ -1,5 +1,5 @@
-// Package cachetest provides utilities for cache testing
-package cachetest
+// Package _test provides utilities for cache testing
+package _test
 
 import (
 	"github.com/pierrre/imageserver"
