@@ -54,7 +54,7 @@ func main() {
 		Cache: cache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
 			if verbose {
-				log.Println(err)
+				log.Println("Cache error:", err)
 			}
 		},
 	}
@@ -101,24 +101,17 @@ func main() {
 		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
 		Expire:      time.Duration(7 * 24 * time.Hour),
 		RequestFunc: func(request *http.Request) error {
-			url := request.URL
-			query := url.Query()
-			errorCodeString := query.Get("error")
-			if len(errorCodeString) == 0 {
-				return nil
+			if verbose {
+				log.Println("Request:", strconv.Quote(request.URL.String()))
 			}
-			errorCode, err := strconv.Atoi(errorCodeString)
-			if err != nil {
-				return imageserver.NewError(err.Error())
-			}
-			return imageserver_http.NewError(errorCode)
+			return nil
 		},
 		HeaderFunc: func(header http.Header, request *http.Request, err error) {
 			header.Set("X-Hostname", hostname)
 		},
 		ErrorFunc: func(err error, request *http.Request) {
 			if verbose {
-				log.Println(err)
+				log.Println("Error:", err)
 			}
 		},
 		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
@@ -127,7 +120,7 @@ func main() {
 				if err != nil {
 					errString = err.Error()
 				}
-				log.Println(request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
+				log.Println("Response:", request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 			}
 		},
 	}
