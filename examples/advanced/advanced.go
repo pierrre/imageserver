@@ -25,6 +25,7 @@ import (
 	"net/http"
 	//_ "net/http/pprof"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 )
@@ -35,6 +36,8 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "Verbose")
 	flag.StringVar(&httpAddr, "http", ":8080", "Http")
 	flag.Parse()
+
+	log.Println("Start")
 
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -137,8 +140,33 @@ func main() {
 		panic(err)
 	}
 
+	interrupted := false
+	interruptChan := make(chan os.Signal)
+	signal.Notify(interruptChan, os.Interrupt)
+	go func() {
+		<-interruptChan
+		interrupted = true
+		log.Println("Close TCP listener")
+		err := tcpListener.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	log.Println("Start HTTP server")
 	err = http.Serve(tcpListener, nil)
 	if err != nil {
-		panic(err)
+		if interrupted {
+			waitDuration := 10 * time.Second
+			log.Printf("Wait clients %s (press CTRL+C again to stop the server immediatly)", waitDuration)
+			select {
+			case <-time.After(waitDuration):
+			case <-interruptChan:
+			}
+		} else {
+			panic(err)
+		}
 	}
+
+	log.Println("Exit")
 }
