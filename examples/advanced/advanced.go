@@ -21,6 +21,7 @@ import (
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 	"log"
+	"net"
 	"net/http"
 	//_ "net/http/pprof"
 	"os"
@@ -124,9 +125,19 @@ func main() {
 			}
 		},
 	}
-
 	http.Handle("/", httpImageServer)
-	err = http.ListenAndServe(httpAddr, nil)
+
+	tcpAddr, err := net.ResolveTCPAddr("tcp", httpAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	tcpListener, err := net.ListenTCP("tcp", tcpAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	err = http.Serve(tcpListener, nil)
 	if err != nil {
 		panic(err)
 	}
