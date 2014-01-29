@@ -30,7 +30,9 @@ import (
 
 func main() {
 	var verbose bool
+	var httpAddr string
 	flag.BoolVar(&verbose, "verbose", false, "Verbose")
+	flag.StringVar(&httpAddr, "http", ":8080", "Http")
 	flag.Parse()
 
 	hostname, err := os.Hostname()
@@ -131,7 +133,7 @@ func main() {
 	}
 
 	http.Handle("/", httpImageServer)
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(httpAddr, nil)
 	if err != nil {
 		panic(err)
 	}
