@@ -32,6 +32,12 @@ http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/m
 ```
 ![Resize jpeg low quality](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/large.jpg&width=400&format=jpeg&quality=50)
 
+```
+Resize huge image (5000x5000)
+http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/huge.jpg&width=300&height=300
+```
+![Resize huge image (5000x5000)](http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/master/testdata/huge.jpg&width=300&height=300)
+
 ## Resize benchmark
 ```
 go test -bench=. -benchtime=10s ./processor/graphicsmagick
@@ -66,7 +72,7 @@ ok  	github.com/pierrre/imageserver/processor/graphicsmagick	443.701s
 ## Usage / Build
 You have to compile/configure your own image server.
 
-See examples: 
+See examples:
 - [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
 - [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
 
