@@ -10,7 +10,7 @@ services:
 
 before_install:
   - sudo apt-get install graphicsmagick
-  - go get -v code.google.com/p/go.tools/cmd/cover
+  - go get -v code.google.com/p/go.tools/cmd/...
   - go get -v github.com/golang/lint/golint
   - export PATH=$PATH:/home/travis/gopath/bin #ugly hack
 
@@ -18,3 +18,4 @@ script:
   - go test -v -cover ./...
   - go test -v -run=Benchmark -bench=. -benchmem ./...
   - golint .
+  - goimports -l .
