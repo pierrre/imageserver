@@ -10,7 +10,7 @@ services:
 
 before_install:
   - sudo apt-get install graphicsmagick
-  - go get -v code.google.com/p/go.tools/cmd/...
+  - cd $PKG && go get -v .
   - go get -v github.com/golang/lint/golint
   - export PATH=$PATH:/home/travis/gopath/bin #ugly hack
 
