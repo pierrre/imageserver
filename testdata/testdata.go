@@ -3,10 +3,11 @@ package testdata
 
 import (
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
+
+	"github.com/pierrre/imageserver"
 )
 
 var (

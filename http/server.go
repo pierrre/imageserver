@@ -4,13 +4,14 @@ package http
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"hash"
 	"io"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/pierrre/imageserver"
 )
 
 var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")

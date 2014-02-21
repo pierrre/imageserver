@@ -3,9 +3,10 @@ package imageserver_test
 import (
 	"crypto/sha256"
 	"fmt"
+	"testing"
+
 	. "github.com/pierrre/imageserver"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
-	"testing"
 )
 
 func TestNewCacheMissError(t *testing.T) {

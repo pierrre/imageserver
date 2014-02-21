@@ -3,11 +3,12 @@ package http
 
 import (
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"regexp"
+
+	"github.com/pierrre/imageserver"
 )
 
 var contentTypeRegexp, _ = regexp.Compile("^image/(.+)$")

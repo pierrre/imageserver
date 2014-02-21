@@ -1,9 +1,10 @@
 package imageserver_test
 
 import (
+	"testing"
+
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
-	"testing"
 )
 
 func BenchmarkImageMarshalBinarySmall(b *testing.B) {

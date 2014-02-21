@@ -4,13 +4,14 @@ package graphicsmagick
 import (
 	"container/list"
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/pierrre/imageserver"
 )
 
 const (

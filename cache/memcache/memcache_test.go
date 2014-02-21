@@ -1,11 +1,12 @@
 package memcache
 
 import (
+	"testing"
+
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageserver"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
-	"testing"
 )
 
 func TestGetSet(t *testing.T) {

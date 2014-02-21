@@ -1,10 +1,11 @@
 package graphicsmagick
 
 import (
-	"github.com/pierrre/imageserver"
-	"github.com/pierrre/imageserver/testdata"
 	"sync"
 	"testing"
+
+	"github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver/testdata"
 )
 
 // Worker 1

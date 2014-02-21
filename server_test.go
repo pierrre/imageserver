@@ -2,10 +2,11 @@ package imageserver_test
 
 import (
 	"crypto/sha256"
+	"testing"
+
 	. "github.com/pierrre/imageserver"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
-	"testing"
 )
 
 func TestServerGet(t *testing.T) {

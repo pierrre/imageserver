@@ -2,9 +2,10 @@
 package sourcepath
 
 import (
-	"github.com/pierrre/imageserver"
 	"net/http"
 	"net/url"
+
+	"github.com/pierrre/imageserver"
 )
 
 // SourcePathParser represents an http Parser that takes the "source" parameter from the path

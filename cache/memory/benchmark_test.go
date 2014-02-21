@@ -1,10 +1,11 @@
 package memory
 
 import (
+	"testing"
+
 	"github.com/pierrre/imageserver"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
-	"testing"
 )
 
 // Worker 1

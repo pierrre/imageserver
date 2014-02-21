@@ -2,9 +2,10 @@
 package list
 
 import (
+	"net/http"
+
 	"github.com/pierrre/imageserver"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	"net/http"
 )
 
 // ListParser represents a list of http Parser

@@ -2,6 +2,8 @@ package main
 
 import (
 	"crypto/sha256"
+	"net/http"
+
 	"github.com/pierrre/imageserver"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_http "github.com/pierrre/imageserver/http"
@@ -10,7 +12,6 @@ import (
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
-	"net/http"
 )
 
 func main() {

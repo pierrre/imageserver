@@ -4,6 +4,15 @@ import (
 	"crypto/sha256"
 	//_ "expvar"
 	"flag"
+	"log"
+	"net"
+	"net/http"
+	//_ "net/http/pprof"
+	"os"
+	"os/signal"
+	"strconv"
+	"time"
+
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache_async "github.com/pierrre/imageserver/cache/async"
@@ -18,14 +27,6 @@ import (
 	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
-	"log"
-	"net"
-	"net/http"
-	//_ "net/http/pprof"
-	"os"
-	"os/signal"
-	"strconv"
-	"time"
 )
 
 func main() {

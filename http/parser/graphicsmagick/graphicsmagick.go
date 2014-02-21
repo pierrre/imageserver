@@ -3,10 +3,11 @@ package graphicsmagick
 
 import (
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/pierrre/imageserver"
 )
 
 // GraphicsMagickParser represents a GraphicsMagick http Parser

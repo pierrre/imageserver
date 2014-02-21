@@ -1,11 +1,12 @@
 package redis
 
 import (
+	"testing"
+	"time"
+
 	redigo "github.com/garyburd/redigo/redis"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
-	"testing"
-	"time"
 )
 
 func TestGetSet(t *testing.T) {

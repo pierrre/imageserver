@@ -1,9 +1,10 @@
 package _test
 
 import (
-	"github.com/pierrre/imageserver"
 	"sync"
 	"testing"
+
+	"github.com/pierrre/imageserver"
 )
 
 // CacheBenchmarkGet is a helper to benchmark cache Get()

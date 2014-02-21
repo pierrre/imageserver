@@ -1,8 +1,9 @@
 package memory
 
 import (
-	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"testing"
+
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
 func TestGetSet(t *testing.T) {

@@ -2,10 +2,11 @@
 package redis
 
 import (
-	redigo "github.com/garyburd/redigo/redis"
-	"github.com/pierrre/imageserver"
 	"strconv"
 	"time"
+
+	redigo "github.com/garyburd/redigo/redis"
+	"github.com/pierrre/imageserver"
 )
 
 // RedisCache represents a Redis Image Cache

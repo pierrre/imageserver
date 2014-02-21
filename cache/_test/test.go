@@ -2,10 +2,11 @@
 package _test
 
 import (
-	"github.com/pierrre/imageserver"
-	"github.com/pierrre/imageserver/testdata"
 	"sync"
 	"testing"
+
+	"github.com/pierrre/imageserver"
+	"github.com/pierrre/imageserver/testdata"
 )
 
 const (

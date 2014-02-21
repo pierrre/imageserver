@@ -2,8 +2,9 @@
 package source
 
 import (
-	"github.com/pierrre/imageserver"
 	"net/http"
+
+	"github.com/pierrre/imageserver"
 )
 
 // SourceParser represents an http Parser that takes the "source" parameter from query

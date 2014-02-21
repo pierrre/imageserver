@@ -4,9 +4,10 @@ package cache
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"hash"
 	"io"
+
+	"github.com/pierrre/imageserver"
 )
 
 // CacheProvider represents a cached Image Provider

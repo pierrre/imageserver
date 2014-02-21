@@ -1,8 +1,9 @@
 package http
 
 import (
-	"github.com/pierrre/imageserver"
 	"net/http"
+
+	"github.com/pierrre/imageserver"
 )
 
 // Parser represents a http parser
