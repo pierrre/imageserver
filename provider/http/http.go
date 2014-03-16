@@ -25,6 +25,21 @@ type HTTPProvider struct {
 //
 // The image type is determined by the "Content-Type" header.
 func (provider *HTTPProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	response, err := provider.getResponse(source)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	image, err := provider.createImage(response)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
+func (provider *HTTPProvider) getResponse(source interface{}) (*http.Response, error) {
 	sourceURL, err := provider.getSourceURL(source)
 	if err != nil {
 		return nil, err
@@ -34,18 +49,8 @@ func (provider *HTTPProvider) Get(source interface{}, parameters imageserver.Par
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
-	if err = provider.checkResponse(response); err != nil {
-		return nil, err
-	}
-
-	image, err := provider.createImage(response)
-	if err != nil {
-		return nil, err
-	}
-
-	return image, nil
+	return response, nil
 }
 
 func (provider *HTTPProvider) getSourceURL(source interface{}) (*url.URL, error) {
@@ -70,17 +75,14 @@ func (provider *HTTPProvider) request(sourceURL *url.URL) (*http.Response, error
 	return http.Get(sourceURL.String())
 }
 
-func (provider *HTTPProvider) checkResponse(response *http.Response) error {
-	if response.StatusCode != http.StatusOK {
-		return imageserver.NewError(fmt.Sprintf("http status code %d while downloading source", response.StatusCode))
-	}
-	return nil
-}
-
 func (provider *HTTPProvider) createImage(response *http.Response) (*imageserver.Image, error) {
+	if err := provider.checkResponse(response); err != nil {
+		return nil, err
+	}
+
 	image := new(imageserver.Image)
 
-	provider.parseType(response, image)
+	provider.parseFormat(response, image)
 
 	if err := provider.parseData(response, image); err != nil {
 		return nil, err
@@ -89,7 +91,14 @@ func (provider *HTTPProvider) createImage(response *http.Response) (*imageserver
 	return image, nil
 }
 
-func (provider *HTTPProvider) parseType(response *http.Response, image *imageserver.Image) {
+func (provider *HTTPProvider) checkResponse(response *http.Response) error {
+	if response.StatusCode != http.StatusOK {
+		return imageserver.NewError(fmt.Sprintf("http status code %d while downloading source", response.StatusCode))
+	}
+	return nil
+}
+
+func (provider *HTTPProvider) parseFormat(response *http.Response, image *imageserver.Image) {
 	contentType := response.Header.Get("Content-Type")
 	if len(contentType) == 0 {
 		return
