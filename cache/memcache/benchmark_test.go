@@ -1,5 +1,3 @@
-//+build !disable_memcache_benchmark
-
 package memcache
 
 import (
