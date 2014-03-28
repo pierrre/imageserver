@@ -17,6 +17,6 @@ before_install:
 
 script:
   - go test -v -cover ./...
-  - go test -v -run=Benchmark -bench=. -benchmem ./...
+  - go test -v -run=Benchmark -bench=. -benchmem -tags="disable_memcache_benchmark" ./... #Memcache benchmark crashes on Travis
   - golint .
   - goimports -l .
