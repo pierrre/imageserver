@@ -41,18 +41,12 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 	if err := parser.parseBool(query, parameters, "only_enlarge_smaller"); err != nil {
 		return err
 	}
-	if err := parser.parseString(query, parameters, "background"); err != nil {
-		return err
-	}
+	parser.parseString(query, parameters, "background")
 	if err := parser.parseBool(query, parameters, "extent"); err != nil {
 		return err
 	}
-	if err := parser.parseString(query, parameters, "format"); err != nil {
-		return err
-	}
-	if err := parser.parseString(query, parameters, "quality"); err != nil {
-		return err
-	}
+	parser.parseString(query, parameters, "format")
+	parser.parseString(query, parameters, "quality")
 	return nil
 }
 
@@ -72,13 +66,13 @@ func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters 
 	return nil
 }
 
-func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) {
 	parameter := query.Get(parameterName)
 	if len(parameter) == 0 {
-		return nil
+		return
 	}
 	parameters[parameterName] = parameter
-	return nil
+	return
 }
 
 func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
@@ -95,7 +89,7 @@ func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters image
 }
 
 func (parser *GraphicsMagickParser) createError(parameterName string, cause string) *imageserver.Error {
-	return imageserver.NewError(fmt.Sprintf("invalid %s parameter (%s)", parameterName, cause))
+	return imageserver.NewError(fmt.Sprintf("invalid \"%s\" parameter: %s", parameterName, cause))
 }
 
 func (parser *GraphicsMagickParser) createParseError(parameterName string, parseType string) *imageserver.Error {
