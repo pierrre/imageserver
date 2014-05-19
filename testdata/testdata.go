@@ -29,6 +29,11 @@ var (
 	Provider = new(testDataProvider)
 )
 
+func GetDir() string {
+	_, currentFile, _, _ := runtime.Caller(0)
+	return filepath.Dir(currentFile)
+}
+
 type testDataProvider struct{}
 
 func (provider *testDataProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
@@ -46,9 +51,7 @@ func (provider *testDataProvider) Get(source interface{}, parameters imageserver
 }
 
 func loadImage(filename string, format string) *imageserver.Image {
-	_, currentFile, _, _ := runtime.Caller(0)
-	dataPath := filepath.Dir(currentFile)
-	filePath := filepath.Join(dataPath, filename)
+	filePath := filepath.Join(GetDir(), filename)
 
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
