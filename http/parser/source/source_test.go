@@ -12,7 +12,7 @@ func TestParse(t *testing.T) {
 	source := "foo"
 
 	query := make(url.Values)
-	query.Add("source", "foo")
+	query.Add("source", source)
 
 	request, err := http.NewRequest(
 		"GET",
