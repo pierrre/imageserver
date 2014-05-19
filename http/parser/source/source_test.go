@@ -27,6 +27,6 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 	if v != "foo" {
-		t.Fatal("Wrong value")
+		t.Fatal("wrong value")
 	}
 }
