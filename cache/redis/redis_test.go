@@ -12,6 +12,7 @@ import (
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
 	defer cache.Close()
+	checkTestRedigoAvailable(t, cache)
 
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire
@@ -22,6 +23,7 @@ func TestGetSet(t *testing.T) {
 func TestGetErrorMiss(t *testing.T) {
 	cache := newTestCache()
 	defer cache.Close()
+	checkTestRedigoAvailable(t, cache)
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
@@ -49,6 +51,7 @@ func TestSetErrorAddress(t *testing.T) {
 func TestGetErrorUnmarshal(t *testing.T) {
 	cache := newTestCache()
 	defer cache.Close()
+	checkTestRedigoAvailable(t, cache)
 
 	data, _ := testdata.Medium.MarshalBinary()
 	data = data[:len(data)-1]
@@ -85,4 +88,12 @@ func newTestRedigoPool(address string) *redigo.Pool {
 		},
 		MaxIdle: 50,
 	}
+}
+
+func checkTestRedigoAvailable(t *testing.T, cache *RedisCache) {
+	conn, err := cache.Pool.Dial()
+	if err != nil {
+		t.Skip(err)
+	}
+	conn.Close()
 }
