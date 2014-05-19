@@ -1,21 +1,49 @@
 package graphicsmagick
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/pierrre/imageserver"
 )
 
 func TestParse(t *testing.T) {
-	parser := &GraphicsMagickParser{}
+	urlParams := map[string]interface{}{
+		"width":                200,
+		"height":               100,
+		"fill":                 true,
+		"ignore_ratio":         true,
+		"only_shrink_larger":   true,
+		"only_enlarge_smaller": true,
+		"background":           "ffffff",
+		"extent":               true,
+		"format":               "jpeg",
+		"quality":              "85",
+	}
 
-	request, err := http.NewRequest("GET", "http://localhost?width=200&height=100&fill=true&ignore_ratio=true&only_shrink_larger=true&only_enlarge_smaller=true&background=ffffff&extent=true&format=jpeg&quality=85", nil)
+	query := make(url.Values)
+	for k, v := range urlParams {
+		query.Add(k, fmt.Sprint(v))
+	}
+
+	request, err := http.NewRequest(
+		"GET",
+		(&url.URL{
+			Scheme:   "http",
+			Host:     "localhost",
+			RawQuery: query.Encode(),
+		}).String(),
+		nil,
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	parameters := make(imageserver.Parameters)
+
+	parser := &GraphicsMagickParser{}
 
 	err = parser.Parse(request, parameters)
 	if err != nil {
@@ -27,88 +55,33 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	width, err := gmParameters.GetInt("width")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if width != 200 {
-		t.Fatal("Wrong value")
-	}
-
-	height, err := gmParameters.GetInt("height")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if height != 100 {
-		t.Fatal("Wrong value")
-	}
-
-	ignoreRatio, err := gmParameters.GetBool("ignore_ratio")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ignoreRatio != true {
-		t.Fatal("Wrong value")
-	}
-
-	onlyShrinkLarger, err := gmParameters.GetBool("only_shrink_larger")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if onlyShrinkLarger != true {
-		t.Fatal("Wrong value")
-	}
-
-	onlyEnlargeSmaller, err := gmParameters.GetBool("only_enlarge_smaller")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if onlyEnlargeSmaller != true {
-		t.Fatal("Wrong value")
-	}
-
-	background, err := gmParameters.GetString("background")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if background != "ffffff" {
-		t.Fatal("Wrong value")
-	}
-
-	extent, err := gmParameters.GetBool("extent")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if extent != true {
-		t.Fatal("Wrong value")
-	}
-
-	format, err := gmParameters.GetString("format")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if format != "jpeg" {
-		t.Fatal("Wrong value")
-	}
-
-	quality, err := gmParameters.GetString("quality")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if quality != "85" {
-		t.Fatal("Wrong value")
+	for k, v := range urlParams {
+		param, err := gmParameters.Get(k)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if param != v {
+			t.Fatal(fmt.Errorf("wrong value: got %#v, expected %#v", param, v))
+		}
 	}
 }
 
 func TestParseEmpty(t *testing.T) {
-	parser := &GraphicsMagickParser{}
-
-	request, err := http.NewRequest("GET", "http://localhost", nil)
+	request, err := http.NewRequest(
+		"GET",
+		(&url.URL{
+			Scheme: "http",
+			Host:   "localhost",
+		}).String(),
+		nil,
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	parameters := make(imageserver.Parameters)
+
+	parser := &GraphicsMagickParser{}
 
 	err = parser.Parse(request, parameters)
 	if err != nil {
@@ -119,7 +92,7 @@ func TestParseEmpty(t *testing.T) {
 func TestParseError(t *testing.T) {
 	parser := &GraphicsMagickParser{}
 
-	for key, value := range map[string]string{
+	for k, v := range map[string]interface{}{
 		"width":                "foo",
 		"height":               "foo",
 		"fill":                 "foo",
@@ -128,7 +101,18 @@ func TestParseError(t *testing.T) {
 		"only_enlarge_smaller": "foo",
 		"extent":               "foo",
 	} {
-		request, err := http.NewRequest("GET", "http://localhost?"+key+"="+value, nil)
+		query := make(url.Values)
+		query.Add(k, fmt.Sprint(v))
+
+		request, err := http.NewRequest(
+			"GET",
+			(&url.URL{
+				Scheme:   "http",
+				Host:     "localhost",
+				RawQuery: query.Encode(),
+			}).String(),
+			nil,
+		)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -143,14 +127,25 @@ func TestParseError(t *testing.T) {
 }
 
 func TestParseErrorDimensionNegative(t *testing.T) {
-	parser := &GraphicsMagickParser{}
+	query := make(url.Values)
+	query.Add("width", fmt.Sprint(-42))
 
-	request, err := http.NewRequest("GET", "http://localhost?width=-42", nil)
+	request, err := http.NewRequest(
+		"GET",
+		(&url.URL{
+			Scheme:   "http",
+			Host:     "localhost",
+			RawQuery: query.Encode(),
+		}).String(),
+		nil,
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	parameters := make(imageserver.Parameters)
+
+	parser := &GraphicsMagickParser{}
 
 	err = parser.Parse(request, parameters)
 	if err == nil {
