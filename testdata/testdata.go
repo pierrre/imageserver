@@ -11,25 +11,32 @@ import (
 )
 
 var (
+	Dir = initDir()
+
 	// Images contains all images by filename
 	Images = make(map[string]*imageserver.Image)
 
 	// Small is a small Image
-	Small = loadImage("small.jpg", "jpeg")
+	SmallFileName = "small.jpg"
+	Small         = loadImage(SmallFileName, "jpeg")
 	// Medium is a medium Image
-	Medium = loadImage("medium.jpg", "jpeg")
+	MediumFileName = "medium.jpg"
+	Medium         = loadImage(MediumFileName, "jpeg")
 	// Large is a large image
-	Large = loadImage("large.jpg", "jpeg")
+	LargeFileName = "large.jpg"
+	Large         = loadImage(LargeFileName, "jpeg")
 	// Huge is a huge image
-	Huge = loadImage("huge.jpg", "jpeg")
+	HugeFileName = "huge.jpg"
+	Huge         = loadImage(HugeFileName, "jpeg")
 	// Animated is an animated GIF Image
-	Animated = loadImage("animated.gif", "gif")
+	AnimatedFileName = "animated.gif"
+	Animated         = loadImage(AnimatedFileName, "gif")
 
 	// Provider is an Image Provider that uses filename as source
 	Provider = new(testDataProvider)
 )
 
-func GetDir() string {
+func initDir() string {
 	_, currentFile, _, _ := runtime.Caller(0)
 	return filepath.Dir(currentFile)
 }
@@ -51,7 +58,7 @@ func (provider *testDataProvider) Get(source interface{}, parameters imageserver
 }
 
 func loadImage(filename string, format string) *imageserver.Image {
-	filePath := filepath.Join(GetDir(), filename)
+	filePath := filepath.Join(Dir, filename)
 
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
