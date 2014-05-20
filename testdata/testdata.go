@@ -11,26 +11,32 @@ import (
 )
 
 var (
+	// Dir is the path to the directory containing the test data
 	Dir = initDir()
 
 	// Images contains all images by filename
 	Images = make(map[string]*imageserver.Image)
 
-	// Small is a small Image
+	// SmallFileName is the file name of Small
 	SmallFileName = "small.jpg"
-	Small         = loadImage(SmallFileName, "jpeg")
-	// Medium is a medium Image
+	// Small is a small Image
+	Small = loadImage(SmallFileName, "jpeg")
+	// MediumFileName is the file name of Medium
 	MediumFileName = "medium.jpg"
-	Medium         = loadImage(MediumFileName, "jpeg")
-	// Large is a large image
+	// Medium is a medium Image
+	Medium = loadImage(MediumFileName, "jpeg")
+	// LargeFileName is the file name of Large
 	LargeFileName = "large.jpg"
-	Large         = loadImage(LargeFileName, "jpeg")
-	// Huge is a huge image
+	// Large is a large image
+	Large = loadImage(LargeFileName, "jpeg")
+	// HugeFileName is the file name of Huge
 	HugeFileName = "huge.jpg"
-	Huge         = loadImage(HugeFileName, "jpeg")
-	// Animated is an animated GIF Image
+	// Huge is a huge image
+	Huge = loadImage(HugeFileName, "jpeg")
+	// AnimatedFileName is the file name of Animated
 	AnimatedFileName = "animated.gif"
-	Animated         = loadImage(AnimatedFileName, "gif")
+	// Animated is an animated GIF Image
+	Animated = loadImage(AnimatedFileName, "gif")
 
 	// Provider is an Image Provider that uses filename as source
 	Provider = new(testDataProvider)

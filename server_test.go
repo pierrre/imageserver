@@ -11,7 +11,7 @@ import (
 
 func TestServerGet(t *testing.T) {
 	image, err := createServer().Get(Parameters{
-		"source": "medium.jpg",
+		"source": testdata.MediumFileName,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -27,14 +27,14 @@ func TestServerGetWithCache(t *testing.T) {
 	server.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
 
 	image, err := server.Get(Parameters{
-		"source": "medium.jpg",
+		"source": testdata.MediumFileName,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	sameImage, err := server.Get(Parameters{
-		"source": "medium.jpg",
+		"source": testdata.MediumFileName,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestServerGetErrorProcessor(t *testing.T) {
 	}
 
 	_, err := server.Get(Parameters{
-		"source": "medium.jpg",
+		"source": testdata.MediumFileName,
 	})
 	if err == nil {
 		t.Fatal("no error")
