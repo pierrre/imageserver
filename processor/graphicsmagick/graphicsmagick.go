@@ -252,31 +252,27 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.L
 }
 
 func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.List, parameters imageserver.Parameters, format string) error {
-	quality, _ := parameters.GetString("quality")
-
-	if len(quality) == 0 && arguments.Len() == 0 {
+	if !parameters.Has("quality") {
 		return nil
 	}
 
-	if len(quality) > 0 {
-		qualityInt, err := strconv.Atoi(quality)
-		if err != nil {
-			return imageserver.NewError("Invalid quality parameter (parse int error)")
-		}
-
-		if qualityInt < 0 {
-			return imageserver.NewError("Invalid quality parameter (less than 0)")
-		}
-
-		if format == "jpeg" {
-			if qualityInt < 0 || qualityInt > 100 {
-				return imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
-			}
-		}
-
-		arguments.PushBack("-quality")
-		arguments.PushBack(quality)
+	quality, err := parameters.GetInt("quality")
+	if err != nil {
+		return err
 	}
+
+	if quality < 0 {
+		return imageserver.NewError("Invalid quality parameter (less than 0)")
+	}
+
+	if format == "jpeg" {
+		if quality < 0 || quality > 100 {
+			return imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
+		}
+	}
+
+	arguments.PushBack("-quality")
+	arguments.PushBack(strconv.Itoa(quality))
 
 	return nil
 }

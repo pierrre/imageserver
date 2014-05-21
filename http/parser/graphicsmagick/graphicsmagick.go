@@ -23,10 +23,10 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 	parameters = p
 
 	query := request.URL.Query()
-	if err := parser.parseDimension(query, parameters, "width"); err != nil {
+	if err := parser.parseInt(query, parameters, "width"); err != nil {
 		return err
 	}
-	if err := parser.parseDimension(query, parameters, "height"); err != nil {
+	if err := parser.parseInt(query, parameters, "height"); err != nil {
 		return err
 	}
 	if err := parser.parseBool(query, parameters, "fill"); err != nil {
@@ -46,23 +46,9 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 		return err
 	}
 	parser.parseString(query, parameters, "format")
-	parser.parseString(query, parameters, "quality")
-	return nil
-}
-
-func (parser *GraphicsMagickParser) parseDimension(query url.Values, parameters imageserver.Parameters, parameterName string) error {
-	dimensionString := query.Get(parameterName)
-	if len(dimensionString) == 0 {
-		return nil
+	if err := parser.parseInt(query, parameters, "quality"); err != nil {
+		return err
 	}
-	dimension, err := strconv.Atoi(dimensionString)
-	if err != nil {
-		return parser.createParseError(parameterName, "int")
-	}
-	if dimension <= 0 {
-		return parser.createError(parameterName, "lower than or equal to zero")
-	}
-	parameters[parameterName] = dimension
 	return nil
 }
 
@@ -73,6 +59,19 @@ func (parser *GraphicsMagickParser) parseString(query url.Values, parameters ima
 	}
 	parameters[parameterName] = parameter
 	return
+}
+
+func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+	parameterString := query.Get(parameterName)
+	if len(parameterString) == 0 {
+		return nil
+	}
+	parameter, err := strconv.Atoi(parameterString)
+	if err != nil {
+		return parser.createParseError(parameterName, "int")
+	}
+	parameters[parameterName] = parameter
+	return nil
 }
 
 func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {

@@ -20,7 +20,7 @@ func TestParse(t *testing.T) {
 		"background":           "ffffff",
 		"extent":               true,
 		"format":               "jpeg",
-		"quality":              "85",
+		"quality":              85,
 	}
 
 	query := make(url.Values)
@@ -100,6 +100,7 @@ func TestParseError(t *testing.T) {
 		"only_shrink_larger":   "foo",
 		"only_enlarge_smaller": "foo",
 		"extent":               "foo",
+		"quality":              "foo",
 	} {
 		query := make(url.Values)
 		query.Add(k, fmt.Sprint(v))
@@ -123,32 +124,5 @@ func TestParseError(t *testing.T) {
 		if err == nil {
 			t.Fatal("no error")
 		}
-	}
-}
-
-func TestParseErrorDimensionNegative(t *testing.T) {
-	query := make(url.Values)
-	query.Add("width", fmt.Sprint(-42))
-
-	request, err := http.NewRequest(
-		"GET",
-		(&url.URL{
-			Scheme:   "http",
-			Host:     "localhost",
-			RawQuery: query.Encode(),
-		}).String(),
-		nil,
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	parameters := make(imageserver.Parameters)
-
-	parser := &GraphicsMagickParser{}
-
-	err = parser.Parse(request, parameters)
-	if err == nil {
-		t.Fatal("no error")
 	}
 }
