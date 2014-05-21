@@ -85,12 +85,11 @@ http://godoc.org/github.com/pierrre/imageserver
 
 ## TODO
 - more tests
+- add new "parameter error", convert in http
 - source provider
     - dispatch (uri scheme)
     - limit concurrent
-    - timeout
+    - http timeout
 - processor:
-    - chain
-	- native / imagemagick
-- regroup requests?
-- thread count problem with system calls http://misfra.me/post/52148362774/callback-magic-with-go
+	- native (use "image" package)
+	- native imagemagick
