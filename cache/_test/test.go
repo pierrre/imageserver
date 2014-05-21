@@ -94,8 +94,8 @@ func (cache *MapCache) Set(key string, image *imageserver.Image, parameters imag
 
 // FuncCache is an Image Cache that forwards calls to user defined functions
 type FuncCache struct {
-	GetFunc func(string, imageserver.Parameters) (*imageserver.Image, error)
-	SetFunc func(string, *imageserver.Image, imageserver.Parameters) error
+	GetFunc func(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error)
+	SetFunc func(key string, image *imageserver.Image, parameters imageserver.Parameters) error
 }
 
 // Get forwards call to GetFunc
