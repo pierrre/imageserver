@@ -23,7 +23,7 @@ func TestServerGet(t *testing.T) {
 
 func TestServerGetWithCache(t *testing.T) {
 	server := createServer()
-	server.Cache = cachetest.NewCacheMap()
+	server.Cache = cachetest.NewMapCache()
 	server.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
 
 	image, err := server.Get(Parameters{

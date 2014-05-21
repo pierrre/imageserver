@@ -11,7 +11,7 @@ import (
 
 func TestNewCacheMissError(t *testing.T) {
 	key := "foobar"
-	cache := cachetest.NewCacheMap()
+	cache := cachetest.NewMapCache()
 	previousErr := fmt.Errorf("not found")
 
 	err := NewCacheMissError(key, cache, previousErr)

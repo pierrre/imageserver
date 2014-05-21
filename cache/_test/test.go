@@ -56,21 +56,21 @@ func CacheTestGetErrorMiss(t *testing.T, cache imageserver.Cache) {
 	}
 }
 
-// CacheMap is a simple Cache (it wraps a map) for tests
-type CacheMap struct {
+// MapCache is a simple Cache (it wraps a map) for tests
+type MapCache struct {
 	mutex sync.RWMutex
 	data  map[string]*imageserver.Image
 }
 
-// NewCacheMap creates a new CacheMap
-func NewCacheMap() *CacheMap {
-	return &CacheMap{
+// NewMapCache creates a new CacheMap
+func NewMapCache() *MapCache {
+	return &MapCache{
 		data: make(map[string]*imageserver.Image),
 	}
 }
 
-// Get gets an Image from the CacheMap
-func (cache *CacheMap) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+// Get gets an Image from the MapCache
+func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
 
@@ -82,8 +82,8 @@ func (cache *CacheMap) Get(key string, parameters imageserver.Parameters) (*imag
 	return image, nil
 }
 
-// Set sets an Image to the CacheMap
-func (cache *CacheMap) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+// Set sets an Image to the MapCache
+func (cache *MapCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 
