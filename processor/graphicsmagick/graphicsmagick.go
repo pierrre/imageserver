@@ -23,10 +23,9 @@ const (
 type GraphicsMagickProcessor struct {
 	Executable string // path to "gm" executable, usually "/usr/bin/gm"
 
-	Timeout          time.Duration     // timeout for process, optional
-	TempDir          string            // temp directory for image files, optional
-	AllowedFormats   []string          // allowed format list, optional
-	DefaultQualities map[string]string // default qualities by format, optional
+	Timeout        time.Duration // timeout for process, optional
+	TempDir        string        // temp directory for image files, optional
+	AllowedFormats []string      // allowed format list, optional
 }
 
 // Process processes Image with the GraphicsMagick command line (mogrify command)
@@ -257,12 +256,6 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.
 
 	if len(quality) == 0 && arguments.Len() == 0 {
 		return nil
-	}
-
-	if len(quality) == 0 && processor.DefaultQualities != nil {
-		if q, ok := processor.DefaultQualities[format]; ok {
-			quality = q
-		}
 	}
 
 	if len(quality) > 0 {

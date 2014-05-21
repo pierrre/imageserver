@@ -82,9 +82,6 @@ func main() {
 			"bmp",
 			"gif",
 		},
-		DefaultQualities: map[string]string{
-			"jpeg": "85",
-		},
 	}
 	processor = imageserver_processor_limit.New(processor, 16)
 
