@@ -5,7 +5,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// LimitProcessor represents an ImageProcessor that limits the number of concurrent executions
+// LimitProcessor represents an Image Processor that limits the number of concurrent executions
 //
 // It wraps an Image Processor and use a buffered channel to limit the number of concurrent executions.
 type LimitProcessor struct {
