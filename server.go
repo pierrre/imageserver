@@ -3,10 +3,10 @@ package imageserver
 
 // Server represents an Image server
 type Server struct {
-	Cache        Cache                              // optional
+	Cache                                           // optional
 	CacheKeyFunc func(parameters Parameters) string // optional
-	Provider     Provider
-	Processor    Processor // optional
+	Provider
+	Processor // optional
 }
 
 // Get returns an Image for given Parameters

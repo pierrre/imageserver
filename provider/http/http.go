@@ -14,8 +14,7 @@ import (
 var contentTypeRegexp, _ = regexp.Compile("^image/(.+)$")
 
 // HTTPProvider represents a http Image Provider
-type HTTPProvider struct {
-}
+type HTTPProvider struct{}
 
 // Get returns an Image for an http source
 //

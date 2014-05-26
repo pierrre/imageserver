@@ -11,8 +11,7 @@ import (
 )
 
 // GraphicsMagickParser represents a GraphicsMagick http Parser
-type GraphicsMagickParser struct {
-}
+type GraphicsMagickParser struct{}
 
 // Parse parses an http Request for GraphicsMagickProcessor
 //

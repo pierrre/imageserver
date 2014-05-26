@@ -20,7 +20,7 @@ var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 // Server represents an http handler for imageserver.Server
 type Server struct {
-	Parser      Parser              // parse request to Parameters
+	Parser                          // parse request to Parameters
 	ImageServer *imageserver.Server // handle image requests
 
 	ETagFunc func(parameters imageserver.Parameters) string // optional

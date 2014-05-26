@@ -13,7 +13,7 @@ import (
 // CacheProvider represents a cached Image Provider
 type CacheProvider struct {
 	imageserver.Provider
-	Cache        imageserver.Cache
+	imageserver.Cache
 	CacheKeyFunc func(source interface{}, parameters imageserver.Parameters) string
 }
 

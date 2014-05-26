@@ -13,7 +13,7 @@ import (
 //
 // It uses Gary Burd's Redis client https://github.com/garyburd/redigo
 type RedisCache struct {
-	Pool *redigo.Pool
+	*redigo.Pool
 
 	Expire time.Duration // optional
 }

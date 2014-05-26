@@ -8,8 +8,7 @@ import (
 )
 
 // SourceParser represents an http Parser that takes the "source" parameter from query
-type SourceParser struct {
-}
+type SourceParser struct{}
 
 // Parse takes the "source" parameter from query
 func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
