@@ -44,8 +44,8 @@ func (processor *NativeProcessor) Process(image *imageserver.Image, parameters i
 	return image, nil
 }
 
-// DefaultDecodeFunc is the default DecodeFunc
-func DefaultDecodeFunc(image *imageserver.Image, parameters imageserver.Parameters) (native_image.Image, error) {
+// DefaultDecode is the default Decode function
+func DefaultDecode(image *imageserver.Image, parameters imageserver.Parameters) (native_image.Image, error) {
 	nativeImage, _, err := native_image.Decode(bytes.NewReader(image.Data))
 	return nativeImage, err
 }
