@@ -10,9 +10,8 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 	defer cache.Close()
-	checkTestRedigoAvailable(t, cache)
 
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire
@@ -21,15 +20,14 @@ func TestGetSet(t *testing.T) {
 }
 
 func TestGetErrorMiss(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 	defer cache.Close()
-	checkTestRedigoAvailable(t, cache)
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
 func TestGetErrorAddress(t *testing.T) {
-	cache := newTestCacheInvalidAddress()
+	cache := newTestCacheInvalidAddress(t)
 	defer cache.Close()
 
 	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
@@ -39,7 +37,7 @@ func TestGetErrorAddress(t *testing.T) {
 }
 
 func TestSetErrorAddress(t *testing.T) {
-	cache := newTestCacheInvalidAddress()
+	cache := newTestCacheInvalidAddress(t)
 	defer cache.Close()
 
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
@@ -49,9 +47,8 @@ func TestSetErrorAddress(t *testing.T) {
 }
 
 func TestGetErrorUnmarshal(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 	defer cache.Close()
-	checkTestRedigoAvailable(t, cache)
 
 	data, _ := testdata.Medium.MarshalBinary()
 	data = data[:len(data)-1]
@@ -67,11 +64,13 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func newTestCache() *RedisCache {
-	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:6379"))
+func newTestCache(tb testing.TB) *RedisCache {
+	cache := newTestCacheWithRedigoPool(newTestRedigoPool("localhost:6379"))
+	checkTestCacheAvailable(tb, cache)
+	return cache
 }
 
-func newTestCacheInvalidAddress() *RedisCache {
+func newTestCacheInvalidAddress(tb testing.TB) *RedisCache {
 	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:16379"))
 }
 
@@ -90,10 +89,11 @@ func newTestRedigoPool(address string) *redigo.Pool {
 	}
 }
 
-func checkTestRedigoAvailable(t *testing.T, cache *RedisCache) {
+func checkTestCacheAvailable(tb testing.TB, cache *RedisCache) {
 	conn, err := cache.Pool.Dial()
 	if err != nil {
-		t.Skip(err)
+		cache.Close()
+		tb.Skip(err)
 	}
 	conn.Close()
 }
