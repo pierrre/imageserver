@@ -99,7 +99,7 @@ func benchmarkGetWorker16(b *testing.B, image *imageserver.Image) {
 }
 
 func benchmarkGet(b *testing.B, workerCount int, image *imageserver.Image) {
-	cache := newTestCache()
+	cache := newTestCache(b)
 
 	cachetest.CacheBenchmarkGet(b, cache, workerCount, image)
 }

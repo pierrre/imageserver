@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 
 	// maximum object size is only 1MB
 	for _, image := range []*imageserver.Image{
@@ -23,13 +23,13 @@ func TestGetSet(t *testing.T) {
 }
 
 func TestGetErrorMiss(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
 func TestGetErrorServer(t *testing.T) {
-	cache := newTestCacheInvalidServer()
+	cache := newTestCacheInvalidServer(t)
 
 	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
 	if err == nil {
@@ -38,7 +38,7 @@ func TestGetErrorServer(t *testing.T) {
 }
 
 func TestSetErrorServer(t *testing.T) {
-	cache := newTestCacheInvalidServer()
+	cache := newTestCacheInvalidServer(t)
 
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
 	if err == nil {
@@ -47,7 +47,7 @@ func TestSetErrorServer(t *testing.T) {
 }
 
 func TestGetErrorUnmarshal(t *testing.T) {
-	cache := newTestCache()
+	cache := newTestCache(t)
 
 	data, _ := testdata.Medium.MarshalBinary()
 	data = data[:len(data)-1]
@@ -63,11 +63,13 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func newTestCache() *MemcacheCache {
-	return newTestCacheWithClient(newTestClient("localhost:11211"))
+func newTestCache(tb testing.TB) *MemcacheCache {
+	cache := newTestCacheWithClient(newTestClient("localhost:11211"))
+	checkTestCacheAvailable(tb, cache)
+	return cache
 }
 
-func newTestCacheInvalidServer() *MemcacheCache {
+func newTestCacheInvalidServer(tb testing.TB) *MemcacheCache {
 	return newTestCacheWithClient(newTestClient("localhost:11311"))
 }
 
@@ -79,4 +81,14 @@ func newTestCacheWithClient(client *memcache_impl.Client) *MemcacheCache {
 
 func newTestClient(server string) *memcache_impl.Client {
 	return memcache_impl.New(server)
+}
+
+func checkTestCacheAvailable(tb testing.TB, cache *MemcacheCache) {
+	err := cache.Client.Set(&memcache_impl.Item{
+		Key:   "ping",
+		Value: []byte("ping"),
+	})
+	if err != nil {
+		tb.Skip(err)
+	}
 }
