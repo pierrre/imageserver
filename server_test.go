@@ -10,7 +10,7 @@ import (
 )
 
 func TestServerGet(t *testing.T) {
-	image, err := createServer().Get(Parameters{
+	image, err := createImageServer().Get(Parameters{
 		"source": testdata.MediumFileName,
 	})
 	if err != nil {
@@ -22,18 +22,18 @@ func TestServerGet(t *testing.T) {
 }
 
 func TestServerGetWithCache(t *testing.T) {
-	server := createServer()
-	server.Cache = cachetest.NewMapCache()
-	server.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
+	imageServer := createImageServer()
+	imageServer.Cache = cachetest.NewMapCache()
+	imageServer.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
 
-	image, err := server.Get(Parameters{
+	image, err := imageServer.Get(Parameters{
 		"source": testdata.MediumFileName,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	sameImage, err := server.Get(Parameters{
+	sameImage, err := imageServer.Get(Parameters{
 		"source": testdata.MediumFileName,
 	})
 	if err != nil {
@@ -45,14 +45,14 @@ func TestServerGetWithCache(t *testing.T) {
 }
 
 func TestServerGetErrorMissingSource(t *testing.T) {
-	_, err := createServer().Get(Parameters{})
+	_, err := createImageServer().Get(Parameters{})
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestServerGetErrorProvider(t *testing.T) {
-	_, err := createServer().Get(Parameters{
+	_, err := createImageServer().Get(Parameters{
 		"source": "foobar",
 	})
 	if err == nil {
@@ -61,12 +61,12 @@ func TestServerGetErrorProvider(t *testing.T) {
 }
 
 func TestServerGetErrorProcessor(t *testing.T) {
-	server := &Server{
+	imageServer := &ImageServer{
 		Provider:  testdata.Provider,
 		Processor: new(errorProcessor),
 	}
 
-	_, err := server.Get(Parameters{
+	_, err := imageServer.Get(Parameters{
 		"source": testdata.MediumFileName,
 	})
 	if err == nil {
@@ -74,8 +74,8 @@ func TestServerGetErrorProcessor(t *testing.T) {
 	}
 }
 
-func createServer() *Server {
-	return &Server{
+func createImageServer() *ImageServer {
+	return &ImageServer{
 		Provider:  testdata.Provider,
 		Processor: new(copyProcessor),
 	}

@@ -85,7 +85,7 @@ func main() {
 	}
 	processor = imageserver_processor_limit.New(processor, 16)
 
-	imageServer := &imageserver.Server{
+	imageServer := &imageserver.ImageServer{
 		Cache:        cache,
 		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
 		Provider:     provider,

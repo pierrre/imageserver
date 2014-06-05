@@ -17,7 +17,7 @@ import (
 func main() {
 	cache := imageserver_cache_memory.New(10 * 1024 * 1024)
 
-	imageServer := &imageserver.Server{
+	imageServer := &imageserver.ImageServer{
 		Cache:        cache,
 		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
 		Provider:     &imageserver_provider_http.HTTPProvider{},

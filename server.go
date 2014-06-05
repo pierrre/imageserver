@@ -1,8 +1,8 @@
 // Package imageserver provides an image server
 package imageserver
 
-// Server represents an Image server
-type Server struct {
+// ImageServer represents an Image server
+type ImageServer struct {
 	Cache                                           // optional
 	CacheKeyFunc func(parameters Parameters) string // optional
 	Provider
@@ -22,12 +22,12 @@ type Server struct {
 // - process the image
 //
 // - store the image in the cache
-func (server *Server) Get(parameters Parameters) (*Image, error) {
+func (imageServer *ImageServer) Get(parameters Parameters) (*Image, error) {
 	var cacheKey string
-	if server.Cache != nil && server.CacheKeyFunc != nil {
-		cacheKey = server.CacheKeyFunc(parameters)
+	if imageServer.Cache != nil && imageServer.CacheKeyFunc != nil {
+		cacheKey = imageServer.CacheKeyFunc(parameters)
 
-		image, err := server.Cache.Get(cacheKey, parameters)
+		image, err := imageServer.Cache.Get(cacheKey, parameters)
 
 		if err == nil {
 			return image, nil
@@ -39,20 +39,20 @@ func (server *Server) Get(parameters Parameters) (*Image, error) {
 		return nil, NewError("Missing source parameter")
 	}
 
-	image, err := server.Provider.Get(source, parameters)
+	image, err := imageServer.Provider.Get(source, parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	if server.Processor != nil {
-		image, err = server.Processor.Process(image, parameters)
+	if imageServer.Processor != nil {
+		image, err = imageServer.Processor.Process(image, parameters)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if server.Cache != nil {
-		server.Cache.Set(cacheKey, image, parameters)
+	if imageServer.Cache != nil {
+		imageServer.Cache.Set(cacheKey, image, parameters)
 		// TODO handle errors properly
 	}
 
