@@ -1,10 +1,9 @@
-package imageserver
+package cache
 
 import (
-	"encoding/hex"
 	"fmt"
-	"hash"
-	"io"
+
+	"github.com/pierrre/imageserver"
 )
 
 // Cache represents an Image cache
@@ -13,8 +12,8 @@ import (
 //
 // The "parameters" argument can be used for custom behavior (no-cache, expiration, ...)
 type Cache interface {
-	Get(key string, parameters Parameters) (*Image, error)
-	Set(key string, image *Image, parameters Parameters) error
+	Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error)
+	Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error
 }
 
 // CacheMissError represents a cache miss error (no image found or cache not available)
@@ -39,14 +38,4 @@ func (err *CacheMissError) Error() string {
 		s = fmt.Sprintf("%s (%s)", s, err.Previous)
 	}
 	return s
-}
-
-// NewParametersHashCacheKeyFunc returns a function that hashes the parameters and returns a Cache key
-func NewParametersHashCacheKeyFunc(newHashFunc func() hash.Hash) func(parameters Parameters) string {
-	return func(parameters Parameters) string {
-		hash := newHashFunc()
-		io.WriteString(hash, parameters.String())
-		data := hash.Sum(nil)
-		return hex.EncodeToString(data)
-	}
 }

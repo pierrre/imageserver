@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // CacheBenchmarkGet is a helper to benchmark cache Get()
-func CacheBenchmarkGet(b *testing.B, cache imageserver.Cache, workerCount int, image *imageserver.Image) {
+func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, workerCount int, image *imageserver.Image) {
 	key := "test"
 	parameters := make(imageserver.Parameters)
 	err := cache.Set(key, image, parameters)

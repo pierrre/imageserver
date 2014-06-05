@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -22,7 +23,7 @@ var (
 )
 
 // CacheTestGetSet is a helper to test cache Get()/Set()
-func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.Image) {
+func CacheTestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.Image) {
 	err := cache.Set(KeyValid, image, ParametersEmpty)
 	if err != nil {
 		t.Fatal(err)
@@ -39,19 +40,19 @@ func CacheTestGetSet(t *testing.T, cache imageserver.Cache, image *imageserver.I
 }
 
 // CacheTestGetSetAllImages is a helper to test cache Get()/Set() with all images from test data
-func CacheTestGetSetAllImages(t *testing.T, cache imageserver.Cache) {
+func CacheTestGetSetAllImages(t *testing.T, cache imageserver_cache.Cache) {
 	for _, image := range testdata.Images {
 		CacheTestGetSet(t, cache, image)
 	}
 }
 
 // CacheTestGetErrorMiss is a helper to test cache Get() with a "cache miss" error
-func CacheTestGetErrorMiss(t *testing.T, cache imageserver.Cache) {
+func CacheTestGetErrorMiss(t *testing.T, cache imageserver_cache.Cache) {
 	_, err := cache.Get(KeyMiss, ParametersEmpty)
 	if err == nil {
 		t.Fatal("no error")
 	}
-	if _, ok := err.(*imageserver.CacheMissError); !ok {
+	if _, ok := err.(*imageserver_cache.CacheMissError); !ok {
 		t.Fatal("invalid error type")
 	}
 }
@@ -76,7 +77,7 @@ func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imag
 
 	image, ok := cache.data[key]
 	if !ok {
-		return nil, imageserver.NewCacheMissError(key, cache, nil)
+		return nil, imageserver_cache.NewCacheMissError(key, cache, nil)
 	}
 
 	return image, nil
@@ -94,7 +95,7 @@ func (cache *MapCache) Set(key string, image *imageserver.Image, parameters imag
 
 // FuncCache is an Image Cache that forwards calls to user defined functions
 type FuncCache struct {
-	GetFunc func(key string, parameters imageserver.Parameters) (image *imageserver.Image, err error)
+	GetFunc func(key string, parameters imageserver.Parameters) (*imageserver.Image, error)
 	SetFunc func(key string, image *imageserver.Image, parameters imageserver.Parameters) error
 }
 

@@ -1,11 +1,9 @@
 package imageserver_test
 
 import (
-	"crypto/sha256"
 	"testing"
 
 	. "github.com/pierrre/imageserver"
-	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -18,29 +16,6 @@ func TestServerGet(t *testing.T) {
 	}
 	if image == nil {
 		t.Fatal("image is nil")
-	}
-}
-
-func TestServerGetWithCache(t *testing.T) {
-	imageServer := createImageServer()
-	imageServer.Cache = cachetest.NewMapCache()
-	imageServer.CacheKeyFunc = NewParametersHashCacheKeyFunc(sha256.New)
-
-	image, err := imageServer.Get(Parameters{
-		"source": testdata.MediumFileName,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	sameImage, err := imageServer.Get(Parameters{
-		"source": testdata.MediumFileName,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !ImageEqual(image, sameImage) {
-		t.Fatal("not equals")
 	}
 }
 
@@ -72,6 +47,13 @@ func TestServerGetErrorProcessor(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+}
+
+func TestImageServerFunc(t *testing.T) {
+	s := ImageServerFunc(func(parameters Parameters) (*Image, error) {
+		return testdata.Medium, nil
+	})
+	s.Get(Parameters{})
 }
 
 func createImageServer() *ImageServer {

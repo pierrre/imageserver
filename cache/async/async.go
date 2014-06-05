@@ -3,11 +3,12 @@ package async
 
 import (
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // AsyncCache represent an asynchronous cache
 type AsyncCache struct {
-	imageserver.Cache
+	imageserver_cache.Cache
 
 	ErrFunc func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters)
 }

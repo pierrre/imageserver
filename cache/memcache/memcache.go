@@ -4,6 +4,7 @@ package memcache
 import (
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // MemcacheCache represents a Memcache Image Cache
@@ -31,7 +32,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 func (cache *MemcacheCache) getData(key string) ([]byte, error) {
 	item, err := cache.Client.Get(key)
 	if err != nil {
-		return nil, imageserver.NewCacheMissError(key, cache, err)
+		return nil, imageserver_cache.NewCacheMissError(key, cache, err)
 	}
 
 	return item.Value, nil

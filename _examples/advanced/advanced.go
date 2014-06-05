@@ -15,6 +15,7 @@ import (
 
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_async "github.com/pierrre/imageserver/cache/async"
 	imageserver_cache_list "github.com/pierrre/imageserver/cache/list"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
@@ -43,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	var cache imageserver.Cache
+	var cache imageserver_cache.Cache
 	cache = &imageserver_cache_redis.RedisCache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
@@ -67,9 +68,9 @@ func main() {
 	}
 
 	provider := &imageserver_provider_cache.CacheProvider{
-		Provider:     &imageserver_provider_http.HTTPProvider{},
-		Cache:        cache,
-		CacheKeyFunc: imageserver_provider_cache.NewSourceHashCacheKeyFunc(sha256.New),
+		Provider:          &imageserver_provider_http.HTTPProvider{},
+		Cache:             cache,
+		CacheKeyGenerator: imageserver_provider_cache.NewSourceHashCacheKeyGeneratorFunc(sha256.New),
 	}
 
 	var processor imageserver.Processor
@@ -85,11 +86,15 @@ func main() {
 	}
 	processor = imageserver_processor_limit.New(processor, 16)
 
-	imageServer := &imageserver.ImageServer{
+	var imageServer imageserver.ImageServerInterface
+	imageServer = &imageserver.ImageServer{
+		Provider:  provider,
+		Processor: processor,
+	}
+	imageServer = &imageserver_cache.CacheImageServer{
+		ImageServer:  imageServer,
 		Cache:        cache,
-		CacheKeyFunc: imageserver.NewParametersHashCacheKeyFunc(sha256.New),
-		Provider:     provider,
-		Processor:    processor,
+		KeyGenerator: imageserver_cache.NewParametersHashKeyGeneratorFunc(sha256.New),
 	}
 
 	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{

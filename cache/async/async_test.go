@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 )
@@ -12,7 +13,7 @@ import (
 func TestSet(t *testing.T) {
 	funcCache := &cachetest.FuncCache{}
 	funcCache.GetFunc = func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-		return nil, imageserver.NewCacheMissError(key, funcCache, nil)
+		return nil, imageserver_cache.NewCacheMissError(key, funcCache, nil)
 	}
 	setCallCh := make(chan struct{})
 	funcCache.SetFunc = func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {

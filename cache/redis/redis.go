@@ -7,6 +7,7 @@ import (
 
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // RedisCache represents a Redis Image Cache
@@ -22,7 +23,7 @@ type RedisCache struct {
 func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
-		return nil, imageserver.NewCacheMissError(key, cache, err)
+		return nil, imageserver_cache.NewCacheMissError(key, cache, err)
 	}
 
 	image, err := imageserver.NewImageUnmarshalBinary(data)

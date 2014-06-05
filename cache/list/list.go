@@ -3,10 +3,11 @@ package list
 
 import (
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // ListCache represents a list of Image Cache
-type ListCache []imageserver.Cache
+type ListCache []imageserver_cache.Cache
 
 // Get gets an Image from caches in sequential order
 //
@@ -25,7 +26,7 @@ func (cache ListCache) Get(key string, parameters imageserver.Parameters) (*imag
 		}
 	}
 
-	return nil, imageserver.NewCacheMissError(key, cache, nil)
+	return nil, imageserver_cache.NewCacheMissError(key, cache, nil)
 }
 
 func (cache ListCache) set(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) error {
