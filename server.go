@@ -58,3 +58,8 @@ func (imageServer *ImageServer) Get(parameters Parameters) (*Image, error) {
 
 	return image, nil
 }
+
+// ImageServerInterface represents an interface for an Image server
+type ImageServerInterface interface {
+	Get(Parameters) (*Image, error)
+}

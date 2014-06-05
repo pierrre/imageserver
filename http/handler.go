@@ -20,8 +20,8 @@ var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 // ImageHTTPHandler represents an HTTP Handler for imageserver.Server
 type ImageHTTPHandler struct {
-	Parser                               // parse request to Parameters
-	ImageServer *imageserver.ImageServer // handle image requests
+	Parser                                       // parse request to Parameters
+	ImageServer imageserver.ImageServerInterface // handle image requests
 
 	ETagFunc func(parameters imageserver.Parameters) string // optional
 	Expire   time.Duration                                  // set the "Expires" header, optional
