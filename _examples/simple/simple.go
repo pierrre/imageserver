@@ -26,7 +26,7 @@ func main() {
 		},
 	}
 
-	httpImageServer := &imageserver_http.Server{
+	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
 		Parser: &imageserver_http_parser_list.ListParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
@@ -34,7 +34,7 @@ func main() {
 		ImageServer: imageServer,
 	}
 
-	http.Handle("/", httpImageServer)
+	http.Handle("/", imageHTTPHandler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)

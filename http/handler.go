@@ -1,4 +1,4 @@
-// Package http provides an http handler for the imageserver package
+// Package http provides an HTTP Handler for the imageserver package
 package http
 
 import (
@@ -18,8 +18,8 @@ var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-// Server represents an http handler for imageserver.Server
-type Server struct {
+// ImageHTTPHandler represents an HTTP Handler for imageserver.Server
+type ImageHTTPHandler struct {
 	Parser                               // parse request to Parameters
 	ImageServer *imageserver.ImageServer // handle image requests
 
@@ -32,49 +32,49 @@ type Server struct {
 	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // allows to handle returned responses, optional
 }
 
-// ServeHTTP implements the http handler interface
+// ServeHTTP implements the HTTP Handler interface
 //
 // Only GET and HEAD methods are supported.
 //
 // Supports ETag/If-None-Match (status code 304).
 // It doesn't check if the image really exists.
-func (server *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
-		server.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
+		handler.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
 		return
 	}
 
-	if server.RequestFunc != nil {
-		if err := server.RequestFunc(request); err != nil {
-			server.sendError(writer, request, err)
+	if handler.RequestFunc != nil {
+		if err := handler.RequestFunc(request); err != nil {
+			handler.sendError(writer, request, err)
 			return
 		}
 	}
 
 	parameters := make(imageserver.Parameters)
-	if err := server.Parser.Parse(request, parameters); err != nil {
-		server.sendError(writer, request, err)
+	if err := handler.Parser.Parse(request, parameters); err != nil {
+		handler.sendError(writer, request, err)
 		return
 	}
 
-	if server.checkNotModified(writer, request, parameters) {
+	if handler.checkNotModified(writer, request, parameters) {
 		return
 	}
 
-	image, err := server.ImageServer.Get(parameters)
+	image, err := handler.ImageServer.Get(parameters)
 	if err != nil {
-		server.sendError(writer, request, err)
+		handler.sendError(writer, request, err)
 		return
 	}
 
-	if err := server.sendImage(writer, request, parameters, image); err != nil {
-		server.callErrFunc(err, request)
+	if err := handler.sendImage(writer, request, parameters, image); err != nil {
+		handler.callErrFunc(err, request)
 		return
 	}
 }
 
-func (server *Server) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
-	if server.ETagFunc == nil {
+func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
+	if handler.ETagFunc == nil {
 		return false
 	}
 
@@ -89,22 +89,22 @@ func (server *Server) checkNotModified(writer http.ResponseWriter, request *http
 	}
 
 	inm := matches[1]
-	etag := server.ETagFunc(parameters)
+	etag := handler.ETagFunc(parameters)
 	if inm != etag {
 		return false
 	}
 
-	server.setImageHeaderCommon(writer, request, parameters)
+	handler.setImageHeaderCommon(writer, request, parameters)
 
 	writer.WriteHeader(http.StatusNotModified)
 
-	server.callResponseFunc(request, http.StatusNotModified, 0, nil)
+	handler.callResponseFunc(request, http.StatusNotModified, 0, nil)
 
 	return true
 }
 
-func (server *Server) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
-	server.setImageHeaderCommon(writer, request, parameters)
+func (handler *ImageHTTPHandler) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
+	handler.setImageHeaderCommon(writer, request, parameters)
 
 	if len(image.Format) > 0 {
 		writer.Header().Set("Content-Type", "image/"+image.Format)
@@ -121,31 +121,31 @@ func (server *Server) sendImage(writer http.ResponseWriter, request *http.Reques
 		}
 	}
 
-	server.callResponseFunc(request, http.StatusOK, contentSize, nil)
+	handler.callResponseFunc(request, http.StatusOK, contentSize, nil)
 
 	return nil
 }
 
-func (server *Server) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
+func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
 	header := writer.Header()
 
 	header.Set("Cache-Control", "public")
 
-	if server.ETagFunc != nil {
-		header.Set("ETag", fmt.Sprintf("\"%s\"", server.ETagFunc(parameters)))
+	if handler.ETagFunc != nil {
+		header.Set("ETag", fmt.Sprintf("\"%s\"", handler.ETagFunc(parameters)))
 	}
 
-	if server.Expire != 0 {
+	if handler.Expire != 0 {
 		t := time.Now()
-		t = t.Add(server.Expire)
+		t = t.Add(handler.Expire)
 		t = t.In(expiresHeaderLocation)
 		header.Set("Expires", t.Format(time.RFC1123))
 	}
 
-	server.callHeaderFunc(header, request, nil)
+	handler.callHeaderFunc(header, request, nil)
 }
 
-func (server *Server) sendError(writer http.ResponseWriter, request *http.Request, err error) {
+func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *http.Request, err error) {
 	var statusCode int
 	var message string
 
@@ -160,31 +160,31 @@ func (server *Server) sendError(writer http.ResponseWriter, request *http.Reques
 		statusCode = http.StatusInternalServerError
 		message = http.StatusText(statusCode)
 
-		server.callErrFunc(err, request)
+		handler.callErrFunc(err, request)
 	}
 
-	server.callHeaderFunc(writer.Header(), request, err)
+	handler.callHeaderFunc(writer.Header(), request, err)
 
 	http.Error(writer, message, statusCode)
 
-	server.callResponseFunc(request, statusCode, int64(len(message)), err)
+	handler.callResponseFunc(request, statusCode, int64(len(message)), err)
 }
 
-func (server *Server) callErrFunc(err error, request *http.Request) {
-	if server.ErrorFunc != nil {
-		server.ErrorFunc(err, request)
+func (handler *ImageHTTPHandler) callErrFunc(err error, request *http.Request) {
+	if handler.ErrorFunc != nil {
+		handler.ErrorFunc(err, request)
 	}
 }
 
-func (server *Server) callHeaderFunc(header http.Header, request *http.Request, err error) {
-	if server.HeaderFunc != nil {
-		server.HeaderFunc(header, request, err)
+func (handler *ImageHTTPHandler) callHeaderFunc(header http.Header, request *http.Request, err error) {
+	if handler.HeaderFunc != nil {
+		handler.HeaderFunc(header, request, err)
 	}
 }
 
-func (server *Server) callResponseFunc(request *http.Request, statusCode int, contentSize int64, err error) {
-	if server.ResponseFunc != nil {
-		server.ResponseFunc(request, statusCode, contentSize, err)
+func (handler *ImageHTTPHandler) callResponseFunc(request *http.Request, statusCode int, contentSize int64, err error) {
+	if handler.ResponseFunc != nil {
+		handler.ResponseFunc(request, statusCode, contentSize, err)
 	}
 }
 

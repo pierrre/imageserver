@@ -92,7 +92,7 @@ func main() {
 		Processor:    processor,
 	}
 
-	httpImageServer := &imageserver_http.Server{
+	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
 		Parser: &imageserver_http_parser_list.ListParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
@@ -124,7 +124,7 @@ func main() {
 			}
 		},
 	}
-	http.Handle("/", httpImageServer)
+	http.Handle("/", imageHTTPHandler)
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", httpAddr)
 	if err != nil {
