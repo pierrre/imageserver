@@ -142,3 +142,13 @@ func (parameters Parameters) String() string {
 
 	return buffer.String()
 }
+
+// ParameterError is an error for a parameter
+type ParameterError struct {
+	Parameter string // Nested parameter path uses "." as separator
+	Message   string
+}
+
+func (err *ParameterError) Error() string {
+	return fmt.Sprintf("invalid parameter \"%s\": %s", err.Parameter, err.Message)
+}

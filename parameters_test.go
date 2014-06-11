@@ -212,3 +212,12 @@ func TestParametersStable(t *testing.T) {
 		t.Fatal("not equals")
 	}
 }
+
+func TestParameterErrorInterface(t *testing.T) {
+	var _ error = &ParameterError{}
+}
+
+func TestParameterError(t *testing.T) {
+	err := &ParameterError{Parameter: "param", Message: "my message"}
+	err.Error()
+}

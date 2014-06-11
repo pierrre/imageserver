@@ -12,4 +12,5 @@ func TestTODO(t *testing.T) {
 
 func TestInterface(t *testing.T) {
 	var _ imageserver_http.Parser = ListParser{}
+	var _ imageserver_http.Resolver = ListParser{}
 }

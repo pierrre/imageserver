@@ -19,3 +19,11 @@ func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.
 	}
 	return nil
 }
+
+// Resolve resolves the "source" parameter
+func (parser *SourceParser) Resolve(parameter string) string {
+	if parameter != "source" {
+		return ""
+	}
+	return "source"
+}

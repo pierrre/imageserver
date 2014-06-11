@@ -2,6 +2,7 @@ package cache_test
 
 import (
 	"crypto/sha256"
+	"errors"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -40,7 +41,7 @@ func TestCacheImageServer(t *testing.T) {
 func TestCacheImageServerErrorImageServer(t *testing.T) {
 	s := &CacheImageServer{
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
-			return nil, imageserver.NewError("error")
+			return nil, errors.New("error")
 		}),
 		Cache: cachetest.NewMapCache(),
 		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
@@ -63,7 +64,7 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 				return nil, &MissError{Key: key}
 			},
 			SetFunc: func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
-				return imageserver.NewError("error")
+				return errors.New("error")
 			},
 		},
 		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {

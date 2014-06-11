@@ -12,6 +12,7 @@ import (
 
 func TestInterface(t *testing.T) {
 	var _ imageserver_http.Parser = &GraphicsMagickParser{}
+	var _ imageserver_http.Resolver = &GraphicsMagickParser{}
 }
 
 func TestParse(t *testing.T) {
@@ -129,5 +130,19 @@ func TestParseError(t *testing.T) {
 		if err == nil {
 			t.Fatal("no error")
 		}
+	}
+}
+
+func TestResolve(t *testing.T) {
+	parser := &GraphicsMagickParser{}
+
+	httpParameter := parser.Resolve("graphicsmagick.foo")
+	if httpParameter != "foo" {
+		t.Fatal("not equals")
+	}
+
+	httpParameter = parser.Resolve("bar")
+	if httpParameter != "" {
+		t.Fatal("not equals")
 	}
 }

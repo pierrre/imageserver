@@ -11,6 +11,7 @@ import (
 
 func TestInterface(t *testing.T) {
 	var _ imageserver_http.Parser = &SourceParser{}
+	var _ imageserver_http.Resolver = &SourceParser{}
 }
 
 func TestParse(t *testing.T) {
@@ -47,5 +48,19 @@ func TestParse(t *testing.T) {
 	}
 	if v != source {
 		t.Fatal("wrong value")
+	}
+}
+
+func TestResolve(t *testing.T) {
+	parser := &SourceParser{}
+
+	httpParameter := parser.Resolve("source")
+	if httpParameter != "source" {
+		t.Fatal("not equals")
+	}
+
+	httpParameter = parser.Resolve("foobar")
+	if httpParameter != "" {
+		t.Fatal("not equals")
 	}
 }

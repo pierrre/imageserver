@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/pierrre/imageserver"
 )
@@ -67,7 +68,7 @@ func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters images
 	}
 	parameter, err := strconv.Atoi(parameterString)
 	if err != nil {
-		return parser.createParseError(parameterName, "int")
+		return parser.newParseError(parameterName, "int")
 	}
 	parameters[parameterName] = parameter
 	return nil
@@ -80,16 +81,23 @@ func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters image
 	}
 	parameter, err := strconv.ParseBool(parameterString)
 	if err != nil {
-		return parser.createParseError(parameterName, "bool")
+		return parser.newParseError(parameterName, "bool")
 	}
 	parameters[parameterName] = parameter
 	return nil
 }
 
-func (parser *GraphicsMagickParser) createError(parameterName string, cause string) *imageserver.Error {
-	return imageserver.NewError(fmt.Sprintf("invalid \"%s\" parameter: %s", parameterName, cause))
+func (parser *GraphicsMagickParser) newParseError(parameterName string, parseType string) *imageserver.ParameterError {
+	return &imageserver.ParameterError{
+		Parameter: fmt.Sprintf("graphicsmagick.%s", parameterName),
+		Message:   fmt.Sprintf("parse %s error", parseType),
+	}
 }
 
-func (parser *GraphicsMagickParser) createParseError(parameterName string, parseType string) *imageserver.Error {
-	return parser.createError(parameterName, fmt.Sprintf("parse %s error", parseType))
+// Resolve resolves GraphicsMagick's parameters
+func (parser *GraphicsMagickParser) Resolve(parameter string) string {
+	if !strings.HasPrefix(parameter, "graphicsmagick.") {
+		return ""
+	}
+	return strings.TrimPrefix(parameter, "graphicsmagick.")
 }

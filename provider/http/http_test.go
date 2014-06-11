@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"math/rand"
 	"net"
 	"net/http"
@@ -96,7 +97,7 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 	}
 }
 
-func TestGetErrorInvalidHost(t *testing.T) {
+func TestGetErrorRequest(t *testing.T) {
 	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
@@ -111,73 +112,26 @@ func TestGetErrorInvalidHost(t *testing.T) {
 	}
 }
 
-func TestParseFormatEmpty(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
+type errorReadCloser struct{}
 
-	source := createTestURL(listener)
-
-	provider := &HTTPProvider{}
-
-	response, err := provider.getResponse(source)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer response.Body.Close()
-
-	response.Header.Del("Content-Type")
-
-	image, err := provider.createImage(response)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if image.Format != "" {
-		t.Fatal("format not empty")
-	}
+func (erc *errorReadCloser) Read(p []byte) (n int, err error) {
+	return 0, errors.New("error")
 }
 
-func TestParseFormatInvalid(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-
-	source := createTestURL(listener)
-
-	provider := &HTTPProvider{}
-
-	response, err := provider.getResponse(source)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer response.Body.Close()
-
-	response.Header.Set("Content-Type", "foobar")
-
-	image, err := provider.createImage(response)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if image.Format != "" {
-		t.Fatal("format not empty")
-	}
+func (erc *errorReadCloser) Close() error {
+	return errors.New("error")
 }
 
-func TestParseDataError(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-
-	source := createTestURL(listener)
-
+func TestParseResponseErrorData(t *testing.T) {
 	provider := &HTTPProvider{}
 
-	response, err := provider.getResponse(source)
-	if err != nil {
-		t.Fatal(err)
+	response := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       &errorReadCloser{},
 	}
-	response.Body.Close()
 
-	_, err = provider.createImage(response)
+	_, err := provider.parseResponse(response)
+	t.Log(err)
 	if err == nil {
 		t.Fatal("no error")
 	}

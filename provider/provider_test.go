@@ -1,9 +1,10 @@
-package provider
+package provider_test
 
 import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	. "github.com/pierrre/imageserver/provider"
 	"github.com/pierrre/imageserver/testdata"
 )
 

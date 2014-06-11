@@ -71,17 +71,15 @@ func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, re
 	if matches == nil {
 		return false
 	}
-
 	inm := matches[1]
+
 	etag := handler.ETagFunc(parameters)
 	if inm != etag {
 		return false
 	}
 
 	handler.setImageHeaderCommon(writer, request, parameters)
-
 	writer.WriteHeader(http.StatusNotModified)
-
 	return true
 }
 
@@ -114,24 +112,25 @@ func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter
 }
 
 func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *http.Request, err error) {
-	var statusCode int
-	var message string
+	httpErr := handler.convertGenericErrorToHTTP(err, request)
+	http.Error(writer, httpErr.Text, httpErr.Code)
+}
 
+func (handler *ImageHTTPHandler) convertGenericErrorToHTTP(err error, request *http.Request) *Error {
 	switch err := err.(type) {
-	case *imageserver.Error:
-		statusCode = http.StatusBadRequest
-		message = err.Error()
 	case *Error:
-		statusCode = err.Code
-		message = err.Text
+		return err
+	case *imageserver.ParameterError:
+		httpParameter := Resolve(handler.Parser, err.Parameter)
+		if httpParameter == "" {
+			httpParameter = err.Parameter
+		}
+		text := fmt.Sprintf("invalid parameter \"%s\": %s", httpParameter, err.Message)
+		return &Error{Code: http.StatusBadRequest, Text: text}
 	default:
-		statusCode = http.StatusInternalServerError
-		message = http.StatusText(statusCode)
-
 		handler.callErrorFunc(err, request)
+		return NewErrorDefaultText(http.StatusInternalServerError)
 	}
-
-	http.Error(writer, message, statusCode)
 }
 
 func (handler *ImageHTTPHandler) callErrorFunc(err error, request *http.Request) {

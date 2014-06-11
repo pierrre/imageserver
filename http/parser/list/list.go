@@ -21,3 +21,14 @@ func (parser ListParser) Parse(request *http.Request, parameters imageserver.Par
 	}
 	return nil
 }
+
+// Resolve resolves the parameter with sub Parsers in sequential order
+func (parser ListParser) Resolve(parameter string) string {
+	for _, subParser := range parser {
+		httpParameter := imageserver_http.Resolve(subParser, parameter)
+		if httpParameter != "" {
+			return httpParameter
+		}
+	}
+	return ""
+}

@@ -1,9 +1,11 @@
-package provider
+package provider_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	. "github.com/pierrre/imageserver/provider"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -34,7 +36,7 @@ func TestImageServerGetErrorMissingSource(t *testing.T) {
 	}
 }
 
-func TestImageServerGetErrorProvider(t *testing.T) {
+func TestImageServerGetErrorProviderSource(t *testing.T) {
 	parameters := imageserver.Parameters{
 		"source": "foobar",
 	}
@@ -45,8 +47,28 @@ func TestImageServerGetErrorProvider(t *testing.T) {
 	}
 }
 
+func TestImageServerGetErrorProvider(t *testing.T) {
+	parameters := imageserver.Parameters{
+		"source": "test",
+	}
+	pis := &ProviderImageServer{
+		Provider: ProviderFunc(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+			return nil, errors.New("error")
+		}),
+	}
+	_, err := pis.Get(parameters)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func createTestProviderImageServer() *ProviderImageServer {
 	return &ProviderImageServer{
 		Provider: testdata.Provider,
 	}
+}
+
+func TestSourceError(t *testing.T) {
+	err := NewSourceError("test")
+	err.Error()
 }

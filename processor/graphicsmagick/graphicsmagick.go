@@ -144,12 +144,12 @@ func (processor *GraphicsMagickProcessor) getParameters(parameters imageserver.P
 func (processor *GraphicsMagickProcessor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
 	width, _ = parameters.GetInt("width")
 	if width < 0 {
-		return 0, 0, imageserver.NewError("Invalid width parameter")
+		return 0, 0, newParameterError("width", "must be greater than or equal to 0")
 	}
 
 	height, _ = parameters.GetInt("height")
 	if height < 0 {
-		return 0, 0, imageserver.NewError("Invalid height parameter")
+		return 0, 0, newParameterError("height", "must be greater than or equal to 0")
 	}
 
 	if width != 0 || height != 0 {
@@ -191,12 +191,12 @@ func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments *li
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			return imageserver.NewError("Invalid background parameter")
+			return newParameterError("background", "length must be equal to 3, 4, 6 or 8")
 		}
 
 		for _, r := range background {
 			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				return imageserver.NewError("Invalid background parameter")
+				return newParameterError("background", "must only contain characters in 0-9a-f")
 			}
 		}
 
@@ -239,7 +239,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.L
 			}
 		}
 		if !ok {
-			return "", false, imageserver.NewError("Invalid format parameter")
+			return "", false, newParameterError("format", "not allowed")
 		}
 	}
 
@@ -262,12 +262,12 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.
 	}
 
 	if quality < 0 {
-		return imageserver.NewError("Invalid quality parameter (less than 0)")
+		return newParameterError("quality", "must be greater than or equal to 0")
 	}
 
 	if format == "jpeg" {
 		if quality < 0 || quality > 100 {
-			return imageserver.NewError("Invalid quality parameter (must be between 0 and 100)")
+			return newParameterError("quality", "must be between 0 and 100")
 		}
 	}
 
@@ -317,5 +317,12 @@ func (processor *GraphicsMagickProcessor) runCommand(cmd *exec.Cmd) error {
 		<-cmdChan
 
 		return fmt.Errorf("command timeout after %s: %+v", processor.Timeout, cmd)
+	}
+}
+
+func newParameterError(parameter string, message string) *imageserver.ParameterError {
+	return &imageserver.ParameterError{
+		Parameter: fmt.Sprintf("graphicsmagick.%s", parameter),
+		Message:   message,
 	}
 }

@@ -2,12 +2,12 @@
 package testdata
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
 
 	"github.com/pierrre/imageserver"
+	imageserver_provider "github.com/pierrre/imageserver/provider"
 )
 
 var (
@@ -52,12 +52,12 @@ type testDataProvider struct{}
 func (provider *testDataProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	name, ok := source.(string)
 	if !ok {
-		return nil, imageserver.NewError(fmt.Sprintf("source is not a string: %#v", source))
+		return nil, imageserver_provider.NewSourceError("not a string")
 	}
 
 	image, ok := Images[name]
 	if !ok {
-		return nil, imageserver.NewError(fmt.Sprintf("source is unknown: %s", name))
+		return nil, imageserver_provider.NewSourceError("unknown image")
 	}
 
 	return image, nil
