@@ -14,7 +14,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-var inmHeaderRegexp, _ = regexp.Compile("^\"(.+)\"$")
+var inmHeaderRegexp = regexp.MustCompile("^\"(.+)\"$")
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 

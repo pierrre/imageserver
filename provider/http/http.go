@@ -11,7 +11,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-var contentTypeRegexp, _ = regexp.Compile("^image/(.+)$")
+var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
 // HTTPProvider represents a http Image Provider
 type HTTPProvider struct{}
