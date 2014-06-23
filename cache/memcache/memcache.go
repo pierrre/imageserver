@@ -11,7 +11,7 @@ import (
 //
 // It uses Brad Fitzpatrick's Memcache client https://github.com/bradfitz/gomemcache
 type MemcacheCache struct {
-	*memcache_impl.Client
+	Client *memcache_impl.Client
 }
 
 // Get gets an Image from Memcache

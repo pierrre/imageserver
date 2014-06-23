@@ -13,9 +13,9 @@ import (
 
 // CacheProvider represents a cached Image Provider
 type CacheProvider struct {
-	imageserver.Provider
-	imageserver_cache.Cache
-	CacheKeyGenerator
+	Provider          imageserver.Provider
+	Cache             imageserver_cache.Cache
+	CacheKeyGenerator CacheKeyGenerator
 }
 
 // Get returns an Image for a source

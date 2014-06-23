@@ -18,8 +18,8 @@ type Cache interface {
 
 // CacheMissError represents a cache miss error (no image found or cache not available)
 type CacheMissError struct {
-	Key string
-	Cache
+	Key      string
+	Cache    Cache
 	Previous error
 }
 

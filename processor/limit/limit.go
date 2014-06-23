@@ -9,7 +9,7 @@ import (
 //
 // It wraps an Image Processor and use a buffered channel to limit the number of concurrent executions.
 type LimitProcessor struct {
-	imageserver.Processor
+	Processor imageserver.Processor
 	LimitChan chan struct{}
 }
 

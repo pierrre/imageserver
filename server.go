@@ -3,8 +3,8 @@ package imageserver
 
 // ImageServer represents an Image server
 type ImageServer struct {
-	Provider
-	Processor // optional
+	Provider  Provider
+	Processor Processor // optional
 }
 
 // Get returns an Image for given Parameters

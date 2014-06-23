@@ -20,7 +20,7 @@ Steps:
 */
 type NativeProcessor struct {
 	DecodeFunc func(*imageserver.Image, imageserver.Parameters) (native_image.Image, error)
-	Processor
+	Processor  Processor
 	EncodeFunc func(native_image.Image, imageserver.Parameters) (*imageserver.Image, error)
 }
 
