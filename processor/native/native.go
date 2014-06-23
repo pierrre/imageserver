@@ -2,7 +2,7 @@ package native
 
 import (
 	"bytes"
-	native_image "image"
+	"image"
 
 	"github.com/pierrre/imageserver"
 )
@@ -19,9 +19,9 @@ Steps:
 - encode (from Go image to raw data)
 */
 type NativeProcessor struct {
-	DecodeFunc func(*imageserver.Image, imageserver.Parameters) (native_image.Image, error)
+	DecodeFunc func(*imageserver.Image, imageserver.Parameters) (image.Image, error)
 	Processor  Processor
-	EncodeFunc func(native_image.Image, imageserver.Parameters) (*imageserver.Image, error)
+	EncodeFunc func(image.Image, imageserver.Parameters) (*imageserver.Image, error)
 }
 
 // Process processes an Image using natives Go images
@@ -45,12 +45,12 @@ func (processor *NativeProcessor) Process(image *imageserver.Image, parameters i
 }
 
 // DefaultDecode is the default Decode function
-func DefaultDecode(image *imageserver.Image, parameters imageserver.Parameters) (native_image.Image, error) {
-	nativeImage, _, err := native_image.Decode(bytes.NewReader(image.Data))
+func DefaultDecode(im *imageserver.Image, parameters imageserver.Parameters) (image.Image, error) {
+	nativeImage, _, err := image.Decode(bytes.NewReader(im.Data))
 	return nativeImage, err
 }
 
 // Processor represents a native Go image processor
 type Processor interface {
-	Process(native_image.Image, imageserver.Parameters) (native_image.Image, error)
+	Process(image.Image, imageserver.Parameters) (image.Image, error)
 }

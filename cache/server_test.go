@@ -6,7 +6,7 @@ import (
 
 	"github.com/pierrre/imageserver"
 	. "github.com/pierrre/imageserver/cache"
-	cache_test "github.com/pierrre/imageserver/cache/_test"
+	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -15,7 +15,7 @@ func TestCacheImageServer(t *testing.T) {
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
-		Cache: cache_test.NewMapCache(),
+		Cache: cachetest.NewMapCache(),
 		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 			return "test"
 		}),
@@ -38,7 +38,7 @@ func TestCacheImageServerErrorImageServer(t *testing.T) {
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, imageserver.NewError("error")
 		}),
-		Cache: cache_test.NewMapCache(),
+		Cache: cachetest.NewMapCache(),
 		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 			return "test"
 		}),
@@ -54,7 +54,7 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
-		Cache: &cache_test.FuncCache{
+		Cache: &cachetest.FuncCache{
 			GetFunc: func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 				return nil, imageserver.NewError("error")
 			},
