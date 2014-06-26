@@ -86,10 +86,4 @@ http://godoc.org/github.com/pierrre/imageserver
 ## TODO
 - more tests
 - add new "parameter error", convert in http
-- source provider
-    - dispatch (uri scheme)
-    - limit concurrent
-    - http timeout
-- processor:
-	- native (use "image" package)
-	- native imagemagick
+- don't ignore error from cache
