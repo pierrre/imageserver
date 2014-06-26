@@ -5,6 +5,7 @@ import (
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 )
@@ -12,6 +13,7 @@ import (
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
 	defer cache.Close()
+	var _ imageserver_cache.Cache = cache
 
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire

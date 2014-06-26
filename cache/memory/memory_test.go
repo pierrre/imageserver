@@ -3,11 +3,13 @@ package memory
 import (
 	"testing"
 
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
+	var _ imageserver_cache.Cache = cache
 
 	cachetest.CacheTestGetSetAllImages(t, cache)
 }

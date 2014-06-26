@@ -29,6 +29,8 @@ func TestSet(t *testing.T) {
 		errFuncCallCh <- struct{}{}
 	}
 
+	var _ imageserver_cache.Cache = asyncCache
+
 	asyncCache.Set("foo", testdata.Small, cachetest.ParametersEmpty)
 	<-setCallCh
 	<-errFuncCallCh

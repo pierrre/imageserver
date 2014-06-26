@@ -5,12 +5,14 @@ import (
 
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
 	"github.com/pierrre/imageserver"
+	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
 )
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
+	var _ imageserver_cache.Cache = cache
 
 	// maximum object size is only 1MB
 	for _, image := range []*imageserver.Image{
