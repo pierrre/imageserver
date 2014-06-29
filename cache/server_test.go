@@ -10,8 +10,12 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+func TestCacheImageServerInterface(t *testing.T) {
+	var _ imageserver.ImageServerInterface = &CacheImageServer{}
+}
+
 func TestCacheImageServer(t *testing.T) {
-	s := CacheImageServer{
+	s := &CacheImageServer{
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
@@ -34,7 +38,7 @@ func TestCacheImageServer(t *testing.T) {
 }
 
 func TestCacheImageServerErrorImageServer(t *testing.T) {
-	s := CacheImageServer{
+	s := &CacheImageServer{
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, imageserver.NewError("error")
 		}),
@@ -50,7 +54,7 @@ func TestCacheImageServerErrorImageServer(t *testing.T) {
 }
 
 func TestCacheImageServerErrorCacheSet(t *testing.T) {
-	s := CacheImageServer{
+	s := &CacheImageServer{
 		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
@@ -70,6 +74,10 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+}
+
+func TestKeyGeneratorFuncInterface(t *testing.T) {
+	var _ KeyGenerator = NewParametersHashKeyGeneratorFunc(sha256.New)
 }
 
 func TestNewParametersHashKeyGeneratorFunc(t *testing.T) {

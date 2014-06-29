@@ -8,6 +8,10 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+func TestInterfaceProcessor(t *testing.T) {
+	var _ imageserver.Processor = &GraphicsMagickProcessor{}
+}
+
 func TestProcess(t *testing.T) {
 	image := testdata.Medium
 

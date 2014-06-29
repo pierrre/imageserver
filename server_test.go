@@ -7,7 +7,11 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestServerGet(t *testing.T) {
+func TestImageServerInterface(t *testing.T) {
+	var _ ImageServerInterface = &ImageServer{}
+}
+
+func TestImageServerGet(t *testing.T) {
 	image, err := createImageServer().Get(Parameters{
 		"source": testdata.MediumFileName,
 	})
@@ -19,14 +23,14 @@ func TestServerGet(t *testing.T) {
 	}
 }
 
-func TestServerGetErrorMissingSource(t *testing.T) {
+func TestImageServerGetErrorMissingSource(t *testing.T) {
 	_, err := createImageServer().Get(Parameters{})
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
-func TestServerGetErrorProvider(t *testing.T) {
+func TestImageServerGetErrorProvider(t *testing.T) {
 	_, err := createImageServer().Get(Parameters{
 		"source": "foobar",
 	})
@@ -35,7 +39,7 @@ func TestServerGetErrorProvider(t *testing.T) {
 	}
 }
 
-func TestServerGetErrorProcessor(t *testing.T) {
+func TestImageServerGetErrorProcessor(t *testing.T) {
 	imageServer := &ImageServer{
 		Provider:  testdata.Provider,
 		Processor: new(errorProcessor),

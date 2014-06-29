@@ -8,7 +8,8 @@ import (
 
 func TestTODO(t *testing.T) {
 	t.Log("TODO")
+}
 
-	cache := ListCache{}
-	var _ imageserver_cache.Cache = cache
+func TestInterfaceCache(t *testing.T) {
+	var _ imageserver_cache.Cache = ListCache{}
 }

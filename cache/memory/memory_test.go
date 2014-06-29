@@ -7,6 +7,10 @@ import (
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
+func TestInterfaceCache(t *testing.T) {
+	var _ imageserver_cache.Cache = newTestCache()
+}
+
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
 	var _ imageserver_cache.Cache = cache

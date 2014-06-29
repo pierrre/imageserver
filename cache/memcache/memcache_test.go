@@ -10,9 +10,12 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+func TestInterfaceCache(t *testing.T) {
+	var _ imageserver_cache.Cache = newTestCache(t)
+}
+
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
-	var _ imageserver_cache.Cache = cache
 
 	// maximum object size is only 1MB
 	for _, image := range []*imageserver.Image{

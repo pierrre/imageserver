@@ -14,6 +14,10 @@ var (
 	testSourceFileName = testdata.SmallFileName
 )
 
+func TestInterfaceProvider(t *testing.T) {
+	var _ imageserver.Provider = &HTTPProvider{}
+}
+
 func TestGet(t *testing.T) {
 	provider, listener, err := createTestHTTPProvider()
 	if err != nil {

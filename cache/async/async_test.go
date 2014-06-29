@@ -10,6 +10,10 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+func TestInterfaceCache(t *testing.T) {
+	var _ imageserver_cache.Cache = &AsyncCache{}
+}
+
 func TestGetSet(t *testing.T) {
 	mapCache := cachetest.NewMapCache()
 
@@ -27,7 +31,6 @@ func TestGetSet(t *testing.T) {
 	asyncCache := &AsyncCache{
 		Cache: funcCache,
 	}
-	var _ imageserver_cache.Cache = asyncCache
 
 	err := asyncCache.Set("foo", testdata.Small, cachetest.ParametersEmpty)
 	if err != nil {

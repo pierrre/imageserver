@@ -10,10 +10,16 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+func TestInterfaceCache(t *testing.T) {
+	cache := newTestCache(t)
+	defer cache.Close()
+
+	var _ imageserver_cache.Cache = cache
+}
+
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
 	defer cache.Close()
-	var _ imageserver_cache.Cache = cache
 
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire

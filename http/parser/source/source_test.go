@@ -6,7 +6,12 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_http "github.com/pierrre/imageserver/http"
 )
+
+func TestInterfaceParser(t *testing.T) {
+	var _ imageserver_http.Parser = &SourceParser{}
+}
 
 func TestParse(t *testing.T) {
 	source := "foo"
