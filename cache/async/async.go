@@ -8,12 +8,17 @@ import (
 
 // AsyncCache represent an asynchronous cache
 type AsyncCache struct {
-	imageserver_cache.Cache
+	Cache imageserver_cache.Cache
 
 	ErrFunc func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters)
 }
 
-// Set sets the Image to the underlying Cache using another goroutine
+// Get gets an Image from the underlying Cache
+func (cache *AsyncCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	return cache.Cache.Get(key, parameters)
+}
+
+// Set sets an Image to the underlying Cache using another goroutine
 func (cache *AsyncCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	go func() {
 		err := cache.Cache.Set(key, image, parameters)
