@@ -19,102 +19,97 @@ func TestInterfaceProvider(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := createTestURL(listener)
 	parameters := make(imageserver.Parameters)
 
+	provider := &HTTPProvider{}
+
 	image, err := provider.Get(source, parameters)
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	if image == nil {
+		t.Fatal("no image")
+	}
 	if len(image.Data) == 0 {
 		t.Fatal("no data")
 	}
-
 	if len(image.Format) == 0 {
 		t.Fatal("no format")
 	}
 }
 
 func TestGetErrorNotFound(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := createTestURL(listener)
 	source.Path += "foobar"
 	parameters := make(imageserver.Parameters)
 
-	_, err = provider.Get(source, parameters)
+	provider := &HTTPProvider{}
+
+	_, err := provider.Get(source, parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestGetErrorInvalidUrl(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := "foobar"
 	parameters := make(imageserver.Parameters)
 
-	_, err = provider.Get(source, parameters)
+	provider := &HTTPProvider{}
+
+	_, err := provider.Get(source, parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestGetErrorInvalidUrlScheme(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := "custom://foobar"
 	parameters := make(imageserver.Parameters)
 
-	_, err = provider.Get(source, parameters)
+	provider := &HTTPProvider{}
+
+	_, err := provider.Get(source, parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestGetErrorInvalidHost(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := "http://invalid.foobar.com"
 	parameters := make(imageserver.Parameters)
 
-	_, err = provider.Get(source, parameters)
+	provider := &HTTPProvider{}
+
+	_, err := provider.Get(source, parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestParseFormatEmpty(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := createTestURL(listener)
+
+	provider := &HTTPProvider{}
 
 	response, err := provider.getResponse(source)
 	if err != nil {
@@ -135,13 +130,12 @@ func TestParseFormatEmpty(t *testing.T) {
 }
 
 func TestParseFormatInvalid(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := createTestURL(listener)
+
+	provider := &HTTPProvider{}
 
 	response, err := provider.getResponse(source)
 	if err != nil {
@@ -162,13 +156,12 @@ func TestParseFormatInvalid(t *testing.T) {
 }
 
 func TestParseDataError(t *testing.T) {
-	provider, listener, err := createTestHTTPProvider()
-	if err != nil {
-		t.Fatal(err)
-	}
+	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
 	source := createTestURL(listener)
+
+	provider := &HTTPProvider{}
 
 	response, err := provider.getResponse(source)
 	if err != nil {
@@ -182,15 +175,15 @@ func TestParseDataError(t *testing.T) {
 	}
 }
 
-func createTestHTTPProvider() (provider *HTTPProvider, listener *net.TCPListener, err error) {
+func createTestHTTPServer(t *testing.T) *net.TCPListener {
 	addr, err := net.ResolveTCPAddr("tcp", "")
 	if err != nil {
-		return
+		t.Fatal(err)
 	}
 
-	listener, err = net.ListenTCP("tcp", addr)
+	listener, err := net.ListenTCP("tcp", addr)
 	if err != nil {
-		return
+		t.Fatal(err)
 	}
 
 	server := &http.Server{
@@ -198,9 +191,7 @@ func createTestHTTPProvider() (provider *HTTPProvider, listener *net.TCPListener
 	}
 	go server.Serve(listener)
 
-	provider = &HTTPProvider{}
-
-	return
+	return listener
 }
 
 func createTestURL(listener *net.TCPListener) *url.URL {
