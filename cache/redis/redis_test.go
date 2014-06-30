@@ -11,10 +11,7 @@ import (
 )
 
 func TestInterfaceCache(t *testing.T) {
-	cache := newTestCache(t)
-	defer cache.Close()
-
-	var _ imageserver_cache.Cache = cache
+	var _ imageserver_cache.Cache = &RedisCache{}
 }
 
 func TestGetSet(t *testing.T) {

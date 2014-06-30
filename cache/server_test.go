@@ -77,7 +77,7 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 }
 
 func TestKeyGeneratorFuncInterface(t *testing.T) {
-	var _ KeyGenerator = NewParametersHashKeyGeneratorFunc(sha256.New)
+	var _ KeyGenerator = KeyGeneratorFunc(nil)
 }
 
 func TestNewParametersHashKeyGeneratorFunc(t *testing.T) {

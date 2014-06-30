@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"crypto/sha256"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -16,5 +15,5 @@ func TestInterfaceProvider(t *testing.T) {
 }
 
 func TestCacheKeyGeneratorFuncInterface(t *testing.T) {
-	var _ CacheKeyGenerator = NewSourceHashCacheKeyGeneratorFunc(sha256.New)
+	var _ CacheKeyGenerator = CacheKeyGeneratorFunc(nil)
 }

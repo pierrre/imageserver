@@ -11,7 +11,7 @@ import (
 )
 
 func TestInterfaceCache(t *testing.T) {
-	var _ imageserver_cache.Cache = newTestCache(t)
+	var _ imageserver_cache.Cache = &MemcacheCache{}
 }
 
 func TestGetSet(t *testing.T) {
