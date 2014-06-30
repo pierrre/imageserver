@@ -8,7 +8,7 @@ import (
 )
 
 /*
-NativeProcessor is an Image Processor that uses the natives Go images
+NativeProcessor is an Image Processor that uses the native Go Image
 
 Steps:
 
@@ -19,14 +19,14 @@ Steps:
 - encode (from Go image to raw data)
 */
 type NativeProcessor struct {
-	DecodeFunc func(*imageserver.Image, imageserver.Parameters) (image.Image, error)
-	Processor  Processor
-	EncodeFunc func(image.Image, imageserver.Parameters) (*imageserver.Image, error)
+	Decoder   Decoder
+	Processor Processor
+	Encoder   Encoder
 }
 
-// Process processes an Image using natives Go images
-func (processor *NativeProcessor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	nativeImage, err := processor.DecodeFunc(image, parameters)
+// Process processes an Image using native Go Image
+func (processor *NativeProcessor) Process(rawImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	nativeImage, decodedFormat, err := processor.Decoder.Decode(rawImage, parameters)
 	if err != nil {
 		return nil, err
 	}
@@ -36,21 +36,60 @@ func (processor *NativeProcessor) Process(image *imageserver.Image, parameters i
 		return nil, err
 	}
 
-	image, err = processor.EncodeFunc(nativeImage, parameters)
+	rawImage, err = processor.Encoder.Encode(nativeImage, decodedFormat, parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	return image, nil
+	return rawImage, nil
 }
 
-// DefaultDecode is the default Decode function
-func DefaultDecode(im *imageserver.Image, parameters imageserver.Parameters) (image.Image, error) {
-	nativeImage, _, err := image.Decode(bytes.NewReader(im.Data))
-	return nativeImage, err
+// Decoder decodes a raw Image to a native Image
+type Decoder interface {
+	Decode(rawImage *imageserver.Image, parameters imageserver.Parameters) (nativeImage image.Image, decodedFormat string, err error)
 }
 
-// Processor represents a native Go image processor
+// DecoderFunc is a Decoder func
+type DecoderFunc func(rawImage *imageserver.Image, parameters imageserver.Parameters) (nativeImage image.Image, decodedFormat string, err error)
+
+// Decode calls the func
+func (f DecoderFunc) Decode(rawImage *imageserver.Image, parameters imageserver.Parameters) (nativeImage image.Image, decodedFormat string, err error) {
+	return f(rawImage, parameters)
+}
+
+var baseDecoder = DecoderFunc(func(rawImage *imageserver.Image, parameters imageserver.Parameters) (nativeImage image.Image, decodedFormat string, err error) {
+	return image.Decode(bytes.NewReader(rawImage.Data))
+})
+
+// GetBaseDecoder returns a base Decoder
+//
+// It decodes Image using image.Decode()
+func GetBaseDecoder() Decoder {
+	return baseDecoder
+}
+
+// Processor processes a native Go Image
 type Processor interface {
 	Process(image.Image, imageserver.Parameters) (image.Image, error)
+}
+
+// ProcessorFunc is a Processor func
+type ProcessorFunc func(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error)
+
+// Process calls the func
+func (f ProcessorFunc) Process(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error) {
+	return f(nativeImage, parameters)
+}
+
+// Encoder encodes a native Image to a raw Image
+type Encoder interface {
+	Encode(nativeImage image.Image, decodedFormat string, parameters imageserver.Parameters) (rawImage *imageserver.Image, err error)
+}
+
+// EncoderFunc is a Encoder func
+type EncoderFunc func(nativeImage image.Image, decodedFormat string, parameters imageserver.Parameters) (rawImage *imageserver.Image, err error)
+
+// Encode calls the func
+func (f EncoderFunc) Encode(nativeImage image.Image, decodedFormat string, parameters imageserver.Parameters) (rawImage *imageserver.Image, err error) {
+	return f(nativeImage, decodedFormat, parameters)
 }

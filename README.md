@@ -87,6 +87,5 @@ http://godoc.org/github.com/pierrre/imageserver
 - more tests
 - add new "parameter error", convert in http
 - don't ignore error from cache
-- clean NativeProcessor (use interface instead of func)
 - add ProcessorImageServer (move Processor)
 - add ProviderImageServer (move Provider)
