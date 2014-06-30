@@ -10,7 +10,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestInterfaceCache(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver_cache.Cache = &RedisCache{}
 }
 

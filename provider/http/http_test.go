@@ -14,7 +14,7 @@ var (
 	testSourceFileName = testdata.SmallFileName
 )
 
-func TestInterfaceProvider(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver.Provider = &HTTPProvider{}
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestInterfaceProcessor(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver.Processor = &GraphicsMagickProcessor{}
 }
 

@@ -10,6 +10,6 @@ func TestTODO(t *testing.T) {
 	t.Log("TODO")
 }
 
-func TestInterfaceCache(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver_cache.Cache = ListCache{}
 }

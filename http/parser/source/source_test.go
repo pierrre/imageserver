@@ -9,7 +9,7 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-func TestInterfaceParser(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver_http.Parser = &SourceParser{}
 }
 

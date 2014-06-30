@@ -10,7 +10,7 @@ func TestTODO(t *testing.T) {
 	t.Log("TODO")
 }
 
-func TestInterfaceProvider(t *testing.T) {
+func TestCacheProviderInterface(t *testing.T) {
 	var _ imageserver.Provider = &CacheProvider{}
 }
 

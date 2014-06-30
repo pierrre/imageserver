@@ -7,7 +7,7 @@ import (
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
-func TestInterfaceCache(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var _ imageserver_cache.Cache = &MemoryCache{}
 }
 
