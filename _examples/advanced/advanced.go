@@ -27,6 +27,7 @@ import (
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
+	imageserver_provider "github.com/pierrre/imageserver/provider"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 )
@@ -87,8 +88,8 @@ func main() {
 	}
 	processor = imageserver_processor_limit.New(processor, 16)
 
-	var imageServer imageserver.ImageServerInterface
-	imageServer = &imageserver.ImageServer{
+	var imageServer imageserver.ImageServer
+	imageServer = &imageserver_provider.ProviderImageServer{
 		Provider: provider,
 	}
 	imageServer = &imageserver_processor.ProcessorImageServer{

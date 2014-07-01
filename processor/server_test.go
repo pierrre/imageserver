@@ -9,7 +9,7 @@ import (
 )
 
 func TestProcessorImageServerInterface(t *testing.T) {
-	var _ imageserver.ImageServerInterface = &ProcessorImageServer{}
+	var _ imageserver.ImageServer = &ProcessorImageServer{}
 }
 
 func TestProcessorImageServer(t *testing.T) {

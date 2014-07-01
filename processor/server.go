@@ -6,7 +6,7 @@ import (
 
 // ProcessorImageServer is a Processor ImageServer
 type ProcessorImageServer struct {
-	ImageServer imageserver.ImageServerInterface
+	ImageServer imageserver.ImageServer
 	Processor   Processor
 }
 

@@ -12,7 +12,8 @@ func TestProcessorFuncInterface(t *testing.T) {
 }
 
 func TestProcessorFunc(t *testing.T) {
-	ProcessorFunc(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	pf := ProcessorFunc(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 		return image, nil
-	})(testdata.Small, make(imageserver.Parameters))
+	})
+	pf.Process(testdata.Small, make(imageserver.Parameters))
 }

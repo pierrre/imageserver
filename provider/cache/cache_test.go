@@ -3,7 +3,7 @@ package cache
 import (
 	"testing"
 
-	"github.com/pierrre/imageserver"
+	imageserver_provider "github.com/pierrre/imageserver/provider"
 )
 
 func TestTODO(t *testing.T) {
@@ -11,7 +11,7 @@ func TestTODO(t *testing.T) {
 }
 
 func TestCacheProviderInterface(t *testing.T) {
-	var _ imageserver.Provider = &CacheProvider{}
+	var _ imageserver_provider.Provider = &CacheProvider{}
 }
 
 func TestCacheKeyGeneratorFuncInterface(t *testing.T) {

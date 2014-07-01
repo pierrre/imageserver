@@ -9,11 +9,12 @@ import (
 
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
+	imageserver_provider "github.com/pierrre/imageserver/provider"
 )
 
 // CacheProvider represents a cached Image Provider
 type CacheProvider struct {
-	Provider          imageserver.Provider
+	Provider          imageserver_provider.Provider
 	Cache             imageserver_cache.Cache
 	CacheKeyGenerator CacheKeyGenerator
 }

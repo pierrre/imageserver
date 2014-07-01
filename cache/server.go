@@ -12,7 +12,7 @@ import (
 //
 // It wraps an ImageServer.
 type CacheImageServer struct {
-	ImageServer  imageserver.ImageServerInterface
+	ImageServer  imageserver.ImageServer
 	Cache        Cache
 	KeyGenerator KeyGenerator
 }

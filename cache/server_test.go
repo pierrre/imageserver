@@ -11,7 +11,7 @@ import (
 )
 
 func TestCacheImageServerInterface(t *testing.T) {
-	var _ imageserver.ImageServerInterface = &CacheImageServer{}
+	var _ imageserver.ImageServer = &CacheImageServer{}
 }
 
 func TestCacheImageServer(t *testing.T) {

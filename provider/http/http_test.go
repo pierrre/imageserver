@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_provider "github.com/pierrre/imageserver/provider"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -15,7 +16,7 @@ var (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver.Provider = &HTTPProvider{}
+	var _ imageserver_provider.Provider = &HTTPProvider{}
 }
 
 func TestGet(t *testing.T) {
