@@ -92,7 +92,7 @@ func TestGetErrorInvalidHost(t *testing.T) {
 	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
-	source := "http://invalid.foobar.com"
+	source := "http://invalid.localhost"
 	parameters := make(imageserver.Parameters)
 
 	provider := &HTTPProvider{}
