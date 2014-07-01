@@ -3,18 +3,19 @@ package limit
 
 import (
 	"github.com/pierrre/imageserver"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 )
 
 // LimitProcessor represents an Image Processor that limits the number of concurrent executions
 //
 // It wraps an Image Processor and use a buffered channel to limit the number of concurrent executions.
 type LimitProcessor struct {
-	Processor imageserver.Processor
+	Processor imageserver_processor.Processor
 	LimitChan chan struct{}
 }
 
 // New creates a LimitProcessor
-func New(processor imageserver.Processor, limit uint) imageserver.Processor {
+func New(processor imageserver_processor.Processor, limit uint) *LimitProcessor {
 	return &LimitProcessor{
 		Processor: processor,
 		LimitChan: make(chan struct{}, limit),

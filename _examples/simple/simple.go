@@ -8,13 +8,18 @@ import (
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
 	imageserver_http_parser_list "github.com/pierrre/imageserver/http/parser/list"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
 )
 
 func main() {
-	imageServer := &imageserver.ImageServer{
+	var imageServer imageserver.ImageServerInterface
+	imageServer = &imageserver.ImageServer{
 		Provider: &imageserver_provider_http.HTTPProvider{},
+	}
+	imageServer = &imageserver_processor.ProcessorImageServer{
+		ImageServer: imageServer,
 		Processor: &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 			Executable: "gm",
 		},

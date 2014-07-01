@@ -3,8 +3,7 @@ package imageserver
 
 // ImageServer represents an Image server
 type ImageServer struct {
-	Provider  Provider
-	Processor Processor // optional
+	Provider Provider
 }
 
 // Get returns an Image for given Parameters
@@ -19,13 +18,6 @@ func (imageServer *ImageServer) Get(parameters Parameters) (*Image, error) {
 	image, err := imageServer.Provider.Get(source, parameters)
 	if err != nil {
 		return nil, err
-	}
-
-	if imageServer.Processor != nil {
-		image, err = imageServer.Processor.Process(image, parameters)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return image, nil

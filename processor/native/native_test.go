@@ -3,7 +3,7 @@ package native
 import (
 	"testing"
 
-	"github.com/pierrre/imageserver"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 )
 
 func TestTODO(t *testing.T) {
@@ -11,7 +11,7 @@ func TestTODO(t *testing.T) {
 }
 
 func TestNativeProcessorInterface(t *testing.T) {
-	var _ imageserver.Processor = &NativeProcessor{}
+	var _ imageserver_processor.Processor = &NativeProcessor{}
 }
 
 func TestDecoderFuncInterface(t *testing.T) {

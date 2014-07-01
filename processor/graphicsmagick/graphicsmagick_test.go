@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/pierrre/imageserver"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 	"github.com/pierrre/imageserver/testdata"
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver.Processor = &GraphicsMagickProcessor{}
+	var _ imageserver_processor.Processor = &GraphicsMagickProcessor{}
 }
 
 func TestProcess(t *testing.T) {

@@ -24,6 +24,7 @@ import (
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
 	imageserver_http_parser_list "github.com/pierrre/imageserver/http/parser/list"
 	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
@@ -73,7 +74,7 @@ func main() {
 		CacheKeyGenerator: imageserver_provider_cache.NewSourceHashCacheKeyGeneratorFunc(sha256.New),
 	}
 
-	var processor imageserver.Processor
+	var processor imageserver_processor.Processor
 	processor = &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
 		Executable: "gm",
 		Timeout:    time.Duration(10 * time.Second),
@@ -88,8 +89,11 @@ func main() {
 
 	var imageServer imageserver.ImageServerInterface
 	imageServer = &imageserver.ImageServer{
-		Provider:  provider,
-		Processor: processor,
+		Provider: provider,
+	}
+	imageServer = &imageserver_processor.ProcessorImageServer{
+		ImageServer: imageServer,
+		Processor:   processor,
 	}
 	imageServer = &imageserver_cache.CacheImageServer{
 		ImageServer:  imageServer,

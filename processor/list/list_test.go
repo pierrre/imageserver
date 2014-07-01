@@ -3,7 +3,7 @@ package list
 import (
 	"testing"
 
-	"github.com/pierrre/imageserver"
+	imageserver_processor "github.com/pierrre/imageserver/processor"
 )
 
 func TestTODO(t *testing.T) {
@@ -11,5 +11,5 @@ func TestTODO(t *testing.T) {
 }
 
 func TestInterface(t *testing.T) {
-	var _ imageserver.Processor = ListProcessor{}
+	var _ imageserver_processor.Processor = ListProcessor{}
 }

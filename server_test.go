@@ -39,18 +39,8 @@ func TestImageServerGetErrorProvider(t *testing.T) {
 	}
 }
 
-func TestImageServerGetErrorProcessor(t *testing.T) {
-	imageServer := &ImageServer{
-		Provider:  testdata.Provider,
-		Processor: new(errorProcessor),
-	}
-
-	_, err := imageServer.Get(Parameters{
-		"source": testdata.MediumFileName,
-	})
-	if err == nil {
-		t.Fatal("no error")
-	}
+func TestImageServerFuncInterface(t *testing.T) {
+	var _ ImageServerInterface = ImageServerFunc(nil)
 }
 
 func TestImageServerFunc(t *testing.T) {
@@ -62,25 +52,6 @@ func TestImageServerFunc(t *testing.T) {
 
 func createImageServer() *ImageServer {
 	return &ImageServer{
-		Provider:  testdata.Provider,
-		Processor: new(copyProcessor),
+		Provider: testdata.Provider,
 	}
-}
-
-type copyProcessor struct{}
-
-func (processor *copyProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
-	data := make([]byte, len(image.Data))
-	copy(image.Data, data)
-	return &Image{
-			Format: image.Format,
-			Data:   data,
-		},
-		nil
-}
-
-type errorProcessor struct{}
-
-func (processor *errorProcessor) Process(image *Image, parameters Parameters) (*Image, error) {
-	return nil, NewError("error")
 }
