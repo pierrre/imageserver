@@ -87,5 +87,5 @@ http://godoc.org/github.com/pierrre/imageserver
 - more tests
 - add new "parameter error", convert in http
 - don't ignore error from cache
-- add ProcessorImageServer (move Processor)
-- add ProviderImageServer (move Provider)
+- add GroupcacheImageServer
+- add timeout in LimitProcessor
