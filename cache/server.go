@@ -12,14 +12,14 @@ import (
 //
 // It wraps an ImageServer.
 type CacheImageServer struct {
-	ImageServer  imageserver.ImageServer
-	Cache        Cache
-	KeyGenerator KeyGenerator
+	ImageServer       imageserver.ImageServer
+	Cache             Cache
+	CacheKeyGenerator CacheKeyGenerator
 }
 
 // Get wraps the call to the underlying ImageServer and Get from/Set to the Cache
 func (cis *CacheImageServer) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
-	key := cis.KeyGenerator.GetKey(parameters)
+	key := cis.CacheKeyGenerator.GetKey(parameters)
 
 	image, err := cis.Cache.Get(key, parameters)
 	if err == nil {
@@ -39,22 +39,22 @@ func (cis *CacheImageServer) Get(parameters imageserver.Parameters) (*imageserve
 	return image, nil
 }
 
-// KeyGenerator generates a Cache key
-type KeyGenerator interface {
+// CacheKeyGenerator generates a Cache key
+type CacheKeyGenerator interface {
 	GetKey(imageserver.Parameters) string
 }
 
-// KeyGeneratorFunc is a KeyGenerator func
-type KeyGeneratorFunc func(imageserver.Parameters) string
+// CacheKeyGeneratorFunc is a KeyGenerator func
+type CacheKeyGeneratorFunc func(imageserver.Parameters) string
 
 // GetKey calls the func
-func (f KeyGeneratorFunc) GetKey(parameters imageserver.Parameters) string {
+func (f CacheKeyGeneratorFunc) GetKey(parameters imageserver.Parameters) string {
 	return f(parameters)
 }
 
-// NewParametersHashKeyGeneratorFunc returns a KeyGeneratorFunc that hashes the Parameters
-func NewParametersHashKeyGeneratorFunc(newHashFunc func() hash.Hash) KeyGeneratorFunc {
-	return KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+// NewParametersHashCacheKeyGeneratorFunc returns a CacheKeyGeneratorFunc that hashes the Parameters
+func NewParametersHashCacheKeyGeneratorFunc(newHashFunc func() hash.Hash) CacheKeyGeneratorFunc {
+	return CacheKeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 		hash := newHashFunc()
 		io.WriteString(hash, parameters.String())
 		data := hash.Sum(nil)

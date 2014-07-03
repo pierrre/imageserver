@@ -97,9 +97,9 @@ func main() {
 		Processor:   processor,
 	}
 	imageServer = &imageserver_cache.CacheImageServer{
-		ImageServer:  imageServer,
-		Cache:        cache,
-		KeyGenerator: imageserver_cache.NewParametersHashKeyGeneratorFunc(sha256.New),
+		ImageServer:       imageServer,
+		Cache:             cache,
+		CacheKeyGenerator: imageserver_cache.NewParametersHashCacheKeyGeneratorFunc(sha256.New),
 	}
 
 	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
