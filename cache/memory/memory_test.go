@@ -13,7 +13,6 @@ func TestInterface(t *testing.T) {
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
-	var _ imageserver_cache.Cache = cache
 
 	cachetest.CacheTestGetSetAllImages(t, cache)
 }
