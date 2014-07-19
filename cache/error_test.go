@@ -1,14 +1,10 @@
 package cache
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestNewCacheMissError(t *testing.T) {
-	key := "foobar"
-	previousErr := fmt.Errorf("not found")
-
-	err := NewMissError(key, previousErr)
+func TestCacheMissError(t *testing.T) {
+	err := &MissError{Key: "foobar"}
 	err.Error()
 }
