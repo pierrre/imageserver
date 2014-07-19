@@ -27,7 +27,7 @@ func New(capacity int64) *MemoryCache {
 func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		return nil, imageserver_cache.NewCacheMissError(key, cache, nil)
+		return nil, imageserver_cache.NewMissError(key, cache, nil)
 	}
 	item := value.(*item)
 	image := item.image

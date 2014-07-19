@@ -13,6 +13,6 @@ func TestNewCacheMissError(t *testing.T) {
 	cache := cachetest.NewMapCache()
 	previousErr := fmt.Errorf("not found")
 
-	err := NewCacheMissError(key, cache, previousErr)
+	err := NewMissError(key, cache, previousErr)
 	err.Error()
 }

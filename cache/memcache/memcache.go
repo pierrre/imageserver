@@ -32,7 +32,7 @@ func (cache *MemcacheCache) Get(key string, parameters imageserver.Parameters) (
 func (cache *MemcacheCache) getData(key string) ([]byte, error) {
 	item, err := cache.Client.Get(key)
 	if err != nil {
-		return nil, imageserver_cache.NewCacheMissError(key, cache, err)
+		return nil, imageserver_cache.NewMissError(key, cache, err)
 	}
 
 	return item.Value, nil

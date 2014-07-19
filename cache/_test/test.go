@@ -52,7 +52,7 @@ func CacheTestGetErrorMiss(t *testing.T, cache imageserver_cache.Cache) {
 	if err == nil {
 		t.Fatal("no error")
 	}
-	if _, ok := err.(*imageserver_cache.CacheMissError); !ok {
+	if _, ok := err.(*imageserver_cache.MissError); !ok {
 		t.Fatal("invalid error type")
 	}
 }
@@ -77,7 +77,7 @@ func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imag
 
 	image, ok := cache.data[key]
 	if !ok {
-		return nil, imageserver_cache.NewCacheMissError(key, cache, nil)
+		return nil, imageserver_cache.NewMissError(key, cache, nil)
 	}
 
 	return image, nil
