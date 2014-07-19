@@ -26,7 +26,7 @@ func (cache ListCache) Get(key string, parameters imageserver.Parameters) (*imag
 		}
 	}
 
-	return nil, imageserver_cache.NewMissError(key, cache, nil)
+	return nil, imageserver_cache.NewMissError(key, nil)
 }
 
 func (cache ListCache) set(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) error {

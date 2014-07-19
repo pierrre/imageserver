@@ -1,18 +1,14 @@
-package cache_test
+package cache
 
 import (
 	"fmt"
 	"testing"
-
-	. "github.com/pierrre/imageserver/cache"
-	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
 func TestNewCacheMissError(t *testing.T) {
 	key := "foobar"
-	cache := cachetest.NewMapCache()
 	previousErr := fmt.Errorf("not found")
 
-	err := NewMissError(key, cache, previousErr)
+	err := NewMissError(key, previousErr)
 	err.Error()
 }

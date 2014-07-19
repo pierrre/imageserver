@@ -77,7 +77,7 @@ func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imag
 
 	image, ok := cache.data[key]
 	if !ok {
-		return nil, imageserver_cache.NewMissError(key, cache, nil)
+		return nil, imageserver_cache.NewMissError(key, nil)
 	}
 
 	return image, nil

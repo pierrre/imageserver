@@ -19,15 +19,13 @@ type Cache interface {
 // MissError represents a cache miss error (no image found or cache not available)
 type MissError struct {
 	Key      string
-	Cache    Cache
 	Previous error
 }
 
 // NewMissError creates a new MissError
-func NewMissError(key string, cache Cache, previous error) *MissError {
+func NewMissError(key string, previous error) *MissError {
 	return &MissError{
 		Key:      key,
-		Cache:    cache,
 		Previous: previous,
 	}
 }

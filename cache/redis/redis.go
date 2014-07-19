@@ -23,7 +23,7 @@ type RedisCache struct {
 func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
-		return nil, imageserver_cache.NewMissError(key, cache, err)
+		return nil, imageserver_cache.NewMissError(key, err)
 	}
 
 	image, err := imageserver.NewImageUnmarshalBinary(data)
