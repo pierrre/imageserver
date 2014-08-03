@@ -8,7 +8,7 @@ import (
 
 // Parser represents a http parser
 //
-// It parses the Tequest and fill Parameters.
+// It parses the Request and fill Parameters.
 type Parser interface {
 	Parse(*http.Request, imageserver.Parameters) error
 }
