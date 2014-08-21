@@ -5,11 +5,9 @@ import (
 	//_ "expvar"
 	"flag"
 	"log"
-	"net"
 	"net/http"
 	//_ "net/http/pprof"
 	"os"
-	"os/signal"
 	"strconv"
 	"time"
 
@@ -136,43 +134,8 @@ func main() {
 	}
 	http.Handle("/", imageHTTPHandler)
 
-	tcpAddr, err := net.ResolveTCPAddr("tcp", httpAddr)
+	err = http.ListenAndServe(httpAddr, nil)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
-
-	tcpListener, err := net.ListenTCP("tcp", tcpAddr)
-	if err != nil {
-		panic(err)
-	}
-
-	interrupted := false
-	interruptChan := make(chan os.Signal)
-	signal.Notify(interruptChan, os.Interrupt)
-	go func() {
-		<-interruptChan
-		interrupted = true
-		log.Println("Close TCP listener")
-		err := tcpListener.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-
-	log.Println("Start HTTP server")
-	err = http.Serve(tcpListener, nil)
-	if err != nil {
-		if interrupted {
-			waitDuration := 10 * time.Second
-			log.Printf("Wait clients %s (press CTRL+C again to stop the server immediatly)", waitDuration)
-			select {
-			case <-time.After(waitDuration):
-			case <-interruptChan:
-			}
-		} else {
-			panic(err)
-		}
-	}
-
-	log.Println("Exit")
 }
