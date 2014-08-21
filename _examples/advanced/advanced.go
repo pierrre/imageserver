@@ -31,9 +31,7 @@ import (
 )
 
 func main() {
-	var verbose bool
 	var httpAddr string
-	flag.BoolVar(&verbose, "verbose", false, "Verbose")
 	flag.StringVar(&httpAddr, "http", ":8080", "Http")
 	flag.Parse()
 
@@ -57,9 +55,7 @@ func main() {
 	cache = &imageserver_cache_async.AsyncCache{
 		Cache: cache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
-			if verbose {
-				log.Println("Cache error:", err)
-			}
+			log.Println("Cache error:", err)
 		},
 	}
 	cache = imageserver_cache_list.ListCache{
@@ -109,27 +105,21 @@ func main() {
 		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
 		Expire:      time.Duration(7 * 24 * time.Hour),
 		RequestFunc: func(request *http.Request) error {
-			if verbose {
-				log.Println("Request:", strconv.Quote(request.URL.String()))
-			}
+			log.Println("Request:", strconv.Quote(request.URL.String()))
 			return nil
 		},
 		HeaderFunc: func(header http.Header, request *http.Request, err error) {
 			header.Set("X-Hostname", hostname)
 		},
 		ErrorFunc: func(err error, request *http.Request) {
-			if verbose {
-				log.Println("Error:", err)
-			}
+			log.Println("Error:", err)
 		},
 		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
-			if verbose {
-				var errString string
-				if err != nil {
-					errString = err.Error()
-				}
-				log.Println("Response:", request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
+			var errString string
+			if err != nil {
+				errString = err.Error()
 			}
+			log.Println("Response:", request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 		},
 	}
 	http.Handle("/", imageHTTPHandler)
