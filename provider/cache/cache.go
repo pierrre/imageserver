@@ -14,9 +14,9 @@ import (
 
 // CacheProvider represents a cached Image Provider
 type CacheProvider struct {
-	Provider          imageserver_provider.Provider
-	Cache             imageserver_cache.Cache
-	CacheKeyGenerator CacheKeyGenerator
+	Provider     imageserver_provider.Provider
+	Cache        imageserver_cache.Cache
+	KeyGenerator KeyGenerator
 }
 
 // Get returns an Image for a source
@@ -24,7 +24,7 @@ type CacheProvider struct {
 // It caches the image.
 // The cache key used is a sha256 of the source's string representation.
 func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	cacheKey := provider.CacheKeyGenerator.GetKey(source, parameters)
+	cacheKey := provider.KeyGenerator.GetKey(source, parameters)
 
 	image, err := provider.Cache.Get(cacheKey, parameters)
 	if err == nil {
@@ -44,22 +44,22 @@ func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Pa
 	return image, nil
 }
 
-// CacheKeyGenerator generates a Cache Key
-type CacheKeyGenerator interface {
+// KeyGenerator generates a Cache Key
+type KeyGenerator interface {
 	GetKey(source interface{}, parameters imageserver.Parameters) string
 }
 
-// CacheKeyGeneratorFunc is a CacheKeyGenerator func
-type CacheKeyGeneratorFunc func(source interface{}, parameters imageserver.Parameters) string
+// KeyGeneratorFunc is a KeyGenerator func
+type KeyGeneratorFunc func(source interface{}, parameters imageserver.Parameters) string
 
 // GetKey calls the func
-func (f CacheKeyGeneratorFunc) GetKey(source interface{}, parameters imageserver.Parameters) string {
+func (f KeyGeneratorFunc) GetKey(source interface{}, parameters imageserver.Parameters) string {
 	return f(source, parameters)
 }
 
-// NewSourceHashCacheKeyGeneratorFunc returns a CacheKeyGeneratorFunc that hashes the source
-func NewSourceHashCacheKeyGeneratorFunc(newHashFunc func() hash.Hash) CacheKeyGeneratorFunc {
-	return CacheKeyGeneratorFunc(func(source interface{}, parameters imageserver.Parameters) string {
+// NewSourceHashKeyGenerator returns a KeyGenerator that hashes the source
+func NewSourceHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
+	return KeyGeneratorFunc(func(source interface{}, parameters imageserver.Parameters) string {
 		hash := newHashFunc()
 		io.WriteString(hash, fmt.Sprint(source))
 		data := hash.Sum(nil)

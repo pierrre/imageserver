@@ -20,7 +20,7 @@ func TestCacheImageServer(t *testing.T) {
 			return testdata.Medium, nil
 		}),
 		Cache: cachetest.NewMapCache(),
-		CacheKeyGenerator: CacheKeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 			return "test"
 		}),
 	}
@@ -43,7 +43,7 @@ func TestCacheImageServerErrorImageServer(t *testing.T) {
 			return nil, imageserver.NewError("error")
 		}),
 		Cache: cachetest.NewMapCache(),
-		CacheKeyGenerator: CacheKeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 			return "test"
 		}),
 	}
@@ -60,13 +60,13 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 		}),
 		Cache: &cachetest.FuncCache{
 			GetFunc: func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-				return nil, imageserver.NewError("error")
+				return nil, &MissError{Key: key}
 			},
 			SetFunc: func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 				return imageserver.NewError("error")
 			},
 		},
-		CacheKeyGenerator: CacheKeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
 			return "test"
 		}),
 	}
@@ -76,12 +76,12 @@ func TestCacheImageServerErrorCacheSet(t *testing.T) {
 	}
 }
 
-func TestCacheKeyGeneratorFuncInterface(t *testing.T) {
-	var _ CacheKeyGenerator = CacheKeyGeneratorFunc(nil)
+func TestKeyGeneratorFuncInterface(t *testing.T) {
+	var _ KeyGenerator = KeyGeneratorFunc(nil)
 }
 
-func TestNewParametersHashCacheKeyGeneratorFunc(t *testing.T) {
-	g := NewParametersHashCacheKeyGeneratorFunc(sha256.New)
+func TestNewParametersHashKeyGenerator(t *testing.T) {
+	g := NewParametersHashKeyGenerator(sha256.New)
 	parameters := imageserver.Parameters{
 		"foo": "bar",
 	}

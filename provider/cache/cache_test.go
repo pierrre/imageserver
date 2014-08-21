@@ -14,6 +14,6 @@ func TestCacheProviderInterface(t *testing.T) {
 	var _ imageserver_provider.Provider = &CacheProvider{}
 }
 
-func TestCacheKeyGeneratorFuncInterface(t *testing.T) {
-	var _ CacheKeyGenerator = CacheKeyGeneratorFunc(nil)
+func TestKeyGeneratorFuncInterface(t *testing.T) {
+	var _ KeyGenerator = KeyGeneratorFunc(nil)
 }

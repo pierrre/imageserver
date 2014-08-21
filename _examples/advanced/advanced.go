@@ -70,9 +70,9 @@ func main() {
 	}
 
 	provider := &imageserver_provider_cache.CacheProvider{
-		Provider:          &imageserver_provider_http.HTTPProvider{},
-		Cache:             cache,
-		CacheKeyGenerator: imageserver_provider_cache.NewSourceHashCacheKeyGeneratorFunc(sha256.New),
+		Provider:     &imageserver_provider_http.HTTPProvider{},
+		Cache:        cache,
+		KeyGenerator: imageserver_provider_cache.NewSourceHashKeyGenerator(sha256.New),
 	}
 
 	var processor imageserver_processor.Processor
@@ -97,9 +97,9 @@ func main() {
 		Processor:   processor,
 	}
 	imageServer = &imageserver_cache.CacheImageServer{
-		ImageServer:       imageServer,
-		Cache:             cache,
-		CacheKeyGenerator: imageserver_cache.NewParametersHashCacheKeyGeneratorFunc(sha256.New),
+		ImageServer:  imageServer,
+		Cache:        cache,
+		KeyGenerator: imageserver_cache.NewParametersHashKeyGenerator(sha256.New),
 	}
 
 	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
