@@ -53,7 +53,7 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 
 func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) {
 	parameter := query.Get(parameterName)
-	if len(parameter) == 0 {
+	if parameter == "" {
 		return
 	}
 	parameters[parameterName] = parameter
@@ -62,7 +62,7 @@ func (parser *GraphicsMagickParser) parseString(query url.Values, parameters ima
 
 func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameterString := query.Get(parameterName)
-	if len(parameterString) == 0 {
+	if parameterString == "" {
 		return nil
 	}
 	parameter, err := strconv.Atoi(parameterString)
@@ -75,7 +75,7 @@ func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters images
 
 func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameterString := query.Get(parameterName)
-	if len(parameterString) == 0 {
+	if parameterString == "" {
 		return nil
 	}
 	parameter, err := strconv.ParseBool(parameterString)

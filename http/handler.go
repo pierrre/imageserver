@@ -79,7 +79,7 @@ func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, re
 	}
 
 	inmHeader := request.Header.Get("If-None-Match")
-	if len(inmHeader) == 0 {
+	if inmHeader == "" {
 		return false
 	}
 
@@ -106,7 +106,7 @@ func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, re
 func (handler *ImageHTTPHandler) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
 	handler.setImageHeaderCommon(writer, request, parameters)
 
-	if len(image.Format) > 0 {
+	if image.Format != "" {
 		writer.Header().Set("Content-Type", "image/"+image.Format)
 	}
 

@@ -225,7 +225,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.L
 	format, _ = parameters.GetString("format")
 
 	formatSpecified = true
-	if len(format) == 0 {
+	if format == "" {
 		format = sourceImage.Format
 		formatSpecified = false
 	}

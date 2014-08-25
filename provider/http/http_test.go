@@ -38,7 +38,7 @@ func TestGet(t *testing.T) {
 	if len(image.Data) == 0 {
 		t.Fatal("no data")
 	}
-	if len(image.Format) == 0 {
+	if image.Format == "" {
 		t.Fatal("no format")
 	}
 }
@@ -125,7 +125,7 @@ func TestParseFormatEmpty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(image.Format) != 0 {
+	if image.Format != "" {
 		t.Fatal("format not empty")
 	}
 }
@@ -151,7 +151,7 @@ func TestParseFormatInvalid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(image.Format) != 0 {
+	if image.Format != "" {
 		t.Fatal("format not empty")
 	}
 }

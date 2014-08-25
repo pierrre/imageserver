@@ -99,7 +99,7 @@ func (provider *HTTPProvider) checkResponse(response *http.Response) error {
 
 func (provider *HTTPProvider) parseFormat(response *http.Response, image *imageserver.Image) {
 	contentType := response.Header.Get("Content-Type")
-	if len(contentType) == 0 {
+	if contentType == "" {
 		return
 	}
 

@@ -14,7 +14,7 @@ type SourceParser struct{}
 func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	query := request.URL.Query()
 	source := query.Get("source")
-	if len(source) > 0 {
+	if source != "" {
 		parameters.Set("source", source)
 	}
 	return nil
