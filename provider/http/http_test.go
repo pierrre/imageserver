@@ -1,10 +1,13 @@
 package http
 
 import (
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/pierrre/imageserver"
 	imageserver_provider "github.com/pierrre/imageserver/provider"
@@ -14,6 +17,10 @@ import (
 var (
 	testSourceFileName = testdata.SmallFileName
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func TestInterface(t *testing.T) {
 	var _ imageserver_provider.Provider = &HTTPProvider{}
@@ -93,7 +100,7 @@ func TestGetErrorInvalidHost(t *testing.T) {
 	listener := createTestHTTPServer(t)
 	defer listener.Close()
 
-	source := "http://invalid.localhost"
+	source := "http://invalidhost" + strconv.Itoa(rand.Int())
 	parameters := make(imageserver.Parameters)
 
 	provider := &HTTPProvider{}
