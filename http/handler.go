@@ -26,7 +26,6 @@ type ImageHTTPHandler struct {
 	ETagFunc func(parameters imageserver.Parameters) string // optional
 	Expire   time.Duration                                  // set the "Expires" header, optional
 
-	HeaderFunc   func(header http.Header, request *http.Request, err error)                // allows to set custom headers, optional
 	ErrorFunc    func(err error, request *http.Request)                                    // allows to handle internal errors, optional
 	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // allows to handle returned responses, optional
 }
@@ -133,8 +132,6 @@ func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter
 		t = t.In(expiresHeaderLocation)
 		header.Set("Expires", t.Format(time.RFC1123))
 	}
-
-	handler.callHeaderFunc(header, request, nil)
 }
 
 func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *http.Request, err error) {
@@ -155,8 +152,6 @@ func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *
 		handler.callErrFunc(err, request)
 	}
 
-	handler.callHeaderFunc(writer.Header(), request, err)
-
 	http.Error(writer, message, statusCode)
 
 	handler.callResponseFunc(request, statusCode, int64(len(message)), err)
@@ -165,12 +160,6 @@ func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *
 func (handler *ImageHTTPHandler) callErrFunc(err error, request *http.Request) {
 	if handler.ErrorFunc != nil {
 		handler.ErrorFunc(err, request)
-	}
-}
-
-func (handler *ImageHTTPHandler) callHeaderFunc(header http.Header, request *http.Request, err error) {
-	if handler.HeaderFunc != nil {
-		handler.HeaderFunc(header, request, err)
 	}
 }
 

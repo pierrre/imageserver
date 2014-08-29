@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	//_ "net/http/pprof"
-	"os"
 	"strconv"
 	"time"
 
@@ -36,11 +35,6 @@ func main() {
 	flag.Parse()
 
 	log.Println("Start")
-
-	hostname, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
 
 	var cache imageserver_cache.Cache
 	cache = &imageserver_cache_redis.RedisCache{
@@ -104,9 +98,6 @@ func main() {
 		ImageServer: imageServer,
 		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
 		Expire:      time.Duration(7 * 24 * time.Hour),
-		HeaderFunc: func(header http.Header, request *http.Request, err error) {
-			header.Set("X-Hostname", hostname)
-		},
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
 		},
@@ -120,7 +111,7 @@ func main() {
 	}
 	http.Handle("/", imageHTTPHandler)
 
-	err = http.ListenAndServe(httpAddr, nil)
+	err := http.ListenAndServe(httpAddr, nil)
 	if err != nil {
 		log.Panic(err)
 	}
