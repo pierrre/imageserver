@@ -104,10 +104,6 @@ func main() {
 		ImageServer: imageServer,
 		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
 		Expire:      time.Duration(7 * 24 * time.Hour),
-		RequestFunc: func(request *http.Request) error {
-			log.Println("Request:", strconv.Quote(request.URL.String()))
-			return nil
-		},
 		HeaderFunc: func(header http.Header, request *http.Request, err error) {
 			header.Set("X-Hostname", hostname)
 		},

@@ -26,7 +26,6 @@ type ImageHTTPHandler struct {
 	ETagFunc func(parameters imageserver.Parameters) string // optional
 	Expire   time.Duration                                  // set the "Expires" header, optional
 
-	RequestFunc  func(request *http.Request) error                                         // allows to handle incoming requests (and eventually return an error), optional
 	HeaderFunc   func(header http.Header, request *http.Request, err error)                // allows to set custom headers, optional
 	ErrorFunc    func(err error, request *http.Request)                                    // allows to handle internal errors, optional
 	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // allows to handle returned responses, optional
@@ -42,13 +41,6 @@ func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *
 	if request.Method != "GET" && request.Method != "HEAD" {
 		handler.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
 		return
-	}
-
-	if handler.RequestFunc != nil {
-		if err := handler.RequestFunc(request); err != nil {
-			handler.sendError(writer, request, err)
-			return
-		}
 	}
 
 	parameters := make(imageserver.Parameters)
