@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	//_ "net/http/pprof"
-	"strconv"
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
@@ -100,13 +99,6 @@ func main() {
 		Expire:      time.Duration(7 * 24 * time.Hour),
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
-		},
-		ResponseFunc: func(request *http.Request, statusCode int, contentSize int64, err error) {
-			var errString string
-			if err != nil {
-				errString = err.Error()
-			}
-			log.Println("Response:", request.RemoteAddr, request.Method, strconv.Quote(request.URL.String()), statusCode, contentSize, strconv.Quote(errString))
 		},
 	}
 	http.Handle("/", imageHTTPHandler)

@@ -20,14 +20,11 @@ var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
 // ImageHTTPHandler represents an HTTP Handler for imageserver.Server
 type ImageHTTPHandler struct {
-	Parser      Parser                  // parse request to Parameters
-	ImageServer imageserver.ImageServer // handle image requests
-
-	ETagFunc func(parameters imageserver.Parameters) string // optional
-	Expire   time.Duration                                  // set the "Expires" header, optional
-
-	ErrorFunc    func(err error, request *http.Request)                                    // allows to handle internal errors, optional
-	ResponseFunc func(request *http.Request, statusCode int, contentSize int64, err error) // allows to handle returned responses, optional
+	Parser      Parser                                         // parse request to Parameters
+	ImageServer imageserver.ImageServer                        // handle image requests
+	ETagFunc    func(parameters imageserver.Parameters) string // optional
+	Expire      time.Duration                                  // set the "Expires" header, optional
+	ErrorFunc   func(err error, request *http.Request)         // allows to handle internal errors, optional
 }
 
 // ServeHTTP implements the HTTP Handler interface
@@ -89,8 +86,6 @@ func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, re
 
 	writer.WriteHeader(http.StatusNotModified)
 
-	handler.callResponseFunc(request, http.StatusNotModified, 0, nil)
-
 	return true
 }
 
@@ -101,18 +96,13 @@ func (handler *ImageHTTPHandler) sendImage(writer http.ResponseWriter, request *
 		writer.Header().Set("Content-Type", "image/"+image.Format)
 	}
 
-	contentLength := len(image.Data)
-	writer.Header().Set("Content-Length", strconv.Itoa(contentLength))
+	writer.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 
-	var contentSize int64
 	if request.Method == "GET" {
-		contentSize = int64(contentLength)
 		if _, err := writer.Write(image.Data); err != nil {
 			return err
 		}
 	}
-
-	handler.callResponseFunc(request, http.StatusOK, contentSize, nil)
 
 	return nil
 }
@@ -153,19 +143,11 @@ func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *
 	}
 
 	http.Error(writer, message, statusCode)
-
-	handler.callResponseFunc(request, statusCode, int64(len(message)), err)
 }
 
 func (handler *ImageHTTPHandler) callErrFunc(err error, request *http.Request) {
 	if handler.ErrorFunc != nil {
 		handler.ErrorFunc(err, request)
-	}
-}
-
-func (handler *ImageHTTPHandler) callResponseFunc(request *http.Request, statusCode int, contentSize int64, err error) {
-	if handler.ResponseFunc != nil {
-		handler.ResponseFunc(request, statusCode, contentSize, err)
 	}
 }
 
