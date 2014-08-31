@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -10,19 +11,11 @@ type Error struct {
 	Text string
 }
 
-// NewError creates an Error with the message associated with the code
-func NewError(code int) *Error {
-	return NewErrorWithText(code, http.StatusText(code))
-}
-
-// NewErrorWithText creates an Error
-func NewErrorWithText(code int, text string) *Error {
-	return &Error{
-		Code: code,
-		Text: text,
-	}
+// NewErrorDefaultText creates an Error with the message associated with the code
+func NewErrorDefaultText(code int) *Error {
+	return &Error{Code: code, Text: http.StatusText(code)}
 }
 
 func (err *Error) Error() string {
-	return err.Text
+	return fmt.Sprintf("http error %d: %s", err.Code, err.Text)
 }

@@ -35,7 +35,7 @@ type ImageHTTPHandler struct {
 // It doesn't check if the image really exists.
 func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
-		handler.sendError(writer, request, NewError(http.StatusMethodNotAllowed))
+		handler.sendError(writer, request, NewErrorDefaultText(http.StatusMethodNotAllowed))
 		return
 	}
 
@@ -134,7 +134,7 @@ func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *
 		message = err.Error()
 	case *Error:
 		statusCode = err.Code
-		message = err.Error()
+		message = err.Text
 	default:
 		statusCode = http.StatusInternalServerError
 		message = http.StatusText(statusCode)
