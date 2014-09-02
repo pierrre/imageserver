@@ -89,17 +89,21 @@ func main() {
 		KeyGenerator: imageserver_cache.NewParametersHashKeyGenerator(sha256.New),
 	}
 
-	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
+	var imageHTTPHandler http.Handler
+	imageHTTPHandler = &imageserver_http.ImageHTTPHandler{
 		Parser: &imageserver_http_parser_list.ListParser{
 			&imageserver_http_parser_source.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
 		},
 		ImageServer: imageServer,
 		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
-		Expire:      time.Duration(7 * 24 * time.Hour),
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
 		},
+	}
+	imageHTTPHandler = &imageserver_http.ExpiresHandler{
+		Handler: imageHTTPHandler,
+		Expires: time.Duration(7 * 24 * time.Hour),
 	}
 	http.Handle("/", imageHTTPHandler)
 

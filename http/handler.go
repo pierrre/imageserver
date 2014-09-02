@@ -9,21 +9,17 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"time"
 
 	"github.com/pierrre/imageserver"
 )
 
 var inmHeaderRegexp = regexp.MustCompile("^\"(.+)\"$")
 
-var expiresHeaderLocation, _ = time.LoadLocation("GMT")
-
 // ImageHTTPHandler represents an HTTP Handler for imageserver.Server
 type ImageHTTPHandler struct {
 	Parser      Parser                                         // parse request to Parameters
 	ImageServer imageserver.ImageServer                        // handle image requests
 	ETagFunc    func(parameters imageserver.Parameters) string // optional
-	Expire      time.Duration                                  // set the "Expires" header, optional
 	ErrorFunc   func(err error, request *http.Request)         // allows to handle internal errors, optional
 }
 
@@ -114,13 +110,6 @@ func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter
 
 	if handler.ETagFunc != nil {
 		header.Set("ETag", fmt.Sprintf("\"%s\"", handler.ETagFunc(parameters)))
-	}
-
-	if handler.Expire != 0 {
-		t := time.Now()
-		t = t.Add(handler.Expire)
-		t = t.In(expiresHeaderLocation)
-		header.Set("Expires", t.Format(time.RFC1123))
 	}
 }
 
