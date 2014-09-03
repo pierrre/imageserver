@@ -52,7 +52,7 @@ func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *
 	}
 
 	if err := handler.sendImage(writer, request, parameters, image); err != nil {
-		handler.callErrFunc(err, request)
+		handler.callErrorFunc(err, request)
 		return
 	}
 }
@@ -128,13 +128,13 @@ func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *
 		statusCode = http.StatusInternalServerError
 		message = http.StatusText(statusCode)
 
-		handler.callErrFunc(err, request)
+		handler.callErrorFunc(err, request)
 	}
 
 	http.Error(writer, message, statusCode)
 }
 
-func (handler *ImageHTTPHandler) callErrFunc(err error, request *http.Request) {
+func (handler *ImageHTTPHandler) callErrorFunc(err error, request *http.Request) {
 	if handler.ErrorFunc != nil {
 		handler.ErrorFunc(err, request)
 	}
