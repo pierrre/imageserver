@@ -17,5 +17,5 @@ before_install:
 
 script:
   - go test -v -cover ./...
-  - golint .
+  - find . -type d | grep -v ".git" | xargs -L 1 golint
   - goimports -l .
