@@ -7,24 +7,24 @@ import (
 	"github.com/pierrre/lrucache"
 )
 
-// MemoryCache represents an in-memory Image Cache
+// Cache represents an in-memory Image Cache
 //
 // It uses an LRU implementation from https://github.com/pierrre/lrucache (copy of https://github.com/youtube/vitess/tree/master/go/cache)
-type MemoryCache struct {
+type Cache struct {
 	lru *lrucache.LRUCache
 }
 
-// New creates a MemoryCache
+// New creates a Cache
 //
 // capacity is the maximum cache size (in bytes)
-func New(capacity int64) *MemoryCache {
-	return &MemoryCache{
+func New(capacity int64) *Cache {
+	return &Cache{
 		lru: lrucache.NewLRUCache(capacity),
 	}
 }
 
 // Get gets an image from the in-memory Cache
-func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache *Cache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
 		return nil, &imageserver_cache.MissError{Key: key}
@@ -35,7 +35,7 @@ func (cache *MemoryCache) Get(key string, parameters imageserver.Parameters) (*i
 }
 
 // Set sets an Image to the in-memory Cache
-func (cache *MemoryCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *Cache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	item := &item{
 		image: image,
 	}

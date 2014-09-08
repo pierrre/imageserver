@@ -10,17 +10,17 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
-// RedisCache represents a Redis Image Cache
+// Cache represents a Redis Image Cache
 //
 // It uses Gary Burd's Redis client https://github.com/garyburd/redigo
-type RedisCache struct {
+type Cache struct {
 	Pool *redigo.Pool
 
 	Expire time.Duration // optional
 }
 
 // Get gets an Image from Redis
-func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache *Cache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
 		return nil, &imageserver_cache.MissError{Key: key}
@@ -34,7 +34,7 @@ func (cache *RedisCache) Get(key string, parameters imageserver.Parameters) (*im
 	return image, nil
 }
 
-func (cache *RedisCache) getData(key string) ([]byte, error) {
+func (cache *Cache) getData(key string) ([]byte, error) {
 	conn := cache.Pool.Get()
 	defer conn.Close()
 
@@ -42,7 +42,7 @@ func (cache *RedisCache) getData(key string) ([]byte, error) {
 }
 
 // Set sets an Image to Redis
-func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *Cache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	data, _ := image.MarshalBinary()
 
 	err := cache.setData(key, data)
@@ -53,7 +53,7 @@ func (cache *RedisCache) Set(key string, image *imageserver.Image, parameters im
 	return nil
 }
 
-func (cache *RedisCache) setData(key string, data []byte) error {
+func (cache *Cache) setData(key string, data []byte) error {
 	params := []interface{}{key, data}
 
 	if cache.Expire != 0 {
@@ -72,6 +72,6 @@ func (cache *RedisCache) setData(key string, data []byte) error {
 }
 
 // Close closes the underlying Redigo pool
-func (cache *RedisCache) Close() error {
+func (cache *Cache) Close() error {
 	return cache.Pool.Close()
 }

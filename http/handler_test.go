@@ -10,6 +10,6 @@ func TestTODO(t *testing.T) {
 	t.Log("TODO")
 }
 
-func TestImageHTTPHandlerInterface(t *testing.T) {
-	var _ http.Handler = &ImageHTTPHandler{}
+func TestHandlerInterface(t *testing.T) {
+	var _ http.Handler = &Handler{}
 }

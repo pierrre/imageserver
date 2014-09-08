@@ -6,11 +6,11 @@ import (
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 )
 
-// ListProcessor represents a list of Image Processor
-type ListProcessor []imageserver_processor.Processor
+// Processor represents a list of Image Processor
+type Processor []imageserver_processor.Processor
 
 // Process processes the Image with the list of Image Processor
-func (processor ListProcessor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (processor Processor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	var err error
 	for _, p := range processor {
 		image, err = p.Process(image, parameters)

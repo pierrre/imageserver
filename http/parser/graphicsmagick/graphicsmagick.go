@@ -1,4 +1,4 @@
-// Package graphicsmagick provides a GraphicsMagick http Parser
+// Package graphicsmagick provides a GraphicsMagick HTTP Parser
 package graphicsmagick
 
 import (
@@ -11,13 +11,13 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// GraphicsMagickParser represents a GraphicsMagick http Parser
-type GraphicsMagickParser struct{}
+// Parser represents a GraphicsMagick HTTP Parser
+type Parser struct{}
 
 // Parse parses an http Request for GraphicsMagickProcessor
 //
-// See GraphicsMagickProcessor for parameters list.
-func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+// See Processor for parameters list.
+func (parser *Parser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	p := make(imageserver.Parameters)
 	parameters.Set("graphicsmagick", p)
 	parameters = p
@@ -52,7 +52,7 @@ func (parser *GraphicsMagickParser) Parse(request *http.Request, parameters imag
 	return nil
 }
 
-func (parser *GraphicsMagickParser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) {
+func (parser *Parser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) {
 	parameter := query.Get(parameterName)
 	if parameter == "" {
 		return
@@ -61,7 +61,7 @@ func (parser *GraphicsMagickParser) parseString(query url.Values, parameters ima
 	return
 }
 
-func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *Parser) parseInt(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameterString := query.Get(parameterName)
 	if parameterString == "" {
 		return nil
@@ -74,7 +74,7 @@ func (parser *GraphicsMagickParser) parseInt(query url.Values, parameters images
 	return nil
 }
 
-func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
+func (parser *Parser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
 	parameterString := query.Get(parameterName)
 	if parameterString == "" {
 		return nil
@@ -87,7 +87,7 @@ func (parser *GraphicsMagickParser) parseBool(query url.Values, parameters image
 	return nil
 }
 
-func (parser *GraphicsMagickParser) newParseError(parameterName string, parseType string) *imageserver.ParameterError {
+func (parser *Parser) newParseError(parameterName string, parseType string) *imageserver.ParameterError {
 	return &imageserver.ParameterError{
 		Parameter: fmt.Sprintf("graphicsmagick.%s", parameterName),
 		Message:   fmt.Sprintf("parse %s error", parseType),
@@ -95,7 +95,7 @@ func (parser *GraphicsMagickParser) newParseError(parameterName string, parseTyp
 }
 
 // Resolve resolves GraphicsMagick's parameters
-func (parser *GraphicsMagickParser) Resolve(parameter string) string {
+func (parser *Parser) Resolve(parameter string) string {
 	if !strings.HasPrefix(parameter, "graphicsmagick.") {
 		return ""
 	}

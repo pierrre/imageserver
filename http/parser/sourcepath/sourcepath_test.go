@@ -11,5 +11,5 @@ func TestTODO(t *testing.T) {
 }
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_http.Parser = &SourcePathParser{}
+	var _ imageserver_http.Parser = &Parser{}
 }

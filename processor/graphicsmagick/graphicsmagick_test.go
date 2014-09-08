@@ -10,7 +10,7 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_processor.Processor = &GraphicsMagickProcessor{}
+	var _ imageserver_processor.Processor = &Processor{}
 }
 
 func TestProcess(t *testing.T) {
@@ -23,7 +23,7 @@ func TestProcess(t *testing.T) {
 		},
 	}
 
-	processor := &GraphicsMagickProcessor{
+	processor := &Processor{
 		Executable: "gm",
 	}
 
@@ -43,7 +43,7 @@ func TestProcessErrorTimeout(t *testing.T) {
 		},
 	}
 
-	processor := &GraphicsMagickProcessor{
+	processor := &Processor{
 		Executable: "gm",
 		Timeout:    1 * time.Nanosecond,
 	}

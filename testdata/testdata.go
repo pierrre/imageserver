@@ -52,12 +52,12 @@ type testDataProvider struct{}
 func (provider *testDataProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	name, ok := source.(string)
 	if !ok {
-		return nil, imageserver_provider.NewSourceError("not a string")
+		return nil, &imageserver_provider.SourceError{Message: "not a string"}
 	}
 
 	image, ok := Images[name]
 	if !ok {
-		return nil, imageserver_provider.NewSourceError("unknown image")
+		return nil, &imageserver_provider.SourceError{Message: "unknown image"}
 	}
 
 	return image, nil

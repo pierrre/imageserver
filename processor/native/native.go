@@ -8,7 +8,7 @@ import (
 )
 
 /*
-NativeProcessor is an Image Processor that uses the native Go Image
+Processor is an Image Processor that uses the native Go Image
 
 Steps:
 
@@ -18,14 +18,14 @@ Steps:
 
 - encode (from Go image to raw data)
 */
-type NativeProcessor struct {
+type Processor struct {
 	Decoder   Decoder
-	Processor Processor
+	Processor ProcessorNative
 	Encoder   Encoder
 }
 
 // Process processes an Image using native Go Image
-func (processor *NativeProcessor) Process(rawImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (processor *Processor) Process(rawImage *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	nativeImage, decodedFormat, err := processor.Decoder.Decode(rawImage, parameters)
 	if err != nil {
 		return nil, err
@@ -68,16 +68,16 @@ func GetBaseDecoder() Decoder {
 	return baseDecoder
 }
 
-// Processor processes a native Go Image
-type Processor interface {
+// ProcessorNative processes a native Go Image
+type ProcessorNative interface {
 	Process(image.Image, imageserver.Parameters) (image.Image, error)
 }
 
-// ProcessorFunc is a Processor func
-type ProcessorFunc func(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error)
+// ProcessorNativeFunc is a Processor func
+type ProcessorNativeFunc func(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error)
 
 // Process calls the func
-func (f ProcessorFunc) Process(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error) {
+func (f ProcessorNativeFunc) Process(nativeImage image.Image, parameters imageserver.Parameters) (image.Image, error) {
 	return f(nativeImage, parameters)
 }
 

@@ -14,8 +14,8 @@ import (
 
 var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
-// HTTPProvider represents a HTTP Image Provider
-type HTTPProvider struct{}
+// Provider represents a HTTP Image Provider
+type Provider struct{}
 
 // Get returns an Image for an HTTP source
 //
@@ -24,7 +24,7 @@ type HTTPProvider struct{}
 // Returns an error if the HTTP status code is not 200 (OK).
 //
 // The image type is determined by the "Content-Type" header.
-func (provider *HTTPProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (provider *Provider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	sourceURL, err := provider.getSourceURL(source)
 	if err != nil {
 		return nil, err
@@ -44,35 +44,35 @@ func (provider *HTTPProvider) Get(source interface{}, parameters imageserver.Par
 	return image, nil
 }
 
-func (provider *HTTPProvider) getSourceURL(source interface{}) (*url.URL, error) {
+func (provider *Provider) getSourceURL(source interface{}) (*url.URL, error) {
 	sourceURL, ok := source.(*url.URL)
 	if !ok {
 		var err error
 		sourceURL, err = url.ParseRequestURI(fmt.Sprint(source))
 		if err != nil {
-			return nil, imageserver_provider.NewSourceError("parse url error")
+			return nil, &imageserver_provider.SourceError{Message: "parse url error"}
 		}
 	}
 
 	if sourceURL.Scheme != "http" && sourceURL.Scheme != "https" {
-		return nil, imageserver_provider.NewSourceError("url scheme must be http(s)")
+		return nil, &imageserver_provider.SourceError{Message: "url scheme must be http(s)"}
 	}
 
 	return sourceURL, nil
 }
 
-func (provider *HTTPProvider) doRequest(sourceURL *url.URL) (*http.Response, error) {
+func (provider *Provider) doRequest(sourceURL *url.URL) (*http.Response, error) {
 	//TODO optional http client
 	response, err := http.Get(sourceURL.String())
 	if err != nil {
-		return nil, imageserver_provider.NewSourceError(err.Error())
+		return nil, &imageserver_provider.SourceError{Message: err.Error()}
 	}
 	return response, nil
 }
 
-func (provider *HTTPProvider) parseResponse(response *http.Response) (*imageserver.Image, error) {
+func (provider *Provider) parseResponse(response *http.Response) (*imageserver.Image, error) {
 	if response.StatusCode != http.StatusOK {
-		return nil, imageserver_provider.NewSourceError(fmt.Sprintf("http status code %d while downloading", response.StatusCode))
+		return nil, &imageserver_provider.SourceError{Message: fmt.Sprintf("http status code %d while downloading", response.StatusCode)}
 	}
 
 	image := new(imageserver.Image)
@@ -87,7 +87,7 @@ func (provider *HTTPProvider) parseResponse(response *http.Response) (*imageserv
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, imageserver_provider.NewSourceError(fmt.Sprintf("error while downloading: %s", err))
+		return nil, &imageserver_provider.SourceError{Message: fmt.Sprintf("error while downloading: %s", err)}
 	}
 	image.Data = data
 

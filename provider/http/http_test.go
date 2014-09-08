@@ -24,7 +24,7 @@ func init() {
 }
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_provider.Provider = &HTTPProvider{}
+	var _ imageserver_provider.Provider = &Provider{}
 }
 
 func TestGet(t *testing.T) {
@@ -34,7 +34,7 @@ func TestGet(t *testing.T) {
 	source := createTestURL(listener)
 	parameters := make(imageserver.Parameters)
 
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	image, err := provider.Get(source, parameters)
 	if err != nil {
@@ -59,7 +59,7 @@ func TestGetErrorNotFound(t *testing.T) {
 	source.Path += "foobar"
 	parameters := make(imageserver.Parameters)
 
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	_, err := provider.Get(source, parameters)
 	if err == nil {
@@ -74,7 +74,7 @@ func TestGetErrorInvalidUrl(t *testing.T) {
 	source := "foobar"
 	parameters := make(imageserver.Parameters)
 
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	_, err := provider.Get(source, parameters)
 	if err == nil {
@@ -89,7 +89,7 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 	source := "custom://foobar"
 	parameters := make(imageserver.Parameters)
 
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	_, err := provider.Get(source, parameters)
 	if err == nil {
@@ -104,7 +104,7 @@ func TestGetErrorRequest(t *testing.T) {
 	source := "http://invalidhost" + strconv.Itoa(rand.Int())
 	parameters := make(imageserver.Parameters)
 
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	_, err := provider.Get(source, parameters)
 	if err == nil {
@@ -123,7 +123,7 @@ func (erc *errorReadCloser) Close() error {
 }
 
 func TestParseResponseErrorData(t *testing.T) {
-	provider := &HTTPProvider{}
+	provider := &Provider{}
 
 	response := &http.Response{
 		StatusCode: http.StatusOK,

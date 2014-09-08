@@ -35,7 +35,7 @@ func benchmarkResize(b *testing.B, image *imageserver.Image) {
 		},
 	}
 
-	processor := &GraphicsMagickProcessor{
+	processor := &Processor{
 		Executable: "gm",
 	}
 

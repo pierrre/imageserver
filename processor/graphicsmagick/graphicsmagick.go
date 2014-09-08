@@ -19,8 +19,8 @@ const (
 	tempDirPrefix       = "imageserver_"
 )
 
-// GraphicsMagickProcessor represents a GraphicsMagick Image Processor
-type GraphicsMagickProcessor struct {
+// Processor represents a GraphicsMagick Image Processor
+type Processor struct {
 	Executable string // path to "gm" executable, usually "/usr/bin/gm"
 
 	Timeout        time.Duration // timeout for process, optional
@@ -53,7 +53,7 @@ type GraphicsMagickProcessor struct {
 // - format: "-format" parameter
 //
 // - quality: "-quality" parameter
-func (processor *GraphicsMagickProcessor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (processor *Processor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	parameters, err := processor.getParameters(parameters)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func (processor *GraphicsMagickProcessor) Process(image *imageserver.Image, para
 	return resultImage, nil
 }
 
-func (processor *GraphicsMagickProcessor) getParameters(parameters imageserver.Parameters) (imageserver.Parameters, error) {
+func (processor *Processor) getParameters(parameters imageserver.Parameters) (imageserver.Parameters, error) {
 	if !parameters.Has(globalParameterName) {
 		return nil, nil
 	}
@@ -141,7 +141,7 @@ func (processor *GraphicsMagickProcessor) getParameters(parameters imageserver.P
 	return parameters.GetParameters(globalParameterName)
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
+func (processor *Processor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
 	width, _ = parameters.GetInt("width")
 	if width < 0 {
 		return 0, 0, newParameterError("width", "must be greater than or equal to 0")
@@ -186,7 +186,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsResize(arguments *list.L
 	return width, height, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments *list.List, parameters imageserver.Parameters) error {
+func (processor *Processor) buildArgumentsBackground(arguments *list.List, parameters imageserver.Parameters) error {
 	background, _ := parameters.GetString("background")
 
 	if backgroundLength := len(background); backgroundLength > 0 {
@@ -207,7 +207,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsBackground(arguments *li
 	return nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments *list.List, parameters imageserver.Parameters, width int, height int) error {
+func (processor *Processor) buildArgumentsExtent(arguments *list.List, parameters imageserver.Parameters, width int, height int) error {
 	if width != 0 && height != 0 {
 		if extent, _ := parameters.GetBool("extent"); extent {
 			arguments.PushBack("-gravity")
@@ -221,7 +221,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsExtent(arguments *list.L
 	return nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.List, parameters imageserver.Parameters, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
+func (processor *Processor) buildArgumentsFormat(arguments *list.List, parameters imageserver.Parameters, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
 	format, _ = parameters.GetString("format")
 
 	formatSpecified = true
@@ -251,7 +251,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsFormat(arguments *list.L
 	return format, formatSpecified, nil
 }
 
-func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.List, parameters imageserver.Parameters, format string) error {
+func (processor *Processor) buildArgumentsQuality(arguments *list.List, parameters imageserver.Parameters, format string) error {
 	if !parameters.Has("quality") {
 		return nil
 	}
@@ -277,7 +277,7 @@ func (processor *GraphicsMagickProcessor) buildArgumentsQuality(arguments *list.
 	return nil
 }
 
-func (processor *GraphicsMagickProcessor) convertArgumentsToSlice(arguments *list.List) []string {
+func (processor *Processor) convertArgumentsToSlice(arguments *list.List) []string {
 	argumentSlice := make([]string, 0, arguments.Len())
 	for e := arguments.Front(); e != nil; e = e.Next() {
 		argumentSlice = append(argumentSlice, e.Value.(string))
@@ -285,7 +285,7 @@ func (processor *GraphicsMagickProcessor) convertArgumentsToSlice(arguments *lis
 	return argumentSlice
 }
 
-func (processor *GraphicsMagickProcessor) runCommand(cmd *exec.Cmd) error {
+func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 	err := cmd.Start()
 	if err != nil {
 		return err

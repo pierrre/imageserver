@@ -8,7 +8,7 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_cache.Cache = &MemoryCache{}
+	var _ imageserver_cache.Cache = &Cache{}
 }
 
 func TestGetSet(t *testing.T) {
@@ -23,6 +23,6 @@ func TestGetErrorMiss(t *testing.T) {
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
-func newTestCache() *MemoryCache {
+func newTestCache() *Cache {
 	return New(20 * 1024 * 1024)
 }

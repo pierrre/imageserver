@@ -57,5 +57,5 @@ http://fuckingfrogs.fr:8080/?source=https://raw.github.com/pierrre/imageserver/m
 - more tests
 - add new "parameter error", convert in http
 - don't ignore error from cache
-- add GroupcacheImageServer
+- add GroupcacheServer
 - add timeout in LimitProcessor

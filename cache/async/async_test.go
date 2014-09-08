@@ -11,7 +11,7 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_cache.Cache = &AsyncCache{}
+	var _ imageserver_cache.Cache = &Cache{}
 }
 
 func TestGetSet(t *testing.T) {
@@ -28,7 +28,7 @@ func TestGetSet(t *testing.T) {
 		},
 	}
 
-	asyncCache := &AsyncCache{
+	asyncCache := &Cache{
 		Cache: funcCache,
 	}
 
@@ -51,7 +51,7 @@ func TestSetErrFunc(t *testing.T) {
 	}
 
 	errFuncCallCh := make(chan struct{})
-	asyncCache := &AsyncCache{
+	asyncCache := &Cache{
 		Cache: funcCache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
 			errFuncCallCh <- struct{}{}

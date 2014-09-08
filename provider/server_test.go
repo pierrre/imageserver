@@ -9,16 +9,16 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestProviderImageServerInterface(t *testing.T) {
-	var _ imageserver.ImageServer = &ProviderImageServer{}
+func TestServerInterface(t *testing.T) {
+	var _ imageserver.Server = &Server{}
 }
 
-func TestImageServerGet(t *testing.T) {
+func TestServer(t *testing.T) {
 	parameters := imageserver.Parameters{
 		"source": testdata.MediumFileName,
 	}
-	pis := createTestProviderImageServer()
-	image, err := pis.Get(parameters)
+	s := createTestServer()
+	image, err := s.Get(parameters)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,48 +27,43 @@ func TestImageServerGet(t *testing.T) {
 	}
 }
 
-func TestImageServerGetErrorMissingSource(t *testing.T) {
+func TestServerErrorMissingSource(t *testing.T) {
 	parameters := imageserver.Parameters{}
-	pis := createTestProviderImageServer()
-	_, err := pis.Get(parameters)
+	s := createTestServer()
+	_, err := s.Get(parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
-func TestImageServerGetErrorProviderSource(t *testing.T) {
+func TestServerErrorProviderSource(t *testing.T) {
 	parameters := imageserver.Parameters{
 		"source": "foobar",
 	}
-	pis := createTestProviderImageServer()
-	_, err := pis.Get(parameters)
+	s := createTestServer()
+	_, err := s.Get(parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
-func TestImageServerGetErrorProvider(t *testing.T) {
+func TestServerErrorProvider(t *testing.T) {
 	parameters := imageserver.Parameters{
 		"source": "test",
 	}
-	pis := &ProviderImageServer{
+	s := &Server{
 		Provider: ProviderFunc(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
 	}
-	_, err := pis.Get(parameters)
+	_, err := s.Get(parameters)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
-func createTestProviderImageServer() *ProviderImageServer {
-	return &ProviderImageServer{
+func createTestServer() *Server {
+	return &Server{
 		Provider: testdata.Provider,
 	}
-}
-
-func TestSourceError(t *testing.T) {
-	err := NewSourceError("test")
-	err.Error()
 }

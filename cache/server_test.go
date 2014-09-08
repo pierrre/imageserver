@@ -11,13 +11,13 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestCacheImageServerInterface(t *testing.T) {
-	var _ imageserver.ImageServer = &CacheImageServer{}
+func TestServerInterface(t *testing.T) {
+	var _ imageserver.Server = &Server{}
 }
 
-func TestCacheImageServer(t *testing.T) {
-	s := &CacheImageServer{
-		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+func TestServer(t *testing.T) {
+	s := &Server{
+		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: cachetest.NewMapCache(),
@@ -38,9 +38,9 @@ func TestCacheImageServer(t *testing.T) {
 	}
 }
 
-func TestCacheImageServerErrorImageServer(t *testing.T) {
-	s := &CacheImageServer{
-		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+func TestServerErrorServer(t *testing.T) {
+	s := &Server{
+		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
 		Cache: cachetest.NewMapCache(),
@@ -54,9 +54,9 @@ func TestCacheImageServerErrorImageServer(t *testing.T) {
 	}
 }
 
-func TestCacheImageServerErrorCacheSet(t *testing.T) {
-	s := &CacheImageServer{
-		ImageServer: imageserver.ImageServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+func TestServerErrorCacheSet(t *testing.T) {
+	s := &Server{
+		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: &cachetest.FuncCache{

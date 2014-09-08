@@ -36,7 +36,7 @@ func main() {
 	log.Println("Start")
 
 	var cache imageserver_cache.Cache
-	cache = &imageserver_cache_redis.RedisCache{
+	cache = &imageserver_cache_redis.Cache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
 				return redigo.Dial("tcp", "localhost:6379")
@@ -45,25 +45,25 @@ func main() {
 		},
 		Expire: time.Duration(7 * 24 * time.Hour),
 	}
-	cache = &imageserver_cache_async.AsyncCache{
+	cache = &imageserver_cache_async.Cache{
 		Cache: cache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
 			log.Println("Cache error:", err)
 		},
 	}
-	cache = imageserver_cache_list.ListCache{
+	cache = imageserver_cache_list.Cache{
 		imageserver_cache_memory.New(10 * 1024 * 1024),
 		cache,
 	}
 
-	provider := &imageserver_provider_cache.CacheProvider{
-		Provider:     &imageserver_provider_http.HTTPProvider{},
+	provider := &imageserver_provider_cache.Provider{
+		Provider:     &imageserver_provider_http.Provider{},
 		Cache:        cache,
 		KeyGenerator: imageserver_provider_cache.NewSourceHashKeyGenerator(sha256.New),
 	}
 
 	var processor imageserver_processor.Processor
-	processor = &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+	processor = &imageserver_processor_graphicsmagick.Processor{
 		Executable: "gm",
 		Timeout:    time.Duration(10 * time.Second),
 		AllowedFormats: []string{
@@ -75,37 +75,37 @@ func main() {
 	}
 	processor = imageserver_processor_limit.New(processor, 16)
 
-	var imageServer imageserver.ImageServer
-	imageServer = &imageserver_provider.ProviderImageServer{
+	var server imageserver.Server
+	server = &imageserver_provider.Server{
 		Provider: provider,
 	}
-	imageServer = &imageserver_processor.ProcessorImageServer{
-		ImageServer: imageServer,
-		Processor:   processor,
+	server = &imageserver_processor.Server{
+		Server:    server,
+		Processor: processor,
 	}
-	imageServer = &imageserver_cache.CacheImageServer{
-		ImageServer:  imageServer,
+	server = &imageserver_cache.Server{
+		Server:       server,
 		Cache:        cache,
 		KeyGenerator: imageserver_cache.NewParametersHashKeyGenerator(sha256.New),
 	}
 
-	var imageHTTPHandler http.Handler
-	imageHTTPHandler = &imageserver_http.ImageHTTPHandler{
-		Parser: &imageserver_http_parser_list.ListParser{
-			&imageserver_http_parser_source.SourceParser{},
-			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
+	var handler http.Handler
+	handler = &imageserver_http.Handler{
+		Parser: &imageserver_http_parser_list.Parser{
+			&imageserver_http_parser_source.Parser{},
+			&imageserver_http_parser_graphicsmagick.Parser{},
 		},
-		ImageServer: imageServer,
-		ETagFunc:    imageserver_http.NewParametersHashETagFunc(sha256.New),
+		Server:   server,
+		ETagFunc: imageserver_http.NewParametersHashETagFunc(sha256.New),
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
 		},
 	}
-	imageHTTPHandler = &imageserver_http.ExpiresHandler{
-		Handler: imageHTTPHandler,
+	handler = &imageserver_http.ExpiresHandler{
+		Handler: handler,
 		Expires: time.Duration(7 * 24 * time.Hour),
 	}
-	http.Handle("/", imageHTTPHandler)
+	http.Handle("/", handler)
 
 	err := http.ListenAndServe(httpAddr, nil)
 	if err != nil {

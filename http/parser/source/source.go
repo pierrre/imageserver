@@ -1,4 +1,4 @@
-// Package source provides an http Parser that takes the "source" parameter from query
+// Package source provides an HTTP Parser that takes the "source" parameter from query
 package source
 
 import (
@@ -7,11 +7,11 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// SourceParser represents an http Parser that takes the "source" parameter from query
-type SourceParser struct{}
+// Parser represents an http Parser that takes the "source" parameter from query
+type Parser struct{}
 
 // Parse takes the "source" parameter from query
-func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+func (parser *Parser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	query := request.URL.Query()
 	source := query.Get("source")
 	if source != "" {
@@ -21,7 +21,7 @@ func (parser *SourceParser) Parse(request *http.Request, parameters imageserver.
 }
 
 // Resolve resolves the "source" parameter
-func (parser *SourceParser) Resolve(parameter string) string {
+func (parser *Parser) Resolve(parameter string) string {
 	if parameter != "source" {
 		return ""
 	}

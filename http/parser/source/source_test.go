@@ -10,8 +10,8 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_http.Parser = &SourceParser{}
-	var _ imageserver_http.Resolver = &SourceParser{}
+	var _ imageserver_http.Parser = &Parser{}
+	var _ imageserver_http.Resolver = &Parser{}
 }
 
 func TestParse(t *testing.T) {
@@ -35,7 +35,7 @@ func TestParse(t *testing.T) {
 
 	parameters := make(imageserver.Parameters)
 
-	parser := &SourceParser{}
+	parser := &Parser{}
 
 	err = parser.Parse(request, parameters)
 	if err != nil {
@@ -52,7 +52,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	parser := &SourceParser{}
+	parser := &Parser{}
 
 	httpParameter := parser.Resolve("source")
 	if httpParameter != "source" {

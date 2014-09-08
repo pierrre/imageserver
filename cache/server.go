@@ -8,30 +8,28 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// CacheImageServer represents an Image server with Cache
-//
-// It wraps an ImageServer.
-type CacheImageServer struct {
-	ImageServer  imageserver.ImageServer
+// Server represents a Server with Cache
+type Server struct {
+	imageserver.Server
 	Cache        Cache
 	KeyGenerator KeyGenerator
 }
 
-// Get wraps the call to the underlying ImageServer and Get from/Set to the Cache
-func (cis *CacheImageServer) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
-	key := cis.KeyGenerator.GetKey(parameters)
+// Get wraps the call to the underlying Server and Get from/Set to the Cache
+func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
+	key := s.KeyGenerator.GetKey(parameters)
 
-	image, err := cis.Cache.Get(key, parameters)
+	image, err := s.Cache.Get(key, parameters)
 	if err == nil {
 		return image, nil
 	}
 
-	image, err = cis.ImageServer.Get(parameters)
+	image, err = s.Server.Get(parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	err = cis.Cache.Set(key, image, parameters)
+	err = s.Cache.Set(key, image, parameters)
 	if err != nil {
 		return nil, err
 	}

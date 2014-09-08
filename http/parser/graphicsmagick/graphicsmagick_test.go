@@ -11,8 +11,8 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_http.Parser = &GraphicsMagickParser{}
-	var _ imageserver_http.Resolver = &GraphicsMagickParser{}
+	var _ imageserver_http.Parser = &Parser{}
+	var _ imageserver_http.Resolver = &Parser{}
 }
 
 func TestParse(t *testing.T) {
@@ -49,7 +49,7 @@ func TestParse(t *testing.T) {
 
 	parameters := make(imageserver.Parameters)
 
-	parser := &GraphicsMagickParser{}
+	parser := &Parser{}
 
 	err = parser.Parse(request, parameters)
 	if err != nil {
@@ -87,7 +87,7 @@ func TestParseEmpty(t *testing.T) {
 
 	parameters := make(imageserver.Parameters)
 
-	parser := &GraphicsMagickParser{}
+	parser := &Parser{}
 
 	err = parser.Parse(request, parameters)
 	if err != nil {
@@ -96,7 +96,7 @@ func TestParseEmpty(t *testing.T) {
 }
 
 func TestParseError(t *testing.T) {
-	parser := &GraphicsMagickParser{}
+	parser := &Parser{}
 
 	for k, v := range map[string]interface{}{
 		"width":                "foo",
@@ -134,7 +134,7 @@ func TestParseError(t *testing.T) {
 }
 
 func TestResolve(t *testing.T) {
-	parser := &GraphicsMagickParser{}
+	parser := &Parser{}
 
 	httpParameter := parser.Resolve("graphicsmagick.foo")
 	if httpParameter != "foo" {

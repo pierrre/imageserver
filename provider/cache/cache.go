@@ -12,18 +12,15 @@ import (
 	imageserver_provider "github.com/pierrre/imageserver/provider"
 )
 
-// CacheProvider represents a cached Image Provider
-type CacheProvider struct {
-	Provider     imageserver_provider.Provider
+// Provider represents an Image Provider with Cache
+type Provider struct {
+	imageserver_provider.Provider
 	Cache        imageserver_cache.Cache
 	KeyGenerator KeyGenerator
 }
 
-// Get returns an Image for a source
-//
-// It caches the image.
-// The cache key used is a sha256 of the source's string representation.
-func (provider *CacheProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+// Get returns an Image with Cache
+func (provider *Provider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	cacheKey := provider.KeyGenerator.GetKey(source, parameters)
 
 	image, err := provider.Cache.Get(cacheKey, parameters)

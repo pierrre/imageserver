@@ -11,7 +11,7 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_cache.Cache = &RedisCache{}
+	var _ imageserver_cache.Cache = &Cache{}
 }
 
 func TestGetSet(t *testing.T) {
@@ -69,18 +69,18 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func newTestCache(tb testing.TB) *RedisCache {
+func newTestCache(tb testing.TB) *Cache {
 	cache := newTestCacheWithRedigoPool(newTestRedigoPool("localhost:6379"))
 	checkTestCacheAvailable(tb, cache)
 	return cache
 }
 
-func newTestCacheInvalidAddress(tb testing.TB) *RedisCache {
+func newTestCacheInvalidAddress(tb testing.TB) *Cache {
 	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:16379"))
 }
 
-func newTestCacheWithRedigoPool(pool *redigo.Pool) *RedisCache {
-	return &RedisCache{
+func newTestCacheWithRedigoPool(pool *redigo.Pool) *Cache {
+	return &Cache{
 		Pool: pool,
 	}
 }
@@ -94,7 +94,7 @@ func newTestRedigoPool(address string) *redigo.Pool {
 	}
 }
 
-func checkTestCacheAvailable(tb testing.TB, cache *RedisCache) {
+func checkTestCacheAvailable(tb testing.TB, cache *Cache) {
 	conn, err := cache.Pool.Dial()
 	if err != nil {
 		cache.Close()

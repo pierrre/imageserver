@@ -1,15 +1,15 @@
-// Package imageserver provides an image server
+// Package imageserver provides an Image server
 package imageserver
 
-// ImageServer is an interface for an Image server
-type ImageServer interface {
+// Server is an interface for an Image server
+type Server interface {
 	Get(Parameters) (*Image, error)
 }
 
-// ImageServerFunc is a ImageServer func
-type ImageServerFunc func(parameters Parameters) (*Image, error)
+// ServerFunc is a Server func
+type ServerFunc func(parameters Parameters) (*Image, error)
 
 // Get calls the func
-func (f ImageServerFunc) Get(parameters Parameters) (*Image, error) {
+func (f ServerFunc) Get(parameters Parameters) (*Image, error) {
 	return f(parameters)
 }

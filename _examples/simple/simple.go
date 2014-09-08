@@ -15,26 +15,26 @@ import (
 )
 
 func main() {
-	var imageServer imageserver.ImageServer
-	imageServer = &imageserver_provider.ProviderImageServer{
-		Provider: &imageserver_provider_http.HTTPProvider{},
+	var server imageserver.Server
+	server = &imageserver_provider.Server{
+		Provider: &imageserver_provider_http.Provider{},
 	}
-	imageServer = &imageserver_processor.ProcessorImageServer{
-		ImageServer: imageServer,
-		Processor: &imageserver_processor_graphicsmagick.GraphicsMagickProcessor{
+	server = &imageserver_processor.Server{
+		Server: server,
+		Processor: &imageserver_processor_graphicsmagick.Processor{
 			Executable: "gm",
 		},
 	}
 
-	imageHTTPHandler := &imageserver_http.ImageHTTPHandler{
-		Parser: &imageserver_http_parser_list.ListParser{
-			&imageserver_http_parser_source.SourceParser{},
-			&imageserver_http_parser_graphicsmagick.GraphicsMagickParser{},
+	handler := &imageserver_http.Handler{
+		Parser: &imageserver_http_parser_list.Parser{
+			&imageserver_http_parser_source.Parser{},
+			&imageserver_http_parser_graphicsmagick.Parser{},
 		},
-		ImageServer: imageServer,
+		Server: server,
 	}
 
-	http.Handle("/", imageHTTPHandler)
+	http.Handle("/", handler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)

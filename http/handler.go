@@ -1,4 +1,4 @@
-// Package http provides an HTTP Handler for the imageserver package
+// Package http provides an HTTP Handler for an Image Server
 package http
 
 import (
@@ -15,12 +15,12 @@ import (
 
 var inmHeaderRegexp = regexp.MustCompile("^\"(.+)\"$")
 
-// ImageHTTPHandler represents an HTTP Handler for imageserver.Server
-type ImageHTTPHandler struct {
-	Parser      Parser                                         // parse request to Parameters
-	ImageServer imageserver.ImageServer                        // handle image requests
-	ETagFunc    func(parameters imageserver.Parameters) string // optional
-	ErrorFunc   func(err error, request *http.Request)         // allows to handle internal errors, optional
+// Handler represents an HTTP Handler for imageserver.Server
+type Handler struct {
+	Parser    Parser                                         // parse request to Parameters
+	Server    imageserver.Server                             // handle image requests
+	ETagFunc  func(parameters imageserver.Parameters) string // optional
+	ErrorFunc func(err error, request *http.Request)         // allows to handle internal errors, optional
 }
 
 // ServeHTTP implements the HTTP Handler interface
@@ -29,7 +29,7 @@ type ImageHTTPHandler struct {
 //
 // Supports ETag/If-None-Match (status code 304).
 // It doesn't check if the image really exists.
-func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (handler *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "GET" && request.Method != "HEAD" {
 		handler.sendError(writer, request, NewErrorDefaultText(http.StatusMethodNotAllowed))
 		return
@@ -45,7 +45,7 @@ func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *
 		return
 	}
 
-	image, err := handler.ImageServer.Get(parameters)
+	image, err := handler.Server.Get(parameters)
 	if err != nil {
 		handler.sendError(writer, request, err)
 		return
@@ -57,7 +57,7 @@ func (handler *ImageHTTPHandler) ServeHTTP(writer http.ResponseWriter, request *
 	}
 }
 
-func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
+func (handler *Handler) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
 	if handler.ETagFunc == nil {
 		return false
 	}
@@ -83,7 +83,7 @@ func (handler *ImageHTTPHandler) checkNotModified(writer http.ResponseWriter, re
 	return true
 }
 
-func (handler *ImageHTTPHandler) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
+func (handler *Handler) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
 	handler.setImageHeaderCommon(writer, request, parameters)
 
 	if image.Format != "" {
@@ -101,7 +101,7 @@ func (handler *ImageHTTPHandler) sendImage(writer http.ResponseWriter, request *
 	return nil
 }
 
-func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
+func (handler *Handler) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
 	header := writer.Header()
 
 	header.Set("Cache-Control", "public")
@@ -111,12 +111,12 @@ func (handler *ImageHTTPHandler) setImageHeaderCommon(writer http.ResponseWriter
 	}
 }
 
-func (handler *ImageHTTPHandler) sendError(writer http.ResponseWriter, request *http.Request, err error) {
+func (handler *Handler) sendError(writer http.ResponseWriter, request *http.Request, err error) {
 	httpErr := handler.convertGenericErrorToHTTP(err, request)
 	http.Error(writer, httpErr.Text, httpErr.Code)
 }
 
-func (handler *ImageHTTPHandler) convertGenericErrorToHTTP(err error, request *http.Request) *Error {
+func (handler *Handler) convertGenericErrorToHTTP(err error, request *http.Request) *Error {
 	switch err := err.(type) {
 	case *Error:
 		return err
@@ -133,7 +133,7 @@ func (handler *ImageHTTPHandler) convertGenericErrorToHTTP(err error, request *h
 	}
 }
 
-func (handler *ImageHTTPHandler) callErrorFunc(err error, request *http.Request) {
+func (handler *Handler) callErrorFunc(err error, request *http.Request) {
 	if handler.ErrorFunc != nil {
 		handler.ErrorFunc(err, request)
 	}

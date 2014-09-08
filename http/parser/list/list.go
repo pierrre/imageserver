@@ -1,4 +1,4 @@
-// Package list provides a list of http Parser
+// Package list provides a list of HTTP Parser
 package list
 
 import (
@@ -8,11 +8,11 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-// ListParser represents a list of http Parser
-type ListParser []imageserver_http.Parser
+// Parser represents a list of HTTP Parser
+type Parser []imageserver_http.Parser
 
 // Parse parses an http Request with sub Parsers in sequential order
-func (parser ListParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+func (parser Parser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	for _, subParser := range parser {
 		err := subParser.Parse(request, parameters)
 		if err != nil {
@@ -23,7 +23,7 @@ func (parser ListParser) Parse(request *http.Request, parameters imageserver.Par
 }
 
 // Resolve resolves the parameter with sub Parsers in sequential order
-func (parser ListParser) Resolve(parameter string) string {
+func (parser Parser) Resolve(parameter string) string {
 	for _, subParser := range parser {
 		httpParameter := imageserver_http.Resolve(subParser, parameter)
 		if httpParameter != "" {

@@ -10,16 +10,16 @@ func TestTODO(t *testing.T) {
 	t.Log("TODO")
 }
 
-func TestNativeProcessorInterface(t *testing.T) {
-	var _ imageserver_processor.Processor = &NativeProcessor{}
+func TestProcessorInterface(t *testing.T) {
+	var _ imageserver_processor.Processor = &Processor{}
 }
 
 func TestDecoderFuncInterface(t *testing.T) {
 	var _ Decoder = DecoderFunc(nil)
 }
 
-func TestProcessorFuncInterface(t *testing.T) {
-	var _ Processor = ProcessorFunc(nil)
+func TestProcessorNativeFuncInterface(t *testing.T) {
+	var _ ProcessorNative = ProcessorNativeFunc(nil)
 }
 
 func TestEncoderFuncInterface(t *testing.T) {

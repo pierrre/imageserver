@@ -11,7 +11,7 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var _ imageserver_cache.Cache = &MemcacheCache{}
+	var _ imageserver_cache.Cache = &Cache{}
 }
 
 func TestGetSet(t *testing.T) {
@@ -68,18 +68,18 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	}
 }
 
-func newTestCache(tb testing.TB) *MemcacheCache {
+func newTestCache(tb testing.TB) *Cache {
 	cache := newTestCacheWithClient(newTestClient("localhost:11211"))
 	checkTestCacheAvailable(tb, cache)
 	return cache
 }
 
-func newTestCacheInvalidServer(tb testing.TB) *MemcacheCache {
+func newTestCacheInvalidServer(tb testing.TB) *Cache {
 	return newTestCacheWithClient(newTestClient("localhost:11311"))
 }
 
-func newTestCacheWithClient(client *memcache_impl.Client) *MemcacheCache {
-	return &MemcacheCache{
+func newTestCacheWithClient(client *memcache_impl.Client) *Cache {
+	return &Cache{
 		Client: client,
 	}
 }
@@ -88,7 +88,7 @@ func newTestClient(server string) *memcache_impl.Client {
 	return memcache_impl.New(server)
 }
 
-func checkTestCacheAvailable(tb testing.TB, cache *MemcacheCache) {
+func checkTestCacheAvailable(tb testing.TB, cache *Cache) {
 	err := cache.Client.Set(&memcache_impl.Item{
 		Key:   "ping",
 		Value: []byte("ping"),

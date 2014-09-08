@@ -17,7 +17,7 @@ func (f ResolverFunc) Resolve(parameter string) string {
 
 // Resolve resolves a parameter with a potential Resolver
 //
-// If it's not a rsolver, it returns an empty string
+// If it's not a resolver, it returns an empty string
 func Resolve(i interface{}, parameter string) string {
 	if resolver, ok := i.(Resolver); ok {
 		return resolver.Resolve(parameter)

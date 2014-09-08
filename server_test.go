@@ -7,13 +7,13 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestImageServerFuncInterface(t *testing.T) {
-	var _ ImageServer = ImageServerFunc(nil)
+func TestServerFuncInterface(t *testing.T) {
+	var _ Server = ServerFunc(nil)
 }
 
-func TestImageServerFunc(t *testing.T) {
-	isf := ImageServerFunc(func(parameters Parameters) (*Image, error) {
+func TestServerFunc(t *testing.T) {
+	sf := ServerFunc(func(parameters Parameters) (*Image, error) {
 		return testdata.Medium, nil
 	})
-	isf.Get(Parameters{})
+	sf.Get(Parameters{})
 }

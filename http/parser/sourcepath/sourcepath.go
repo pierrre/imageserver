@@ -8,13 +8,13 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// SourcePathParser represents an http Parser that takes the "source" parameter from the path
-type SourcePathParser struct {
+// Parser represents an HTTP Parser that takes the "source" parameter from the path
+type Parser struct {
 	Base *url.URL
 }
 
 // Parse takes the "source" parameter from the path
-func (parser *SourcePathParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+func (parser *Parser) Parse(request *http.Request, parameters imageserver.Parameters) error {
 	s := *parser.Base
 	source := &s
 	source.Path += request.URL.Path

@@ -6,13 +6,13 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
-// ListCache represents a list of Image Cache
-type ListCache []imageserver_cache.Cache
+// Cache represents a list of Image Cache
+type Cache []imageserver_cache.Cache
 
 // Get gets an Image from caches in sequential order
 //
 // If an Image is found, previous caches are filled
-func (cache ListCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache Cache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 	for i, c := range cache {
 		image, err := c.Get(key, parameters)
 		if err == nil {
@@ -29,7 +29,7 @@ func (cache ListCache) Get(key string, parameters imageserver.Parameters) (*imag
 	return nil, &imageserver_cache.MissError{Key: key}
 }
 
-func (cache ListCache) set(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) error {
+func (cache Cache) set(key string, image *imageserver.Image, parameters imageserver.Parameters, indexLimit int) error {
 	for i := 0; i < indexLimit; i++ {
 		err := cache[i].Set(key, image, parameters)
 		if err != nil {
@@ -40,6 +40,6 @@ func (cache ListCache) set(key string, image *imageserver.Image, parameters imag
 }
 
 // Set sets the image to all caches
-func (cache ListCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache Cache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
 	return cache.set(key, image, parameters, len(cache))
 }
