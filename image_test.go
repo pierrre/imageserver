@@ -22,7 +22,7 @@ func TestImage(t *testing.T) {
 	}
 }
 
-func TestImageUnmarshalBinaryError(t *testing.T) {
+func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 	for _, image := range testdata.Images {
 		data, _ := image.MarshalBinary()
 
