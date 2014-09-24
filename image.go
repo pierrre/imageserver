@@ -59,14 +59,15 @@ func (image *Image) MarshalBinary() ([]byte, error) {
 
 // UnmarshalBinary unserializes bytes to the Image
 func (image *Image) UnmarshalBinary(data []byte) error {
-	dataStart, dataEnd := 0, 0
+	dataPosition := 0
 	readData := func(length int) ([]byte, error) {
-		dataStart = dataEnd
-		dataEnd += length
+		dataEnd := dataPosition + length
 		if dataEnd > len(data) {
 			return nil, fmt.Errorf("unexpected end of data at index %d instead of %d", len(data), dataEnd)
 		}
-		return data[dataStart:dataEnd], nil
+		d := data[dataPosition:dataEnd]
+		dataPosition = dataEnd
+		return d, nil
 	}
 
 	var imageFormatLength uint32
