@@ -59,7 +59,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
-		Cache: &cachetest.FuncCache{
+		Cache: &Func{
 			GetFunc: func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
 				return nil, &MissError{Key: key}
 			},

@@ -12,7 +12,6 @@ import (
 
 func TestInterface(t *testing.T) {
 	var _ imageserver_http.Parser = &Parser{}
-	var _ imageserver_http.Resolver = &Parser{}
 }
 
 func TestParse(t *testing.T) {

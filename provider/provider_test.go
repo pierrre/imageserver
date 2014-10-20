@@ -8,12 +8,12 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestProviderFuncInterface(t *testing.T) {
-	var _ Provider = ProviderFunc(nil)
+func TestFuncInterface(t *testing.T) {
+	var _ Provider = Func(nil)
 }
 
-func TestProviderFunc(t *testing.T) {
-	pf := ProviderFunc(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func TestFunc(t *testing.T) {
+	pf := Func(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 		return testdata.Small, nil
 	})
 	pf.Get("foo", make(imageserver.Parameters))

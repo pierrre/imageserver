@@ -17,7 +17,7 @@ func TestServer(t *testing.T) {
 		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Small, nil
 		}),
-		Processor: ProcessorFunc(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return image, nil
 		}),
 	}
@@ -35,7 +35,7 @@ func TestServerErrorServer(t *testing.T) {
 		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
-		Processor: ProcessorFunc(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return image, nil
 		}),
 	}
@@ -50,7 +50,7 @@ func TestServerErrorProcessor(t *testing.T) {
 		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return testdata.Small, nil
 		}),
-		Processor: ProcessorFunc(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}

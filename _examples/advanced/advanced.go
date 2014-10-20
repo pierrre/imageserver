@@ -12,17 +12,12 @@ import (
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
-	imageserver_cache_async "github.com/pierrre/imageserver/cache/async"
-	imageserver_cache_list "github.com/pierrre/imageserver/cache/list"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
-	imageserver_http_parser_list "github.com/pierrre/imageserver/http/parser/list"
-	imageserver_http_parser_source "github.com/pierrre/imageserver/http/parser/source"
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
-	imageserver_processor_limit "github.com/pierrre/imageserver/processor/limit"
 	imageserver_provider "github.com/pierrre/imageserver/provider"
 	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
 	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
@@ -45,13 +40,13 @@ func main() {
 		},
 		Expire: time.Duration(7 * 24 * time.Hour),
 	}
-	cache = &imageserver_cache_async.Cache{
+	cache = &imageserver_cache.Async{
 		Cache: cache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
 			log.Println("Cache error:", err)
 		},
 	}
-	cache = imageserver_cache_list.Cache{
+	cache = imageserver_cache.List{
 		imageserver_cache_memory.New(10 * 1024 * 1024),
 		cache,
 	}
@@ -73,7 +68,7 @@ func main() {
 			"gif",
 		},
 	}
-	processor = imageserver_processor_limit.New(processor, 16)
+	processor = imageserver_processor.NewLimit(processor, 16)
 
 	var server imageserver.Server
 	server = &imageserver_provider.Server{
@@ -91,8 +86,8 @@ func main() {
 
 	var handler http.Handler
 	handler = &imageserver_http.Handler{
-		Parser: &imageserver_http_parser_list.Parser{
-			&imageserver_http_parser_source.Parser{},
+		Parser: &imageserver_http.ListParser{
+			&imageserver_http.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.Parser{},
 		},
 		Server:   server,

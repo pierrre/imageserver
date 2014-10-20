@@ -121,7 +121,7 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, request *http.Reque
 	case *Error:
 		return err
 	case *imageserver.ParameterError:
-		httpParameter := Resolve(handler.Parser, err.Parameter)
+		httpParameter := handler.Parser.Resolve(err.Parameter)
 		if httpParameter == "" {
 			httpParameter = err.Parameter
 		}

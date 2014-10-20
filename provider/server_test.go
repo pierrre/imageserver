@@ -52,7 +52,7 @@ func TestServerErrorProvider(t *testing.T) {
 		"source": "test",
 	}
 	s := &Server{
-		Provider: ProviderFunc(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Provider: Func(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
 	}
