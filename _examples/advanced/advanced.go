@@ -19,8 +19,7 @@ import (
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_provider "github.com/pierrre/imageserver/provider"
-	imageserver_provider_cache "github.com/pierrre/imageserver/provider/cache"
-	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
+	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
 func main() {
@@ -51,12 +50,6 @@ func main() {
 		cache,
 	}
 
-	provider := &imageserver_provider_cache.Provider{
-		Provider:     &imageserver_provider_http.Provider{},
-		Cache:        cache,
-		KeyGenerator: imageserver_provider_cache.NewSourceHashKeyGenerator(sha256.New),
-	}
-
 	var processor imageserver_processor.Processor
 	processor = &imageserver_processor_graphicsmagick.Processor{
 		Executable: "gm",
@@ -72,7 +65,7 @@ func main() {
 
 	var server imageserver.Server
 	server = &imageserver_provider.Server{
-		Provider: provider,
+		Provider: imageserver_testdata.Provider,
 	}
 	server = &imageserver_processor.Server{
 		Server:    server,

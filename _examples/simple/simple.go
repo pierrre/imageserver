@@ -9,13 +9,13 @@ import (
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_provider "github.com/pierrre/imageserver/provider"
-	imageserver_provider_http "github.com/pierrre/imageserver/provider/http"
+	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
 func main() {
 	var server imageserver.Server
 	server = &imageserver_provider.Server{
-		Provider: &imageserver_provider_http.Provider{},
+		Provider: imageserver_testdata.Provider,
 	}
 	server = &imageserver_processor.Server{
 		Server: server,
