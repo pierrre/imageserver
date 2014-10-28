@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"sync"
 
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
@@ -56,10 +57,17 @@ func (f KeyGeneratorFunc) GetKey(source interface{}, parameters imageserver.Para
 
 // NewSourceHashKeyGenerator returns a KeyGenerator that hashes the source
 func NewSourceHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
+	pool := &sync.Pool{
+		New: func() interface{} {
+			return newHashFunc()
+		},
+	}
 	return KeyGeneratorFunc(func(source interface{}, parameters imageserver.Parameters) string {
-		hash := newHashFunc()
-		io.WriteString(hash, fmt.Sprint(source))
-		data := hash.Sum(nil)
+		h := pool.Get().(hash.Hash)
+		io.WriteString(h, fmt.Sprint(source))
+		data := h.Sum(nil)
+		h.Reset()
+		pool.Put(h)
 		return hex.EncodeToString(data)
 	})
 }

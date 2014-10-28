@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"hash"
 	"io"
+	"sync"
 
 	"github.com/pierrre/imageserver"
 )
@@ -52,10 +53,17 @@ func (f KeyGeneratorFunc) GetKey(parameters imageserver.Parameters) string {
 
 // NewParametersHashKeyGenerator returns a KeyGenerator that hashes the Parameters
 func NewParametersHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
+	pool := &sync.Pool{
+		New: func() interface{} {
+			return newHashFunc()
+		},
+	}
 	return KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
-		hash := newHashFunc()
-		io.WriteString(hash, parameters.String())
-		data := hash.Sum(nil)
+		h := pool.Get().(hash.Hash)
+		io.WriteString(h, parameters.String())
+		data := h.Sum(nil)
+		h.Reset()
+		pool.Put(h)
 		return hex.EncodeToString(data)
 	})
 }
