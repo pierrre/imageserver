@@ -68,7 +68,7 @@ func (handler *Handler) checkNotModified(writer http.ResponseWriter, request *ht
 	}
 
 	matches := inmHeaderRegexp.FindStringSubmatch(inmHeader)
-	if matches == nil {
+	if matches == nil || len(matches) != 2 {
 		return false
 	}
 	inm := matches[1]
