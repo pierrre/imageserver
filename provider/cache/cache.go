@@ -71,3 +71,14 @@ func NewSourceHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 		return hex.EncodeToString(data)
 	})
 }
+
+// PrefixKeyGenerator is a KeyGenerator that adds a prefix to the key.
+type PrefixKeyGenerator struct {
+	KeyGenerator
+	Prefix string
+}
+
+// GetKey returns the prefixed key.
+func (pkg *PrefixKeyGenerator) GetKey(source interface{}, parameters imageserver.Parameters) string {
+	return pkg.Prefix + pkg.KeyGenerator.GetKey(source, parameters)
+}
