@@ -21,7 +21,3 @@ func TestFunc(t *testing.T) {
 func TestListInterface(t *testing.T) {
 	var _ Processor = List{}
 }
-
-func TestLimitInterface(t *testing.T) {
-	var _ Processor = &Limit{}
-}

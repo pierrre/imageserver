@@ -33,28 +33,17 @@ func (l List) Process(image *imageserver.Image, parameters imageserver.Parameter
 }
 
 /*
-Limit represents an Image Processor that limits the number of concurrent executions.
+NewLimit creates a new Processor that limits the number of concurrent executions.
 
-It wraps an Image Processor and use a buffered channel to limit the number of concurrent executions.
+It uses a buffered channel to limit the number of concurrent executions.
 */
-type Limit struct {
-	Processor
-	limitChan chan struct{}
-}
-
-// NewLimit creates a Limit
-func NewLimit(processor Processor, limit uint) *Limit {
-	return &Limit{
-		Processor: processor,
-		limitChan: make(chan struct{}, limit),
-	}
-}
-
-// Process forwards the call to the wrapped Image Processor and limits the number of concurrent executions
-func (processor *Limit) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	processor.limitChan <- struct{}{}
-	defer func() {
-		<-processor.limitChan
-	}()
-	return processor.Processor.Process(image, parameters)
+func NewLimit(processor Processor, limit uint) Processor {
+	limitCh := make(chan struct{}, limit)
+	return Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		limitCh <- struct{}{}
+		defer func() {
+			<-limitCh
+		}()
+		return processor.Process(image, parameters)
+	})
 }
