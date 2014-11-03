@@ -70,3 +70,7 @@ func TestSourceParserResolve(t *testing.T) {
 func TestSourcePathParserInterface(t *testing.T) {
 	var _ Parser = &SourcePathParser{}
 }
+
+func TestSourceURLParserInterface(t *testing.T) {
+	var _ Parser = &SourceURLParser{}
+}

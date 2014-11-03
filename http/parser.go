@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -65,19 +66,44 @@ func (parser *SourceParser) Resolve(parameter string) string {
 
 // SourcePathParser represents an HTTP Parser that takes the "source" parameter from the path
 type SourcePathParser struct {
-	Base *url.URL
 }
 
 // Parse takes the "source" parameter from the path
 func (parser *SourcePathParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
-	s := *parser.Base
-	source := &s
-	source.Path += request.URL.Path
-	parameters.Set("source", source)
+	parameters.Set("source", request.URL.Path)
 	return nil
 }
 
 // Resolve resolves the "source" parameter
 func (parser *SourcePathParser) Resolve(parameter string) string {
 	return ""
+}
+
+// SourceURLParser is a Parser that takes the "source" from the sub Parser and adds it to the Base URL.
+type SourceURLParser struct {
+	Parser
+	Base *url.URL
+}
+
+// Parse implements Parser
+func (parser *SourceURLParser) Parse(request *http.Request, parameters imageserver.Parameters) error {
+	err := parser.Parser.Parse(request, parameters)
+	if err != nil {
+		return err
+	}
+	source, err := parameters.Get("source")
+	if err != nil {
+		return &imageserver.ParameterError{Parameter: "source", Message: "missing"}
+	}
+
+	u := copyURL(parser.Base)
+	u.Path += fmt.Sprint(source)
+	parameters.Set("source", u)
+
+	return nil
+}
+
+// Resolve implements Parser
+func (parser *SourceURLParser) Resolve(parameter string) string {
+	return parser.Parser.Resolve(parameter)
 }
