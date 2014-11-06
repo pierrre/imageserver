@@ -2,11 +2,9 @@ package main
 
 import (
 	"crypto/sha256"
-	//_ "expvar"
 	"flag"
 	"log"
 	"net/http"
-	//_ "net/http/pprof"
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
