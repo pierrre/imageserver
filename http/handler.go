@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"sync"
 
 	"github.com/pierrre/imageserver"
 )
@@ -141,10 +142,17 @@ func (handler *Handler) callErrorFunc(err error, request *http.Request) {
 
 // NewParametersHashETagFunc returns a function that hashes the parameters and returns an ETag value
 func NewParametersHashETagFunc(newHashFunc func() hash.Hash) func(parameters imageserver.Parameters) string {
+	pool := &sync.Pool{
+		New: func() interface{} {
+			return newHashFunc()
+		},
+	}
 	return func(parameters imageserver.Parameters) string {
-		hash := newHashFunc()
-		io.WriteString(hash, parameters.String())
-		data := hash.Sum(nil)
+		h := pool.Get().(hash.Hash)
+		io.WriteString(h, parameters.String())
+		data := h.Sum(nil)
+		h.Reset()
+		pool.Put(h)
 		return hex.EncodeToString(data)
 	}
 }
