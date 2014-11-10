@@ -11,8 +11,8 @@ services:
 before_install:
   - sudo apt-get install graphicsmagick
   - export PATH=$PATH:$GOROOT/bin:/home/travis/gopath/bin #ugly hack
-  - go get -v code.google.com/p/go.tools/cmd/cover
-  - go get -v code.google.com/p/go.tools/cmd/vet
+  - go get -v golang.org/x/tools/cmd/cover
+  - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/golang/lint/golint
 
 install: go get -v -t ./...
