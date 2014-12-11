@@ -131,7 +131,6 @@ func TestParseResponseErrorData(t *testing.T) {
 	}
 
 	_, err := provider.parseResponse(response)
-	t.Log(err)
 	if err == nil {
 		t.Fatal("no error")
 	}
