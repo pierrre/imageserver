@@ -8,10 +8,6 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-func TestTODO(t *testing.T) {
-	t.Log("TODO")
-}
-
 func TestHandlerInterface(t *testing.T) {
 	var _ http.Handler = &Handler{}
 }
