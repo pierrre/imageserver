@@ -14,11 +14,11 @@ func TestServerInterface(t *testing.T) {
 }
 
 func TestServer(t *testing.T) {
-	parameters := imageserver.Parameters{
+	params := imageserver.Params{
 		"source": testdata.MediumFileName,
 	}
 	s := createTestServer()
-	image, err := s.Get(parameters)
+	image, err := s.Get(params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,35 +28,35 @@ func TestServer(t *testing.T) {
 }
 
 func TestServerErrorMissingSource(t *testing.T) {
-	parameters := imageserver.Parameters{}
+	params := imageserver.Params{}
 	s := createTestServer()
-	_, err := s.Get(parameters)
+	_, err := s.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestServerErrorProviderSource(t *testing.T) {
-	parameters := imageserver.Parameters{
+	params := imageserver.Params{
 		"source": "foobar",
 	}
 	s := createTestServer()
-	_, err := s.Get(parameters)
+	_, err := s.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestServerErrorProvider(t *testing.T) {
-	parameters := imageserver.Parameters{
+	params := imageserver.Params{
 		"source": "test",
 	}
 	s := &Server{
-		Provider: Func(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Provider: Func(func(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
 	}
-	_, err := s.Get(parameters)
+	_, err := s.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}

@@ -35,16 +35,16 @@ func TestSourceParserParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	parameters := make(imageserver.Parameters)
+	params := make(imageserver.Params)
 
 	parser := &SourceParser{}
 
-	err = parser.Parse(request, parameters)
+	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	v, err := parameters.GetString("source")
+	v, err := params.GetString("source")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,13 +56,13 @@ func TestSourceParserParse(t *testing.T) {
 func TestSourceParserResolve(t *testing.T) {
 	parser := &SourceParser{}
 
-	httpParameter := parser.Resolve("source")
-	if httpParameter != "source" {
+	httpParam := parser.Resolve("source")
+	if httpParam != "source" {
 		t.Fatal("not equals")
 	}
 
-	httpParameter = parser.Resolve("foobar")
-	if httpParameter != "" {
+	httpParam = parser.Resolve("foobar")
+	if httpParam != "" {
 		t.Fatal("not equals")
 	}
 }

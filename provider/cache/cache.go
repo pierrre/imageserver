@@ -21,20 +21,20 @@ type Provider struct {
 }
 
 // Get returns an Image with Cache
-func (provider *Provider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	cacheKey := provider.KeyGenerator.GetKey(source, parameters)
+func (provider *Provider) Get(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
+	cacheKey := provider.KeyGenerator.GetKey(source, params)
 
-	image, err := provider.Cache.Get(cacheKey, parameters)
+	image, err := provider.Cache.Get(cacheKey, params)
 	if err == nil {
 		return image, nil
 	}
 
-	image, err = provider.Provider.Get(source, parameters)
+	image, err = provider.Provider.Get(source, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = provider.Cache.Set(cacheKey, image, parameters)
+	err = provider.Cache.Set(cacheKey, image, params)
 	if err != nil {
 		return nil, err
 	}
@@ -44,15 +44,15 @@ func (provider *Provider) Get(source interface{}, parameters imageserver.Paramet
 
 // KeyGenerator generates a Cache Key
 type KeyGenerator interface {
-	GetKey(source interface{}, parameters imageserver.Parameters) string
+	GetKey(source interface{}, params imageserver.Params) string
 }
 
 // KeyGeneratorFunc is a KeyGenerator func
-type KeyGeneratorFunc func(source interface{}, parameters imageserver.Parameters) string
+type KeyGeneratorFunc func(source interface{}, params imageserver.Params) string
 
 // GetKey calls the func
-func (f KeyGeneratorFunc) GetKey(source interface{}, parameters imageserver.Parameters) string {
-	return f(source, parameters)
+func (f KeyGeneratorFunc) GetKey(source interface{}, params imageserver.Params) string {
+	return f(source, params)
 }
 
 // NewSourceHashKeyGenerator returns a KeyGenerator that hashes the source
@@ -62,7 +62,7 @@ func NewSourceHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 			return newHashFunc()
 		},
 	}
-	return KeyGeneratorFunc(func(source interface{}, parameters imageserver.Parameters) string {
+	return KeyGeneratorFunc(func(source interface{}, params imageserver.Params) string {
 		h := pool.Get().(hash.Hash)
 		io.WriteString(h, fmt.Sprint(source))
 		data := h.Sum(nil)

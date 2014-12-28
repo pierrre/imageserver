@@ -32,11 +32,10 @@ func TestGet(t *testing.T) {
 	defer listener.Close()
 
 	source := createTestURL(listener)
-	parameters := make(imageserver.Parameters)
 
 	provider := &Provider{}
 
-	image, err := provider.Get(source, parameters)
+	image, err := provider.Get(source, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,11 +56,10 @@ func TestGetErrorNotFound(t *testing.T) {
 
 	source := createTestURL(listener)
 	source.Path += "foobar"
-	parameters := make(imageserver.Parameters)
 
 	provider := &Provider{}
 
-	_, err := provider.Get(source, parameters)
+	_, err := provider.Get(source, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -72,11 +70,10 @@ func TestGetErrorInvalidUrl(t *testing.T) {
 	defer listener.Close()
 
 	source := "foobar"
-	parameters := make(imageserver.Parameters)
 
 	provider := &Provider{}
 
-	_, err := provider.Get(source, parameters)
+	_, err := provider.Get(source, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -87,11 +84,10 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 	defer listener.Close()
 
 	source := "custom://foobar"
-	parameters := make(imageserver.Parameters)
 
 	provider := &Provider{}
 
-	_, err := provider.Get(source, parameters)
+	_, err := provider.Get(source, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -102,11 +98,10 @@ func TestGetErrorRequest(t *testing.T) {
 	defer listener.Close()
 
 	source := "http://invalidhost" + strconv.Itoa(rand.Int())
-	parameters := make(imageserver.Parameters)
 
 	provider := &Provider{}
 
-	_, err := provider.Get(source, parameters)
+	_, err := provider.Get(source, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

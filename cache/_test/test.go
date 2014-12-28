@@ -17,19 +17,14 @@ const (
 	KeyMiss = "unknown"
 )
 
-var (
-	// ParametersEmpty is an empty Parameters
-	ParametersEmpty = make(imageserver.Parameters)
-)
-
 // CacheTestGetSet is a helper to test cache Get()/Set()
 func CacheTestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.Image) {
-	err := cache.Set(KeyValid, image, ParametersEmpty)
+	err := cache.Set(KeyValid, image, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	newImage, err := cache.Get(KeyValid, ParametersEmpty)
+	newImage, err := cache.Get(KeyValid, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +43,7 @@ func CacheTestGetSetAllImages(t *testing.T, cache imageserver_cache.Cache) {
 
 // CacheTestGetErrorMiss is a helper to test cache Get() with a "cache miss" error
 func CacheTestGetErrorMiss(t *testing.T, cache imageserver_cache.Cache) {
-	_, err := cache.Get(KeyMiss, ParametersEmpty)
+	_, err := cache.Get(KeyMiss, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -71,7 +66,7 @@ func NewMapCache() *MapCache {
 }
 
 // Get gets an Image from the MapCache
-func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache *MapCache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
 
@@ -84,7 +79,7 @@ func (cache *MapCache) Get(key string, parameters imageserver.Parameters) (*imag
 }
 
 // Set sets an Image to the MapCache
-func (cache *MapCache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *MapCache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 

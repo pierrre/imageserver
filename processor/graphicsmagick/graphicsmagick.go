@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	globalParameterName = "graphicsmagick"
-	tempDirPrefix       = "imageserver_"
+	globalParamName = "graphicsmagick"
+	tempDirPrefix   = "imageserver_"
 )
 
 // Processor represents a GraphicsMagick Image Processor
@@ -30,11 +30,11 @@ type Processor struct {
 
 // Process processes Image with the GraphicsMagick command line (mogrify command)
 //
-// All parameters are extracted from the "graphicsmagick" node parameter and are optionals.
+// All params are extracted from the "graphicsmagick" node param and are optionals.
 //
 // See GraphicsMagick documentation for more information about arguments.
 //
-// Parameters
+// Params
 //
 // - width / height: sizes for "-resize" argument (both optionals)
 //
@@ -48,43 +48,43 @@ type Processor struct {
 //
 // - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
 //
-// - extent: "-extent" parameter, uses width/height parameters and add "-gravity center" argument
+// - extent: "-extent" param, uses width/height params and add "-gravity center" argument
 //
-// - format: "-format" parameter
+// - format: "-format" param
 //
-// - quality: "-quality" parameter
-func (processor *Processor) Process(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
-	parameters, err := processor.getParameters(parameters)
+// - quality: "-quality" param
+func (processor *Processor) Process(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+	params, err := processor.getParams(params)
 	if err != nil {
 		return nil, err
 	}
-	if parameters == nil || parameters.Empty() {
+	if params == nil || params.Empty() {
 		return image, nil
 	}
 
 	arguments := list.New()
 
-	width, height, err := processor.buildArgumentsResize(arguments, parameters)
+	width, height, err := processor.buildArgumentsResize(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsBackground(arguments, parameters)
+	err = processor.buildArgumentsBackground(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsExtent(arguments, parameters, width, height)
+	err = processor.buildArgumentsExtent(arguments, params, width, height)
 	if err != nil {
 		return nil, err
 	}
 
-	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, parameters, image)
+	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, params, image)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsQuality(arguments, parameters, format)
+	err = processor.buildArgumentsQuality(arguments, params, format)
 	if err != nil {
 		return nil, err
 	}
@@ -133,23 +133,23 @@ func (processor *Processor) Process(image *imageserver.Image, parameters imagese
 	return resultImage, nil
 }
 
-func (processor *Processor) getParameters(parameters imageserver.Parameters) (imageserver.Parameters, error) {
-	if !parameters.Has(globalParameterName) {
+func (processor *Processor) getParams(params imageserver.Params) (imageserver.Params, error) {
+	if !params.Has(globalParamName) {
 		return nil, nil
 	}
 
-	return parameters.GetParameters(globalParameterName)
+	return params.GetParams(globalParamName)
 }
 
-func (processor *Processor) buildArgumentsResize(arguments *list.List, parameters imageserver.Parameters) (width int, height int, err error) {
-	width, _ = parameters.GetInt("width")
+func (processor *Processor) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
+	width, _ = params.GetInt("width")
 	if width < 0 {
-		return 0, 0, newParameterError("width", "must be greater than or equal to 0")
+		return 0, 0, newParamError("width", "must be greater than or equal to 0")
 	}
 
-	height, _ = parameters.GetInt("height")
+	height, _ = params.GetInt("height")
 	if height < 0 {
-		return 0, 0, newParameterError("height", "must be greater than or equal to 0")
+		return 0, 0, newParamError("height", "must be greater than or equal to 0")
 	}
 
 	if width != 0 || height != 0 {
@@ -163,19 +163,19 @@ func (processor *Processor) buildArgumentsResize(arguments *list.List, parameter
 		}
 		resize := fmt.Sprintf("%sx%s", widthString, heightString)
 
-		if fill, _ := parameters.GetBool("fill"); fill {
+		if fill, _ := params.GetBool("fill"); fill {
 			resize = resize + "^"
 		}
 
-		if ignoreRatio, _ := parameters.GetBool("ignore_ratio"); ignoreRatio {
+		if ignoreRatio, _ := params.GetBool("ignore_ratio"); ignoreRatio {
 			resize = resize + "!"
 		}
 
-		if onlyShrinkLarger, _ := parameters.GetBool("only_shrink_larger"); onlyShrinkLarger {
+		if onlyShrinkLarger, _ := params.GetBool("only_shrink_larger"); onlyShrinkLarger {
 			resize = resize + ">"
 		}
 
-		if onlyEnlargeSmaller, _ := parameters.GetBool("only_enlarge_smaller"); onlyEnlargeSmaller {
+		if onlyEnlargeSmaller, _ := params.GetBool("only_enlarge_smaller"); onlyEnlargeSmaller {
 			resize = resize + "<"
 		}
 
@@ -186,17 +186,17 @@ func (processor *Processor) buildArgumentsResize(arguments *list.List, parameter
 	return width, height, nil
 }
 
-func (processor *Processor) buildArgumentsBackground(arguments *list.List, parameters imageserver.Parameters) error {
-	background, _ := parameters.GetString("background")
+func (processor *Processor) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
+	background, _ := params.GetString("background")
 
 	if backgroundLength := len(background); backgroundLength > 0 {
 		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			return newParameterError("background", "length must be equal to 3, 4, 6 or 8")
+			return newParamError("background", "length must be equal to 3, 4, 6 or 8")
 		}
 
 		for _, r := range background {
 			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				return newParameterError("background", "must only contain characters in 0-9a-f")
+				return newParamError("background", "must only contain characters in 0-9a-f")
 			}
 		}
 
@@ -207,9 +207,9 @@ func (processor *Processor) buildArgumentsBackground(arguments *list.List, param
 	return nil
 }
 
-func (processor *Processor) buildArgumentsExtent(arguments *list.List, parameters imageserver.Parameters, width int, height int) error {
+func (processor *Processor) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
 	if width != 0 && height != 0 {
-		if extent, _ := parameters.GetBool("extent"); extent {
+		if extent, _ := params.GetBool("extent"); extent {
 			arguments.PushBack("-gravity")
 			arguments.PushBack("center")
 
@@ -221,8 +221,8 @@ func (processor *Processor) buildArgumentsExtent(arguments *list.List, parameter
 	return nil
 }
 
-func (processor *Processor) buildArgumentsFormat(arguments *list.List, parameters imageserver.Parameters, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
-	format, _ = parameters.GetString("format")
+func (processor *Processor) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
+	format, _ = params.GetString("format")
 
 	formatSpecified = true
 	if format == "" {
@@ -239,7 +239,7 @@ func (processor *Processor) buildArgumentsFormat(arguments *list.List, parameter
 			}
 		}
 		if !ok {
-			return "", false, newParameterError("format", "not allowed")
+			return "", false, newParamError("format", "not allowed")
 		}
 	}
 
@@ -251,23 +251,23 @@ func (processor *Processor) buildArgumentsFormat(arguments *list.List, parameter
 	return format, formatSpecified, nil
 }
 
-func (processor *Processor) buildArgumentsQuality(arguments *list.List, parameters imageserver.Parameters, format string) error {
-	if !parameters.Has("quality") {
+func (processor *Processor) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
+	if !params.Has("quality") {
 		return nil
 	}
 
-	quality, err := parameters.GetInt("quality")
+	quality, err := params.GetInt("quality")
 	if err != nil {
 		return err
 	}
 
 	if quality < 0 {
-		return newParameterError("quality", "must be greater than or equal to 0")
+		return newParamError("quality", "must be greater than or equal to 0")
 	}
 
 	if format == "jpeg" {
 		if quality < 0 || quality > 100 {
-			return newParameterError("quality", "must be between 0 and 100")
+			return newParamError("quality", "must be between 0 and 100")
 		}
 	}
 
@@ -320,9 +320,9 @@ func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 	}
 }
 
-func newParameterError(parameter string, message string) *imageserver.ParameterError {
-	return &imageserver.ParameterError{
-		Parameter: fmt.Sprintf("graphicsmagick.%s", parameter),
-		Message:   message,
+func newParamError(param string, message string) *imageserver.ParamError {
+	return &imageserver.ParamError{
+		Param:   fmt.Sprintf("graphicsmagick.%s", param),
+		Message: message,
 	}
 }

@@ -24,7 +24,7 @@ type Provider struct{}
 // Returns an error if the HTTP status code is not 200 (OK).
 //
 // The image type is determined by the "Content-Type" header.
-func (provider *Provider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (provider *Provider) Get(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
 	sourceURL, err := provider.getSourceURL(source)
 	if err != nil {
 		return nil, err

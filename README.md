@@ -55,7 +55,6 @@ http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300
 
 ## TODO
 - more tests
-- add new "parameter error", convert in http
 - don't ignore error from cache
 - add GroupcacheServer
 - add timeout in LimitProcessor

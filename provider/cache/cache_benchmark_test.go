@@ -9,11 +9,11 @@ import (
 
 func BenchmarkNewSourceHashKeyGenerator(b *testing.B) {
 	source := "foobar"
-	parameters := imageserver.Parameters{}
+	params := imageserver.Params{}
 	g := NewSourceHashKeyGenerator(sha256.New)
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			g.GetKey(source, parameters)
+			g.GetKey(source, params)
 		}
 	})
 }

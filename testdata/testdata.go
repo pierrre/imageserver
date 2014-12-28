@@ -49,7 +49,7 @@ func initDir() string {
 
 type testDataProvider struct{}
 
-func (provider *testDataProvider) Get(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (provider *testDataProvider) Get(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
 	name, ok := source.(string)
 	if !ok {
 		return nil, &imageserver_provider.SourceError{Message: "not a string"}

@@ -7,12 +7,12 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-func BenchmarkNewParametersHashKeyGenerator(b *testing.B) {
-	parameters := imageserver.Parameters{"foo": "bar"}
-	g := NewParametersHashKeyGenerator(sha256.New)
+func BenchmarkNewParamsHashKeyGenerator(b *testing.B) {
+	params := imageserver.Params{"foo": "bar"}
+	g := NewParamsHashKeyGenerator(sha256.New)
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			g.GetKey(parameters)
+			g.GetKey(params)
 		}
 	})
 }

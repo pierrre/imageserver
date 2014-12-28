@@ -12,8 +12,7 @@ func TestServerFuncInterface(t *testing.T) {
 }
 
 func TestServerFunc(t *testing.T) {
-	sf := ServerFunc(func(parameters Parameters) (*Image, error) {
+	ServerFunc(func(params Params) (*Image, error) {
 		return testdata.Medium, nil
-	})
-	sf.Get(Parameters{})
+	}).Get(Params{})
 }

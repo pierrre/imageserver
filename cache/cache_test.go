@@ -32,12 +32,12 @@ func TestAsyncGetSet(t *testing.T) {
 
 	setCallCh := make(chan struct{})
 	funcCache := &Func{
-		GetFunc: func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
-			return mapCache.Get(key, parameters)
+		GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+			return mapCache.Get(key, params)
 		},
-		SetFunc: func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+		SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
 			setCallCh <- struct{}{}
-			return mapCache.Set(key, image, parameters)
+			return mapCache.Set(key, image, params)
 		},
 	}
 
@@ -45,12 +45,12 @@ func TestAsyncGetSet(t *testing.T) {
 		Cache: funcCache,
 	}
 
-	err := asyncCache.Set("foo", testdata.Small, cachetest.ParametersEmpty)
+	err := asyncCache.Set("foo", testdata.Small, imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}
 	<-setCallCh
-	_, err = asyncCache.Get("foo", cachetest.ParametersEmpty)
+	_, err = asyncCache.Get("foo", imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func TestAsyncGetSet(t *testing.T) {
 
 func TestAsyncSetErrFunc(t *testing.T) {
 	funcCache := &Func{
-		SetFunc: func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+		SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
 			return fmt.Errorf("error")
 		},
 	}
@@ -66,12 +66,12 @@ func TestAsyncSetErrFunc(t *testing.T) {
 	errFuncCallCh := make(chan struct{})
 	asyncCache := &Async{
 		Cache: funcCache,
-		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
+		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
 			errFuncCallCh <- struct{}{}
 		},
 	}
 
-	err := asyncCache.Set("foo", testdata.Small, cachetest.ParametersEmpty)
+	err := asyncCache.Set("foo", testdata.Small, imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}
@@ -90,11 +90,11 @@ func TestPrefixSet(t *testing.T) {
 	c := cachetest.NewMapCache()
 	pc := &Prefix{Cache: c, Prefix: "foo"}
 
-	err := pc.Set("bar", testdata.Medium, cachetest.ParametersEmpty)
+	err := pc.Set("bar", testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = c.Get("foobar", cachetest.ParametersEmpty)
+	_, err = c.Get("foobar", imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,11 +104,11 @@ func TestPrefixGet(t *testing.T) {
 	c := cachetest.NewMapCache()
 	pc := &Prefix{Cache: c, Prefix: "foo"}
 
-	err := c.Set("foobar", testdata.Medium, cachetest.ParametersEmpty)
+	err := c.Set("foobar", testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = pc.Get("bar", cachetest.ParametersEmpty)
+	_, err = pc.Get("bar", imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}

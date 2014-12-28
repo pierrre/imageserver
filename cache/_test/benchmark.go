@@ -10,8 +10,7 @@ import (
 // CacheBenchmarkGet is a helper to benchmark cache Get()
 func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, image *imageserver.Image) {
 	key := "test"
-	parameters := make(imageserver.Parameters)
-	err := cache.Set(key, image, parameters)
+	err := cache.Set(key, image, imageserver.Params{})
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -20,7 +19,7 @@ func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, image *image
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := cache.Get(key, parameters)
+			_, err := cache.Get(key, imageserver.Params{})
 			if err != nil {
 				b.Fatal(err)
 			}

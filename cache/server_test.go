@@ -17,19 +17,19 @@ func TestServerInterface(t *testing.T) {
 
 func TestServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: cachetest.NewMapCache(),
-		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
 			return "test"
 		}),
 	}
-	image1, err := s.Get(imageserver.Parameters{})
+	image1, err := s.Get(imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	image2, err := s.Get(imageserver.Parameters{})
+	image2, err := s.Get(imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,15 +40,15 @@ func TestServer(t *testing.T) {
 
 func TestServerErrorServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
 		Cache: cachetest.NewMapCache(),
-		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
 			return "test"
 		}),
 	}
-	_, err := s.Get(imageserver.Parameters{})
+	_, err := s.Get(imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -56,22 +56,22 @@ func TestServerErrorServer(t *testing.T) {
 
 func TestServerErrorCacheSet(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: &Func{
-			GetFunc: func(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &MissError{Key: key}
 			},
-			SetFunc: func(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
 				return errors.New("error")
 			},
 		},
-		KeyGenerator: KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
 			return "test"
 		}),
 	}
-	_, err := s.Get(imageserver.Parameters{})
+	_, err := s.Get(imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -81,10 +81,8 @@ func TestKeyGeneratorFuncInterface(t *testing.T) {
 	var _ KeyGenerator = KeyGeneratorFunc(nil)
 }
 
-func TestNewParametersHashKeyGenerator(t *testing.T) {
-	g := NewParametersHashKeyGenerator(sha256.New)
-	parameters := imageserver.Parameters{
+func TestNewParamsHashKeyGenerator(t *testing.T) {
+	NewParamsHashKeyGenerator(sha256.New).GetKey(imageserver.Params{
 		"foo": "bar",
-	}
-	g.GetKey(parameters)
+	})
 }

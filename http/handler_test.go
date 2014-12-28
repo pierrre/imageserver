@@ -12,10 +12,8 @@ func TestHandlerInterface(t *testing.T) {
 	var _ http.Handler = &Handler{}
 }
 
-func TestNewParametersHashETagFunc(t *testing.T) {
-	f := NewParametersHashETagFunc(sha256.New)
-	parameters := imageserver.Parameters{
+func TestNewParamsHashETagFunc(t *testing.T) {
+	NewParamsHashETagFunc(sha256.New)(imageserver.Params{
 		"foo": "bar",
-	}
-	f(parameters)
+	})
 }

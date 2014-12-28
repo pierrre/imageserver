@@ -5,6 +5,7 @@ import (
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
+	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
@@ -35,7 +36,7 @@ func TestGetErrorAddress(t *testing.T) {
 	cache := newTestCacheInvalidAddress(t)
 	defer cache.Close()
 
-	_, err := cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
+	_, err := cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -45,7 +46,7 @@ func TestSetErrorAddress(t *testing.T) {
 	cache := newTestCacheInvalidAddress(t)
 	defer cache.Close()
 
-	err := cache.Set(cachetest.KeyValid, testdata.Medium, cachetest.ParametersEmpty)
+	err := cache.Set(cachetest.KeyValid, testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -63,7 +64,7 @@ func TestGetErrorUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = cache.Get(cachetest.KeyValid, cachetest.ParametersEmpty)
+	_, err = cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

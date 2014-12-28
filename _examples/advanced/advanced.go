@@ -39,7 +39,7 @@ func main() {
 	}
 	cache = &imageserver_cache.Async{
 		Cache: cache,
-		ErrFunc: func(err error, key string, image *imageserver.Image, parameters imageserver.Parameters) {
+		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
 			log.Println("Cache error:", err)
 		},
 	}
@@ -72,7 +72,7 @@ func main() {
 	server = &imageserver_cache.Server{
 		Server:       server,
 		Cache:        cache,
-		KeyGenerator: imageserver_cache.NewParametersHashKeyGenerator(sha256.New),
+		KeyGenerator: imageserver_cache.NewParamsHashKeyGenerator(sha256.New),
 	}
 
 	var handler http.Handler
@@ -82,7 +82,7 @@ func main() {
 			&imageserver_http_parser_graphicsmagick.Parser{},
 		},
 		Server:   server,
-		ETagFunc: imageserver_http.NewParametersHashETagFunc(sha256.New),
+		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
 		},

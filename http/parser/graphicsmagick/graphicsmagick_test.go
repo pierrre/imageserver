@@ -46,22 +46,22 @@ func TestParse(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	parameters := make(imageserver.Parameters)
+	params := make(imageserver.Params)
 
 	parser := &Parser{}
 
-	err = parser.Parse(request, parameters)
+	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gmParameters, err := parameters.GetParameters("graphicsmagick")
+	gmParams, err := params.GetParams("graphicsmagick")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for k, v := range urlParams {
-		param, err := gmParameters.Get(k)
+		param, err := gmParams.Get(k)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -84,11 +84,11 @@ func TestParseEmpty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	parameters := make(imageserver.Parameters)
+	params := make(imageserver.Params)
 
 	parser := &Parser{}
 
-	err = parser.Parse(request, parameters)
+	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,9 +123,9 @@ func TestParseError(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		parameters := make(imageserver.Parameters)
+		params := make(imageserver.Params)
 
-		err = parser.Parse(request, parameters)
+		err = parser.Parse(request, params)
 		if err == nil {
 			t.Fatal("no error")
 		}
@@ -135,13 +135,13 @@ func TestParseError(t *testing.T) {
 func TestResolve(t *testing.T) {
 	parser := &Parser{}
 
-	httpParameter := parser.Resolve("graphicsmagick.foo")
-	if httpParameter != "foo" {
+	httpParam := parser.Resolve("graphicsmagick.foo")
+	if httpParam != "foo" {
 		t.Fatal("not equals")
 	}
 
-	httpParameter = parser.Resolve("bar")
-	if httpParameter != "" {
+	httpParam = parser.Resolve("bar")
+	if httpParam != "" {
 		t.Fatal("not equals")
 	}
 }

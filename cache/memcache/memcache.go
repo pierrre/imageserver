@@ -15,7 +15,7 @@ type Cache struct {
 }
 
 // Get gets an Image from Memcache
-func (cache *Cache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (cache *Cache) getData(key string) ([]byte, error) {
 }
 
 // Set sets an Image to Memcache
-func (cache *Cache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *Cache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	data, _ := image.MarshalBinary()
 
 	err := cache.setData(key, data)

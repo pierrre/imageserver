@@ -14,14 +14,14 @@ func TestServerInterface(t *testing.T) {
 
 func TestServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Small, nil
 		}),
-		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 			return image, nil
 		}),
 	}
-	image, err := s.Get(make(imageserver.Parameters))
+	image, err := s.Get(imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,14 +32,14 @@ func TestServer(t *testing.T) {
 
 func TestServerErrorServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
-		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 			return image, nil
 		}),
 	}
-	_, err := s.Get(make(imageserver.Parameters))
+	_, err := s.Get(imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -47,14 +47,14 @@ func TestServerErrorServer(t *testing.T) {
 
 func TestServerErrorProcessor(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Small, nil
 		}),
-		Processor: Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+		Processor: Func(func(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
-	_, err := s.Get(make(imageserver.Parameters))
+	_, err := s.Get(imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

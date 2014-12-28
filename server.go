@@ -3,13 +3,13 @@ package imageserver
 
 // Server is an interface for an Image server
 type Server interface {
-	Get(Parameters) (*Image, error)
+	Get(Params) (*Image, error)
 }
 
 // ServerFunc is a Server func
-type ServerFunc func(parameters Parameters) (*Image, error)
+type ServerFunc func(params Params) (*Image, error)
 
 // Get calls the func
-func (f ServerFunc) Get(parameters Parameters) (*Image, error) {
-	return f(parameters)
+func (f ServerFunc) Get(params Params) (*Image, error) {
+	return f(params)
 }

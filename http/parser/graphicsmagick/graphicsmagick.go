@@ -16,88 +16,88 @@ type Parser struct{}
 
 // Parse parses an http Request for GraphicsMagickProcessor
 //
-// See Processor for parameters list.
-func (parser *Parser) Parse(request *http.Request, parameters imageserver.Parameters) error {
-	p := make(imageserver.Parameters)
-	parameters.Set("graphicsmagick", p)
-	parameters = p
+// See Processor for params list.
+func (parser *Parser) Parse(request *http.Request, params imageserver.Params) error {
+	p := make(imageserver.Params)
+	params.Set("graphicsmagick", p)
+	params = p
 
 	query := request.URL.Query()
-	if err := parser.parseInt(query, parameters, "width"); err != nil {
+	if err := parser.parseInt(query, params, "width"); err != nil {
 		return err
 	}
-	if err := parser.parseInt(query, parameters, "height"); err != nil {
+	if err := parser.parseInt(query, params, "height"); err != nil {
 		return err
 	}
-	if err := parser.parseBool(query, parameters, "fill"); err != nil {
+	if err := parser.parseBool(query, params, "fill"); err != nil {
 		return err
 	}
-	if err := parser.parseBool(query, parameters, "ignore_ratio"); err != nil {
+	if err := parser.parseBool(query, params, "ignore_ratio"); err != nil {
 		return err
 	}
-	if err := parser.parseBool(query, parameters, "only_shrink_larger"); err != nil {
+	if err := parser.parseBool(query, params, "only_shrink_larger"); err != nil {
 		return err
 	}
-	if err := parser.parseBool(query, parameters, "only_enlarge_smaller"); err != nil {
+	if err := parser.parseBool(query, params, "only_enlarge_smaller"); err != nil {
 		return err
 	}
-	parser.parseString(query, parameters, "background")
-	if err := parser.parseBool(query, parameters, "extent"); err != nil {
+	parser.parseString(query, params, "background")
+	if err := parser.parseBool(query, params, "extent"); err != nil {
 		return err
 	}
-	parser.parseString(query, parameters, "format")
-	if err := parser.parseInt(query, parameters, "quality"); err != nil {
+	parser.parseString(query, params, "format")
+	if err := parser.parseInt(query, params, "quality"); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (parser *Parser) parseString(query url.Values, parameters imageserver.Parameters, parameterName string) {
-	parameter := query.Get(parameterName)
-	if parameter == "" {
+func (parser *Parser) parseString(query url.Values, params imageserver.Params, paramName string) {
+	param := query.Get(paramName)
+	if param == "" {
 		return
 	}
-	parameters[parameterName] = parameter
+	params[paramName] = param
 	return
 }
 
-func (parser *Parser) parseInt(query url.Values, parameters imageserver.Parameters, parameterName string) error {
-	parameterString := query.Get(parameterName)
-	if parameterString == "" {
+func (parser *Parser) parseInt(query url.Values, params imageserver.Params, paramName string) error {
+	paramString := query.Get(paramName)
+	if paramString == "" {
 		return nil
 	}
-	parameter, err := strconv.Atoi(parameterString)
+	param, err := strconv.Atoi(paramString)
 	if err != nil {
-		return parser.newParseError(parameterName, "int")
+		return parser.newParseError(paramName, "int")
 	}
-	parameters[parameterName] = parameter
+	params[paramName] = param
 	return nil
 }
 
-func (parser *Parser) parseBool(query url.Values, parameters imageserver.Parameters, parameterName string) error {
-	parameterString := query.Get(parameterName)
-	if parameterString == "" {
+func (parser *Parser) parseBool(query url.Values, params imageserver.Params, paramName string) error {
+	paramString := query.Get(paramName)
+	if paramString == "" {
 		return nil
 	}
-	parameter, err := strconv.ParseBool(parameterString)
+	param, err := strconv.ParseBool(paramString)
 	if err != nil {
-		return parser.newParseError(parameterName, "bool")
+		return parser.newParseError(paramName, "bool")
 	}
-	parameters[parameterName] = parameter
+	params[paramName] = param
 	return nil
 }
 
-func (parser *Parser) newParseError(parameterName string, parseType string) *imageserver.ParameterError {
-	return &imageserver.ParameterError{
-		Parameter: fmt.Sprintf("graphicsmagick.%s", parameterName),
-		Message:   fmt.Sprintf("parse %s error", parseType),
+func (parser *Parser) newParseError(paramName string, parseType string) *imageserver.ParamError {
+	return &imageserver.ParamError{
+		Param:   fmt.Sprintf("graphicsmagick.%s", paramName),
+		Message: fmt.Sprintf("parse %s error", parseType),
 	}
 }
 
-// Resolve resolves GraphicsMagick's parameters
-func (parser *Parser) Resolve(parameter string) string {
-	if !strings.HasPrefix(parameter, "graphicsmagick.") {
+// Resolve resolves GraphicsMagick's params
+func (parser *Parser) Resolve(param string) string {
+	if !strings.HasPrefix(param, "graphicsmagick.") {
 		return ""
 	}
-	return strings.TrimPrefix(parameter, "graphicsmagick.")
+	return strings.TrimPrefix(param, "graphicsmagick.")
 }

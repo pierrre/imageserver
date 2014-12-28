@@ -18,5 +18,5 @@ func TestKeyGeneratorFuncInterface(t *testing.T) {
 
 func TestNewSourceHashKeyGenerator(t *testing.T) {
 	g := NewSourceHashKeyGenerator(sha256.New)
-	g.GetKey("foobar", imageserver.Parameters{})
+	g.GetKey("foobar", imageserver.Params{})
 }

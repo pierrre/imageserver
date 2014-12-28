@@ -17,20 +17,20 @@ type Server struct {
 }
 
 // Get wraps the call to the underlying Server and Get from/Set to the Cache
-func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
-	key := s.KeyGenerator.GetKey(parameters)
+func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+	key := s.KeyGenerator.GetKey(params)
 
-	image, err := s.Cache.Get(key, parameters)
+	image, err := s.Cache.Get(key, params)
 	if err == nil {
 		return image, nil
 	}
 
-	image, err = s.Server.Get(parameters)
+	image, err = s.Server.Get(params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.Cache.Set(key, image, parameters)
+	err = s.Cache.Set(key, image, params)
 	if err != nil {
 		return nil, err
 	}
@@ -40,27 +40,27 @@ func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, err
 
 // KeyGenerator generates a Cache key
 type KeyGenerator interface {
-	GetKey(imageserver.Parameters) string
+	GetKey(imageserver.Params) string
 }
 
 // KeyGeneratorFunc is a KeyGenerator func
-type KeyGeneratorFunc func(imageserver.Parameters) string
+type KeyGeneratorFunc func(imageserver.Params) string
 
 // GetKey calls the func
-func (f KeyGeneratorFunc) GetKey(parameters imageserver.Parameters) string {
-	return f(parameters)
+func (f KeyGeneratorFunc) GetKey(params imageserver.Params) string {
+	return f(params)
 }
 
-// NewParametersHashKeyGenerator returns a KeyGenerator that hashes the Parameters
-func NewParametersHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
+// NewParamsHashKeyGenerator returns a KeyGenerator that hashes the Params
+func NewParamsHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 	pool := &sync.Pool{
 		New: func() interface{} {
 			return newHashFunc()
 		},
 	}
-	return KeyGeneratorFunc(func(parameters imageserver.Parameters) string {
+	return KeyGeneratorFunc(func(params imageserver.Params) string {
 		h := pool.Get().(hash.Hash)
-		io.WriteString(h, parameters.String())
+		io.WriteString(h, params.String())
 		data := h.Sum(nil)
 		h.Reset()
 		pool.Put(h)

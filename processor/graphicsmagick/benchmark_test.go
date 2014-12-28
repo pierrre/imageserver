@@ -28,8 +28,8 @@ func BenchmarkResizeAnimated(b *testing.B) {
 }
 
 func benchmarkResize(b *testing.B, image *imageserver.Image) {
-	parameters := imageserver.Parameters{
-		"graphicsmagick": imageserver.Parameters{
+	params := imageserver.Params{
+		"graphicsmagick": imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},
@@ -41,7 +41,7 @@ func benchmarkResize(b *testing.B, image *imageserver.Image) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := processor.Process(image, parameters)
+			_, err := processor.Process(image, params)
 			if err != nil {
 				b.Fatal(err)
 			}

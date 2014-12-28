@@ -13,8 +13,7 @@ func TestFuncInterface(t *testing.T) {
 }
 
 func TestFunc(t *testing.T) {
-	pf := Func(func(source interface{}, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	Func(func(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
 		return testdata.Small, nil
-	})
-	pf.Get("foo", make(imageserver.Parameters))
+	}).Get("foo", imageserver.Params{})
 }

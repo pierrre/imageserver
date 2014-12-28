@@ -9,17 +9,17 @@ type Server struct {
 	Provider Provider
 }
 
-// Get get an Image from the Provider using the "source" parameter
-func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
-	source, err := parameters.Get("source")
+// Get get an Image from the Provider using the "source" param
+func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+	source, err := params.Get("source")
 	if err != nil {
-		return nil, newSourceParameterError("missing")
+		return nil, newSourceParamError("missing")
 	}
 
-	image, err := s.Provider.Get(source, parameters)
+	image, err := s.Provider.Get(source, params)
 	if err != nil {
 		if err, ok := err.(*SourceError); ok {
-			return nil, newSourceParameterError(err.Message)
+			return nil, newSourceParamError(err.Message)
 		}
 		return nil, err
 	}
@@ -27,6 +27,6 @@ func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, err
 	return image, nil
 }
 
-func newSourceParameterError(message string) error {
-	return &imageserver.ParameterError{Parameter: "source", Message: message}
+func newSourceParamError(message string) error {
+	return &imageserver.ParamError{Param: "source", Message: message}
 }

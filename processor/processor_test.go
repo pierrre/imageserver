@@ -12,10 +12,9 @@ func TestFuncInterface(t *testing.T) {
 }
 
 func TestFunc(t *testing.T) {
-	pf := Func(func(image *imageserver.Image, parameters imageserver.Parameters) (*imageserver.Image, error) {
+	Func(func(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 		return image, nil
-	})
-	pf.Process(testdata.Small, make(imageserver.Parameters))
+	}).Process(testdata.Small, imageserver.Params{})
 }
 
 func TestListInterface(t *testing.T) {

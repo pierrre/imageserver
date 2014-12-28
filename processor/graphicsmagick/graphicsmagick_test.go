@@ -16,8 +16,8 @@ func TestInterface(t *testing.T) {
 func TestProcess(t *testing.T) {
 	image := testdata.Medium
 
-	parameters := imageserver.Parameters{
-		"graphicsmagick": imageserver.Parameters{
+	params := imageserver.Params{
+		"graphicsmagick": imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},
@@ -27,7 +27,7 @@ func TestProcess(t *testing.T) {
 		Executable: "gm",
 	}
 
-	_, err := processor.Process(image, parameters)
+	_, err := processor.Process(image, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,8 +36,8 @@ func TestProcess(t *testing.T) {
 func TestProcessErrorTimeout(t *testing.T) {
 	image := testdata.Medium
 
-	parameters := imageserver.Parameters{
-		"graphicsmagick": imageserver.Parameters{
+	params := imageserver.Params{
+		"graphicsmagick": imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},
@@ -48,7 +48,7 @@ func TestProcessErrorTimeout(t *testing.T) {
 		Timeout:    1 * time.Nanosecond,
 	}
 
-	_, err := processor.Process(image, parameters)
+	_, err := processor.Process(image, params)
 	if err == nil {
 		t.Fatal("no error")
 	}

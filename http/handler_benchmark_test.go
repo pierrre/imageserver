@@ -7,12 +7,12 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-func BenchmarkNewParametersHashETagFunc(b *testing.B) {
-	parameters := imageserver.Parameters{"foo": "bar"}
-	f := NewParametersHashETagFunc(sha256.New)
+func BenchmarkNewParamsHashETagFunc(b *testing.B) {
+	params := imageserver.Params{"foo": "bar"}
+	f := NewParamsHashETagFunc(sha256.New)
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			f(parameters)
+			f(params)
 		}
 	})
 }

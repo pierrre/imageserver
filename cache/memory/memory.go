@@ -24,7 +24,7 @@ func New(capacity int64) *Cache {
 }
 
 // Get gets an image from the in-memory Cache
-func (cache *Cache) Get(key string, parameters imageserver.Parameters) (*imageserver.Image, error) {
+func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
 		return nil, &imageserver_cache.MissError{Key: key}
@@ -35,7 +35,7 @@ func (cache *Cache) Get(key string, parameters imageserver.Parameters) (*imagese
 }
 
 // Set sets an Image to the in-memory Cache
-func (cache *Cache) Set(key string, image *imageserver.Image, parameters imageserver.Parameters) error {
+func (cache *Cache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	item := &item{
 		image: image,
 	}

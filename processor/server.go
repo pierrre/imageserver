@@ -11,13 +11,13 @@ type Server struct {
 }
 
 // Get gets an Image from the underlying Server, then processes it with the Processor
-func (s *Server) Get(parameters imageserver.Parameters) (*imageserver.Image, error) {
-	image, err := s.Server.Get(parameters)
+func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+	image, err := s.Server.Get(params)
 	if err != nil {
 		return nil, err
 	}
 
-	image, err = s.Processor.Process(image, parameters)
+	image, err = s.Processor.Process(image, params)
 	if err != nil {
 		return nil, err
 	}

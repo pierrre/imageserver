@@ -18,10 +18,10 @@ var inmHeaderRegexp = regexp.MustCompile("^\"(.+)\"$")
 
 // Handler represents an HTTP Handler for imageserver.Server
 type Handler struct {
-	Parser    Parser                                         // parse request to Parameters
-	Server    imageserver.Server                             // handle image requests
-	ETagFunc  func(parameters imageserver.Parameters) string // optional
-	ErrorFunc func(err error, request *http.Request)         // allows to handle internal errors, optional
+	Parser    Parser                                 // parse request to Params
+	Server    imageserver.Server                     // handle image requests
+	ETagFunc  func(params imageserver.Params) string // optional
+	ErrorFunc func(err error, request *http.Request) // allows to handle internal errors, optional
 }
 
 // ServeHTTP implements the HTTP Handler interface
@@ -36,29 +36,29 @@ func (handler *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	parameters := make(imageserver.Parameters)
-	if err := handler.Parser.Parse(request, parameters); err != nil {
+	params := make(imageserver.Params)
+	if err := handler.Parser.Parse(request, params); err != nil {
 		handler.sendError(writer, request, err)
 		return
 	}
 
-	if handler.checkNotModified(writer, request, parameters) {
+	if handler.checkNotModified(writer, request, params) {
 		return
 	}
 
-	image, err := handler.Server.Get(parameters)
+	image, err := handler.Server.Get(params)
 	if err != nil {
 		handler.sendError(writer, request, err)
 		return
 	}
 
-	if err := handler.sendImage(writer, request, parameters, image); err != nil {
+	if err := handler.sendImage(writer, request, params, image); err != nil {
 		handler.callErrorFunc(err, request)
 		return
 	}
 }
 
-func (handler *Handler) checkNotModified(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) bool {
+func (handler *Handler) checkNotModified(writer http.ResponseWriter, request *http.Request, params imageserver.Params) bool {
 	if handler.ETagFunc == nil {
 		return false
 	}
@@ -74,18 +74,18 @@ func (handler *Handler) checkNotModified(writer http.ResponseWriter, request *ht
 	}
 	inm := matches[1]
 
-	etag := handler.ETagFunc(parameters)
+	etag := handler.ETagFunc(params)
 	if inm != etag {
 		return false
 	}
 
-	handler.setImageHeaderCommon(writer, request, parameters)
+	handler.setImageHeaderCommon(writer, request, params)
 	writer.WriteHeader(http.StatusNotModified)
 	return true
 }
 
-func (handler *Handler) sendImage(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters, image *imageserver.Image) error {
-	handler.setImageHeaderCommon(writer, request, parameters)
+func (handler *Handler) sendImage(writer http.ResponseWriter, request *http.Request, params imageserver.Params, image *imageserver.Image) error {
+	handler.setImageHeaderCommon(writer, request, params)
 
 	if image.Format != "" {
 		writer.Header().Set("Content-Type", "image/"+image.Format)
@@ -102,13 +102,13 @@ func (handler *Handler) sendImage(writer http.ResponseWriter, request *http.Requ
 	return nil
 }
 
-func (handler *Handler) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, parameters imageserver.Parameters) {
+func (handler *Handler) setImageHeaderCommon(writer http.ResponseWriter, request *http.Request, params imageserver.Params) {
 	header := writer.Header()
 
 	header.Set("Cache-Control", "public")
 
 	if handler.ETagFunc != nil {
-		header.Set("ETag", fmt.Sprintf("\"%s\"", handler.ETagFunc(parameters)))
+		header.Set("ETag", fmt.Sprintf("\"%s\"", handler.ETagFunc(params)))
 	}
 }
 
@@ -121,12 +121,12 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, request *http.Reque
 	switch err := err.(type) {
 	case *Error:
 		return err
-	case *imageserver.ParameterError:
-		httpParameter := handler.Parser.Resolve(err.Parameter)
-		if httpParameter == "" {
-			httpParameter = err.Parameter
+	case *imageserver.ParamError:
+		httpParam := handler.Parser.Resolve(err.Param)
+		if httpParam == "" {
+			httpParam = err.Param
 		}
-		text := fmt.Sprintf("invalid parameter \"%s\": %s", httpParameter, err.Message)
+		text := fmt.Sprintf("invalid param \"%s\": %s", httpParam, err.Message)
 		return &Error{Code: http.StatusBadRequest, Text: text}
 	default:
 		handler.callErrorFunc(err, request)
@@ -140,16 +140,16 @@ func (handler *Handler) callErrorFunc(err error, request *http.Request) {
 	}
 }
 
-// NewParametersHashETagFunc returns a function that hashes the parameters and returns an ETag value
-func NewParametersHashETagFunc(newHashFunc func() hash.Hash) func(parameters imageserver.Parameters) string {
+// NewParamsHashETagFunc returns a function that hashes the params and returns an ETag value
+func NewParamsHashETagFunc(newHashFunc func() hash.Hash) func(params imageserver.Params) string {
 	pool := &sync.Pool{
 		New: func() interface{} {
 			return newHashFunc()
 		},
 	}
-	return func(parameters imageserver.Parameters) string {
+	return func(params imageserver.Params) string {
 		h := pool.Get().(hash.Hash)
-		io.WriteString(h, parameters.String())
+		io.WriteString(h, params.String())
 		data := h.Sum(nil)
 		h.Reset()
 		pool.Put(h)
