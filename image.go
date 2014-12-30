@@ -45,10 +45,9 @@ func NewImageUnmarshalBinary(marshalledData []byte) (*Image, error) {
 func (image *Image) MarshalBinary() ([]byte, error) {
 	buffer := new(bytes.Buffer)
 
-	formatBytes := []byte(image.Format)
-	formatLen := uint32(len(formatBytes))
+	formatLen := uint32(len(image.Format))
 	binary.Write(buffer, binary.LittleEndian, &formatLen)
-	buffer.Write(formatBytes)
+	buffer.Write([]byte(image.Format))
 
 	dataLen := uint32(len(image.Data))
 	binary.Write(buffer, binary.LittleEndian, &dataLen)
