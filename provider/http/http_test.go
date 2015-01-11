@@ -66,9 +66,6 @@ func TestGetErrorNotFound(t *testing.T) {
 }
 
 func TestGetErrorInvalidUrl(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-
 	source := "foobar"
 
 	provider := &Provider{}
@@ -80,9 +77,6 @@ func TestGetErrorInvalidUrl(t *testing.T) {
 }
 
 func TestGetErrorInvalidUrlScheme(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-
 	source := "custom://foobar"
 
 	provider := &Provider{}
@@ -94,9 +88,6 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 }
 
 func TestGetErrorRequest(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-
 	source := "http://invalidhost" + strconv.Itoa(rand.Int())
 
 	provider := &Provider{}
