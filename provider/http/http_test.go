@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strconv"
 	"testing"
 	"time"
 
@@ -88,7 +87,7 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 }
 
 func TestGetErrorRequest(t *testing.T) {
-	source := "http://invalidhost" + strconv.Itoa(rand.Int())
+	source := "http://localhost:123456"
 
 	provider := &Provider{}
 
