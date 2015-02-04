@@ -42,8 +42,8 @@ http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300
 [![Build Status](https://travis-ci.org/pierrre/imageserver.png?branch=master)](https://travis-ci.org/pierrre/imageserver)
 
 ## Examples
-- [Simple](https://github.com/pierrre/imageserver/blob/master/_examples/simple/simple.go)
-- [Advanced](https://github.com/pierrre/imageserver/blob/master/_examples/advanced/advanced.go)
+- [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
+- [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
 
 ## Documentation
 - http://godoc.org/github.com/pierrre/imageserver
