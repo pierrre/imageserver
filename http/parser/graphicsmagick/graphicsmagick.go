@@ -2,13 +2,11 @@
 package graphicsmagick
 
 import (
-	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/pierrre/imageserver"
+	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
 // Parser represents a GraphicsMagick HTTP Parser
@@ -19,79 +17,47 @@ type Parser struct{}
 // See Processor for params list.
 func (parser *Parser) Parse(request *http.Request, params imageserver.Params) error {
 	p := make(imageserver.Params)
-	params.Set("graphicsmagick", p)
-	params = p
-
-	query := request.URL.Query()
-	if err := parser.parseInt(query, params, "width"); err != nil {
-		return err
-	}
-	if err := parser.parseInt(query, params, "height"); err != nil {
-		return err
-	}
-	if err := parser.parseBool(query, params, "fill"); err != nil {
-		return err
-	}
-	if err := parser.parseBool(query, params, "ignore_ratio"); err != nil {
-		return err
-	}
-	if err := parser.parseBool(query, params, "only_shrink_larger"); err != nil {
-		return err
-	}
-	if err := parser.parseBool(query, params, "only_enlarge_smaller"); err != nil {
-		return err
-	}
-	parser.parseString(query, params, "background")
-	if err := parser.parseBool(query, params, "extent"); err != nil {
-		return err
-	}
-	parser.parseString(query, params, "format")
-	if err := parser.parseInt(query, params, "quality"); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (parser *Parser) parseString(query url.Values, params imageserver.Params, paramName string) {
-	param := query.Get(paramName)
-	if param == "" {
-		return
-	}
-	params[paramName] = param
-	return
-}
-
-func (parser *Parser) parseInt(query url.Values, params imageserver.Params, paramName string) error {
-	paramString := query.Get(paramName)
-	if paramString == "" {
-		return nil
-	}
-	param, err := strconv.Atoi(paramString)
+	err := parser.parse(request, p)
 	if err != nil {
-		return parser.newParseError(paramName, "int")
+		if err, ok := err.(*imageserver.ParamError); ok {
+			err.Param = "graphicsmagick." + err.Param
+		}
+		return err
 	}
-	params[paramName] = param
+	if !p.Empty() {
+		params.Set("graphicsmagick", p)
+	}
 	return nil
 }
 
-func (parser *Parser) parseBool(query url.Values, params imageserver.Params, paramName string) error {
-	paramString := query.Get(paramName)
-	if paramString == "" {
-		return nil
+func (parser *Parser) parse(request *http.Request, params imageserver.Params) error {
+	if err := imageserver_http.ParseQueryInt("width", request, params); err != nil {
+		return err
 	}
-	param, err := strconv.ParseBool(paramString)
-	if err != nil {
-		return parser.newParseError(paramName, "bool")
+	if err := imageserver_http.ParseQueryInt("height", request, params); err != nil {
+		return err
 	}
-	params[paramName] = param
+	if err := imageserver_http.ParseQueryBool("fill", request, params); err != nil {
+		return err
+	}
+	if err := imageserver_http.ParseQueryBool("ignore_ratio", request, params); err != nil {
+		return err
+	}
+	if err := imageserver_http.ParseQueryBool("only_shrink_larger", request, params); err != nil {
+		return err
+	}
+	if err := imageserver_http.ParseQueryBool("only_enlarge_smaller", request, params); err != nil {
+		return err
+	}
+	imageserver_http.ParseQueryString("background", request, params)
+	if err := imageserver_http.ParseQueryBool("extent", request, params); err != nil {
+		return err
+	}
+	imageserver_http.ParseQueryString("format", request, params)
+	if err := imageserver_http.ParseQueryInt("quality", request, params); err != nil {
+		return err
+	}
 	return nil
-}
-
-func (parser *Parser) newParseError(paramName string, parseType string) *imageserver.ParamError {
-	return &imageserver.ParamError{
-		Param:   fmt.Sprintf("graphicsmagick.%s", paramName),
-		Message: fmt.Sprintf("parse %s error", parseType),
-	}
 }
 
 // Resolve resolves GraphicsMagick's params
