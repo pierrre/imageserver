@@ -128,6 +128,35 @@ func TestParamsGetIntErrorWrongType(t *testing.T) {
 	}
 }
 
+func TestParamsGetFloat(t *testing.T) {
+	params := make(Params)
+	params.Set("foo", 12.34)
+	value, err := params.GetFloat("foo")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value != 12.34 {
+		t.Fatal("not equals")
+	}
+}
+
+func TestParamsGetFloatErrorMiss(t *testing.T) {
+	params := make(Params)
+	_, err := params.GetFloat("foo")
+	if err == nil {
+		t.Fatal("no miss")
+	}
+}
+
+func TestParamsGetFloatErrorWrongType(t *testing.T) {
+	params := make(Params)
+	params.Set("foo", "bar")
+	_, err := params.GetFloat("foo")
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func TestParamsGetBool(t *testing.T) {
 	params := make(Params)
 	params.Set("foo", true)

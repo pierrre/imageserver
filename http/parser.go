@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/pierrre/imageserver"
 )
@@ -106,4 +107,61 @@ func (parser *SourceURLParser) Parse(request *http.Request, params imageserver.P
 // Resolve implements Parser
 func (parser *SourceURLParser) Resolve(param string) string {
 	return parser.Parser.Resolve(param)
+}
+
+// ParseQueryString takes the param from the query string and add it to params.
+func ParseQueryString(param string, request *http.Request, params imageserver.Params) {
+	s := request.URL.Query().Get(param)
+	if s != "" {
+		params.Set(param, s)
+	}
+}
+
+// ParseQueryInt takes the param from the query string, parse it as an int and add it to params.
+func ParseQueryInt(param string, request *http.Request, params imageserver.Params) error {
+	s := request.URL.Query().Get(param)
+	if s == "" {
+		return nil
+	}
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return newParseTypeParamError(param, "string", err)
+	}
+	params.Set(param, i)
+	return nil
+}
+
+// ParseQueryFloat takes the param from the query string, parse it as a float64 and add it to params.
+func ParseQueryFloat(param string, request *http.Request, params imageserver.Params) error {
+	s := request.URL.Query().Get(param)
+	if s == "" {
+		return nil
+	}
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return newParseTypeParamError(param, "float", err)
+	}
+	params.Set(param, f)
+	return nil
+}
+
+// ParseQueryBool takes the param from the query string, parse it as an bool and add it to params.
+func ParseQueryBool(param string, request *http.Request, params imageserver.Params) error {
+	s := request.URL.Query().Get(param)
+	if s == "" {
+		return nil
+	}
+	b, err := strconv.ParseBool(s)
+	if err != nil {
+		return newParseTypeParamError(param, "bool", err)
+	}
+	params.Set(param, b)
+	return nil
+}
+
+func newParseTypeParamError(param string, parseType string, parseErr error) *imageserver.ParamError {
+	return &imageserver.ParamError{
+		Param:   param,
+		Message: fmt.Sprintf("parse %s: %s", parseType, parseErr.Error()),
+	}
 }

@@ -87,6 +87,21 @@ func (params Params) GetInt(key string) (int, error) {
 	return value, nil
 }
 
+// GetFloat returns the value as a float64 for the key
+//
+// It returns an error if the value is not a float64
+func (params Params) GetFloat(key string) (float64, error) {
+	v, err := params.Get(key)
+	if err != nil {
+		return 0, err
+	}
+	value, ok := v.(float64)
+	if !ok {
+		return value, params.newErrorType(key, v, "float")
+	}
+	return value, nil
+}
+
 // GetBool returns the value as a bool for the key
 //
 // It returns an error if the value is not a bool
