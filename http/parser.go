@@ -49,11 +49,7 @@ type SourceParser struct{}
 
 // Parse takes the "source" param from query
 func (parser *SourceParser) Parse(request *http.Request, params imageserver.Params) error {
-	query := request.URL.Query()
-	source := query.Get("source")
-	if source != "" {
-		params.Set("source", source)
-	}
+	ParseQueryString("source", request, params)
 	return nil
 }
 
