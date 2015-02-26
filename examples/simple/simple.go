@@ -13,10 +13,9 @@ import (
 )
 
 func main() {
-	var server imageserver.Server
-	server = &imageserver_provider.Server{
+	server := imageserver.Server(&imageserver_provider.Server{
 		Provider: imageserver_testdata.Provider,
-	}
+	})
 	server = &imageserver_processor.Server{
 		Server: server,
 		Processor: &imageserver_processor_graphicsmagick.Processor{

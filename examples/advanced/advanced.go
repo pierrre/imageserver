@@ -27,8 +27,7 @@ func main() {
 
 	log.Println("Start")
 
-	var cache imageserver_cache.Cache
-	cache = &imageserver_cache_redis.Cache{
+	cache := imageserver_cache.Cache(&imageserver_cache_redis.Cache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
 				return redigo.Dial("tcp", "localhost:6379")
@@ -36,7 +35,7 @@ func main() {
 			MaxIdle: 50,
 		},
 		Expire: time.Duration(7 * 24 * time.Hour),
-	}
+	})
 	cache = &imageserver_cache.Async{
 		Cache: cache,
 		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
@@ -48,8 +47,7 @@ func main() {
 		cache,
 	}
 
-	var processor imageserver_processor.Processor
-	processor = &imageserver_processor_graphicsmagick.Processor{
+	processor := imageserver_processor.Processor(&imageserver_processor_graphicsmagick.Processor{
 		Executable: "gm",
 		Timeout:    time.Duration(10 * time.Second),
 		AllowedFormats: []string{
@@ -58,13 +56,12 @@ func main() {
 			"bmp",
 			"gif",
 		},
-	}
+	})
 	processor = imageserver_processor.NewLimit(processor, 16)
 
-	var server imageserver.Server
-	server = &imageserver_provider.Server{
+	server := imageserver.Server(&imageserver_provider.Server{
 		Provider: imageserver_testdata.Provider,
-	}
+	})
 	server = &imageserver_processor.Server{
 		Server:    server,
 		Processor: processor,
@@ -75,8 +72,7 @@ func main() {
 		KeyGenerator: imageserver_cache.NewParamsHashKeyGenerator(sha256.New),
 	}
 
-	var handler http.Handler
-	handler = &imageserver_http.Handler{
+	handler := http.Handler(&imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{
 			&imageserver_http.SourceParser{},
 			&imageserver_http_parser_graphicsmagick.Parser{},
@@ -86,7 +82,7 @@ func main() {
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Println("Error:", err)
 		},
-	}
+	})
 	handler = &imageserver_http.ExpiresHandler{
 		Handler: handler,
 		Expires: time.Duration(7 * 24 * time.Hour),
