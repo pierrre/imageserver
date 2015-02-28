@@ -10,6 +10,7 @@ services:
 
 before_install:
   - sudo apt-get install graphicsmagick
+  - gm convert -list format
   - export PATH=$PATH:$GOROOT/bin:/home/travis/gopath/bin #ugly hack
   - go get -v golang.org/x/tools/cmd/cover
   - go get -v golang.org/x/tools/cmd/vet
