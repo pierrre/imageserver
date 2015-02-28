@@ -31,11 +31,15 @@ func main() {
 }
 
 func startHTTPServerAddr(addr string) {
-	http.Handle("/", newHTTPHandler())
+	initHTTPServer()
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func initHTTPServer() {
+	http.Handle("/", newHTTPHandler())
 }
 
 func newHTTPHandler() http.Handler {
