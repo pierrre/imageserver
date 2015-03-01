@@ -31,7 +31,7 @@ func testMain(m *testing.M) int {
 		panic(err)
 	}
 	defer listener.Close()
-	initHTTPServer()
+	initHTTPServer("")
 	go http.Serve(listener, nil)
 	testHost = listener.Addr().String()
 	return m.Run()

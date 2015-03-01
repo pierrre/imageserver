@@ -5,9 +5,11 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
+	"github.com/pierrre/githubhook"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
@@ -23,26 +25,48 @@ import (
 func main() {
 	var httpAddr string
 	flag.StringVar(&httpAddr, "http", ":8080", "Http")
+	var gitHubWebhookSecret string
+	flag.StringVar(&gitHubWebhookSecret, "github-webhook-secret", "", "GitHub webhook secret")
 	flag.Parse()
 
 	log.Println("Start")
 
-	startHTTPServerAddr(httpAddr)
+	startHTTPServerAddr(httpAddr, gitHubWebhookSecret)
 }
 
-func startHTTPServerAddr(addr string) {
-	initHTTPServer()
+func startHTTPServerAddr(addr string, gitHubWebhookSecret string) {
+	initHTTPServer(gitHubWebhookSecret)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Panic(err)
 	}
 }
 
-func initHTTPServer() {
-	http.Handle("/", newHTTPHandler())
+func initHTTPServer(gitHubWebhookSecret string) {
+	http.Handle("/", newImageHTTPHandler())
+	if gitHubWebhookSecret != "" {
+		http.Handle("/github_webhook", newGitHubWebhookHTTPHandler(gitHubWebhookSecret))
+	}
 }
 
-func newHTTPHandler() http.Handler {
+func newGitHubWebhookHTTPHandler(secret string) http.Handler {
+	return &githubhook.Handler{
+		Secret: secret,
+		Delivery: func(event string, deliveryID string, payload interface{}) {
+			log.Printf("Received GitHub webhook: %s", event)
+			if event == "push" {
+				delay := time.Duration(5 * time.Second)
+				log.Printf("Killing process in %s", delay)
+				time.AfterFunc(delay, func() {
+					log.Println("Killing process now")
+					os.Exit(0)
+				})
+			}
+		},
+	}
+}
+
+func newImageHTTPHandler() http.Handler {
 	handler := http.Handler(&imageserver_http.Handler{
 		Parser:   newParser(),
 		Server:   newServer(),
