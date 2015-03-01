@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.4.1
+  - 1.4.2
   - tip
 
 services:
@@ -10,14 +10,16 @@ services:
 
 before_install:
   - sudo apt-get install graphicsmagick
-  - gm convert -list format
-  - export PATH=$PATH:$GOROOT/bin:/home/travis/gopath/bin #ugly hack
   - go get -v golang.org/x/tools/cmd/cover
   - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/golang/lint/golint
+  - go get -v rsc.io/grind
 
 install: go get -v -t ./...
 
 script:
   - go test -v -cover ./...
+  - gofmt -d .
+  - go tool vet .
   - golint ./...
+  - find . -iname "*.go" | xargs grind -v -diff

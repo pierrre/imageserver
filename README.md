@@ -1,6 +1,8 @@
 # Image Server
 An image server toolkit in Go (Golang)
 
+[![Build Status](https://travis-ci.org/pierrre/imageserver.svg?branch=master)](https://travis-ci.org/pierrre/imageserver)
+
 ## Features
 - Http server
 - Resize / convert / process (Graphicsmagick)
@@ -38,20 +40,12 @@ http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300
 ```
 ![Resize huge image (5000x5000)](http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300)
 
-## Build status
-[![Build Status](https://travis-ci.org/pierrre/imageserver.png?branch=master)](https://travis-ci.org/pierrre/imageserver)
-
 ## Examples
 - [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
 - [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
 
 ## Documentation
-- http://godoc.org/github.com/pierrre/imageserver
-- http://sourcegraph.com/github.com/pierrre/imageserver
-
-## Help
-- Twitter: @pierredurand87
-- Github issue
+https://godoc.org/github.com/pierrre/imageserver
 
 ## TODO
 - more tests
