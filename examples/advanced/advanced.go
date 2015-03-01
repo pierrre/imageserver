@@ -38,17 +38,14 @@ func main() {
 }
 
 func startHTTPServerAddr(addr string, gitHubWebhookSecret string) {
-	initHTTPServer(gitHubWebhookSecret)
-	err := http.ListenAndServe(addr, nil)
-	if err != nil {
-		log.Panic(err)
-	}
-}
-
-func initHTTPServer(gitHubWebhookSecret string) {
 	http.Handle("/", newImageHTTPHandler())
 	if gitHubWebhookSecret != "" {
 		http.Handle("/github_webhook", newGitHubWebhookHTTPHandler(gitHubWebhookSecret))
+	}
+	log.Printf("Start HTTP server on %s", addr)
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		log.Panic(err)
 	}
 }
 

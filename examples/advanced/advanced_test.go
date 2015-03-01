@@ -31,8 +31,7 @@ func testMain(m *testing.M) int {
 		panic(err)
 	}
 	defer listener.Close()
-	initHTTPServer("")
-	go http.Serve(listener, nil)
+	go http.Serve(listener, newImageHTTPHandler())
 	testHost = listener.Addr().String()
 	return m.Run()
 }
