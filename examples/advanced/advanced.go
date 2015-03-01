@@ -63,6 +63,9 @@ func newGitHubWebhookHTTPHandler(secret string) http.Handler {
 				})
 			}
 		},
+		Error: func(err error, req *http.Request) {
+			log.Printf("GitHub webhook error: %s", err)
+		},
 	}
 }
 
