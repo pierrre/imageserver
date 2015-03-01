@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	redigo "github.com/garyburd/redigo/redis"
@@ -30,6 +31,8 @@ func main() {
 	flag.Parse()
 
 	log.Println("Start")
+	log.Printf("Go version: %s", runtime.Version())
+	log.Printf("Go max procs: %d", runtime.GOMAXPROCS(0))
 
 	startHTTPServerAddr(httpAddr, gitHubWebhookSecret)
 }
