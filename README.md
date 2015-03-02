@@ -1,6 +1,7 @@
 # Image Server
 An image server toolkit in Go (Golang)
 
+[![GoDoc](https://godoc.org/github.com/pierrre/imageserver?status.svg)](https://godoc.org/github.com/pierrre/imageserver)
 [![Build Status](https://travis-ci.org/pierrre/imageserver.svg?branch=master)](https://travis-ci.org/pierrre/imageserver)
 
 ## Features
@@ -43,9 +44,6 @@ http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300
 ## Examples
 - [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
 - [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
-
-## Documentation
-https://godoc.org/github.com/pierrre/imageserver
 
 ## TODO
 - more tests
