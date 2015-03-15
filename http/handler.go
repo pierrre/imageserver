@@ -128,6 +128,9 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, request *http.Reque
 		}
 		text := fmt.Sprintf("invalid param \"%s\": %s", httpParam, err.Message)
 		return &Error{Code: http.StatusBadRequest, Text: text}
+	case *imageserver.ImageError:
+		text := fmt.Sprintf("image error: %s", err.Message)
+		return &Error{Code: http.StatusBadRequest, Text: text}
 	default:
 		handler.callErrorFunc(err, request)
 		return NewErrorDefaultText(http.StatusInternalServerError)

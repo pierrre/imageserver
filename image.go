@@ -62,7 +62,7 @@ func (image *Image) UnmarshalBinary(data []byte) error {
 	readData := func(length int) ([]byte, error) {
 		dataEnd := dataPosition + length
 		if dataEnd > len(data) {
-			return nil, fmt.Errorf("unexpected end of data at index %d instead of %d", len(data), dataEnd)
+			return nil, &ImageError{Message: fmt.Sprintf("unmarshal: unexpected end of data at index %d instead of %d", len(data), dataEnd)}
 		}
 		d := data[dataPosition:dataEnd]
 		dataPosition = dataEnd
@@ -117,4 +117,13 @@ func ImageEqual(image1, image2 *Image) bool {
 	}
 
 	return true
+}
+
+// ImageError in an Image error
+type ImageError struct {
+	Message string
+}
+
+func (err *ImageError) Error() string {
+	return fmt.Sprintf("image error: %s", err.Message)
 }

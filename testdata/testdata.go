@@ -37,6 +37,10 @@ var (
 	AnimatedFileName = "animated.gif"
 	// Animated is an animated GIF Image
 	Animated = loadImage(AnimatedFileName, "gif")
+	// InvalidFileName is the file name of Invalid
+	InvalidFileName = "invalid.jpg"
+	// Invalid is an invalid Image
+	Invalid = loadImage(InvalidFileName, "jpeg")
 
 	// Provider is an Image Provider that uses filename as source
 	Provider = new(testDataProvider)

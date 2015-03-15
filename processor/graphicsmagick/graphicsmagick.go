@@ -291,7 +291,7 @@ func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 		return err
 	}
 
-	cmdChan := make(chan error)
+	cmdChan := make(chan error, 1)
 	go func() {
 		cmdChan <- cmd.Wait()
 	}()
@@ -303,21 +303,15 @@ func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 
 	select {
 	case err = <-cmdChan:
-		if err != nil {
-			return err
-		}
-
-		return nil
 	case <-timeoutChan:
-		err = cmd.Process.Kill()
-		if err != nil {
-			return err
-		}
-
-		<-cmdChan
-
-		return fmt.Errorf("command timeout after %s: %+v", processor.Timeout, cmd)
+		cmd.Process.Kill()
+		err = fmt.Errorf("timeout after %s", processor.Timeout)
 	}
+
+	if err != nil {
+		return &imageserver.ImageError{Message: fmt.Sprintf("GraphicsMagick command: %s", err)}
+	}
+	return nil
 }
 
 func newParamError(param string, message string) *imageserver.ParamError {

@@ -64,6 +64,11 @@ func TestImageEqual(t *testing.T) {
 	}
 }
 
+func TestImageError(t *testing.T) {
+	err := &ImageError{Message: "test"}
+	err.Error()
+}
+
 func imageCopy(image *Image) *Image {
 	value := *image
 	return &value
