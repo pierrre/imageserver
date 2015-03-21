@@ -13,7 +13,6 @@ before_install:
   - go get -v golang.org/x/tools/cmd/cover
   - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/golang/lint/golint
-  - go get -v rsc.io/grind
 
 install: go get -v -t ./...
 
@@ -22,4 +21,3 @@ script:
   - gofmt -d .
   - go tool vet .
   - golint ./...
-  - find . -iname "*.go" | xargs grind -v -diff
