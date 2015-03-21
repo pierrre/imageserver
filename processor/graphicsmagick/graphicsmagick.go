@@ -21,8 +21,7 @@ const (
 
 // Processor represents a GraphicsMagick Image Processor
 type Processor struct {
-	Executable string // path to "gm" executable, usually "/usr/bin/gm"
-
+	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
 	Timeout        time.Duration // timeout for process, optional
 	TempDir        string        // temp directory for image files, optional
 	AllowedFormats []string      // allowed format list, optional
@@ -53,15 +52,28 @@ type Processor struct {
 // - format: "-format" param
 //
 // - quality: "-quality" param
-func (processor *Processor) Process(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
-	params, err := processor.getParams(params)
+func (processor *Processor) Process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+	if !params.Has(globalParamName) {
+		return im, nil
+	}
+	params, err := params.GetParams(globalParamName)
 	if err != nil {
 		return nil, err
 	}
-	if params == nil || params.Empty() {
-		return image, nil
+	if params.Empty() {
+		return im, nil
 	}
+	im, err = processor.process(im, params)
+	if err != nil {
+		if err, ok := err.(*imageserver.ParamError); ok {
+			err.Param = "graphicsmagick." + err.Param
+		}
+		return nil, err
+	}
+	return im, nil
+}
 
+func (processor *Processor) process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	arguments := list.New()
 
 	width, height, err := processor.buildArgumentsResize(arguments, params)
@@ -79,7 +91,7 @@ func (processor *Processor) Process(image *imageserver.Image, params imageserver
 		return nil, err
 	}
 
-	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, params, image)
+	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, params, im)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +102,7 @@ func (processor *Processor) Process(image *imageserver.Image, params imageserver
 	}
 
 	if arguments.Len() == 0 {
-		return image, nil
+		return im, nil
 	}
 
 	arguments.PushFront("mogrify")
@@ -103,15 +115,13 @@ func (processor *Processor) Process(image *imageserver.Image, params imageserver
 
 	file := filepath.Join(tempDir, "image")
 	arguments.PushBack(file)
-	err = ioutil.WriteFile(file, image.Data, os.FileMode(0600))
+	err = ioutil.WriteFile(file, im.Data, os.FileMode(0600))
 	if err != nil {
 		return nil, err
 	}
 
-	argumentSlice := processor.convertArgumentsToSlice(arguments)
-
+	argumentSlice := convertArgumentsToSlice(arguments)
 	cmd := exec.Command(processor.Executable, argumentSlice...)
-
 	err = processor.runCommand(cmd)
 	if err != nil {
 		return nil, err
@@ -125,111 +135,140 @@ func (processor *Processor) Process(image *imageserver.Image, params imageserver
 		return nil, err
 	}
 
-	resultImage := &imageserver.Image{
+	im = &imageserver.Image{
 		Format: format,
 		Data:   data,
 	}
-
-	return resultImage, nil
-}
-
-func (processor *Processor) getParams(params imageserver.Params) (imageserver.Params, error) {
-	if !params.Has(globalParamName) {
-		return nil, nil
-	}
-
-	return params.GetParams(globalParamName)
+	return im, nil
 }
 
 func (processor *Processor) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
-	width, _ = params.GetInt("width")
-	if width < 0 {
-		return 0, 0, newParamError("width", "must be greater than or equal to 0")
+	width, err = getDimension("width", params)
+	if err != nil {
+		return 0, 0, err
 	}
-
-	height, _ = params.GetInt("height")
-	if height < 0 {
-		return 0, 0, newParamError("height", "must be greater than or equal to 0")
+	height, err = getDimension("height", params)
+	if err != nil {
+		return 0, 0, err
 	}
-
-	if width != 0 || height != 0 {
-		widthString := ""
-		if width != 0 {
-			widthString = strconv.Itoa(width)
+	if width == 0 && height == 0 {
+		return 0, 0, nil
+	}
+	widthString := ""
+	if width != 0 {
+		widthString = strconv.Itoa(width)
+	}
+	heightString := ""
+	if height != 0 {
+		heightString = strconv.Itoa(height)
+	}
+	resize := fmt.Sprintf("%sx%s", widthString, heightString)
+	if params.Has("fill") {
+		fill, err := params.GetBool("fill")
+		if err != nil {
+			return 0, 0, err
 		}
-		heightString := ""
-		if height != 0 {
-			heightString = strconv.Itoa(height)
-		}
-		resize := fmt.Sprintf("%sx%s", widthString, heightString)
-
-		if fill, _ := params.GetBool("fill"); fill {
+		if fill {
 			resize = resize + "^"
 		}
-
-		if ignoreRatio, _ := params.GetBool("ignore_ratio"); ignoreRatio {
+	}
+	if params.Has("ignore_ratio") {
+		ignoreRatio, err := params.GetBool("ignore_ratio")
+		if err != nil {
+			return 0, 0, err
+		}
+		if ignoreRatio {
 			resize = resize + "!"
 		}
-
-		if onlyShrinkLarger, _ := params.GetBool("only_shrink_larger"); onlyShrinkLarger {
+	}
+	if params.Has("only_shrink_larger") {
+		onlyShrinkLarger, err := params.GetBool("only_shrink_larger")
+		if err != nil {
+			return 0, 0, err
+		}
+		if onlyShrinkLarger {
 			resize = resize + ">"
 		}
-
-		if onlyEnlargeSmaller, _ := params.GetBool("only_enlarge_smaller"); onlyEnlargeSmaller {
+	}
+	if params.Has("only_enlarge_smaller") {
+		onlyEnlargeSmaller, err := params.GetBool("only_enlarge_smaller")
+		if err != nil {
+			return 0, 0, err
+		}
+		if onlyEnlargeSmaller {
 			resize = resize + "<"
 		}
-
-		arguments.PushBack("-resize")
-		arguments.PushBack(resize)
 	}
-
+	arguments.PushBack("-resize")
+	arguments.PushBack(resize)
 	return width, height, nil
 }
 
-func (processor *Processor) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
-	background, _ := params.GetString("background")
-
-	if backgroundLength := len(background); backgroundLength > 0 {
-		if backgroundLength != 6 && backgroundLength != 8 && backgroundLength != 3 && backgroundLength != 4 {
-			return newParamError("background", "length must be equal to 3, 4, 6 or 8")
-		}
-
-		for _, r := range background {
-			if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
-				return newParamError("background", "must only contain characters in 0-9a-f")
-			}
-		}
-
-		arguments.PushBack("-background")
-		arguments.PushBack(fmt.Sprintf("#%s", background))
+func getDimension(name string, params imageserver.Params) (int, error) {
+	if !params.Has(name) {
+		return 0, nil
 	}
+	dimension, err := params.GetInt(name)
+	if err != nil {
+		return 0, err
+	}
+	if dimension < 0 {
+		return 0, &imageserver.ParamError{Param: name, Message: "must be greater than or equal to 0"}
+	}
+	return dimension, nil
+}
 
+func (processor *Processor) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
+	if !params.Has("background") {
+		return nil
+	}
+	background, err := params.GetString("background")
+	if err != nil {
+		return err
+	}
+	switch len(background) {
+	case 3, 4, 6, 8:
+	default:
+		return &imageserver.ParamError{Param: "background", Message: "length must be equal to 3, 4, 6 or 8"}
+	}
+	for _, r := range background {
+		if (r < '0' || r > '9') && (r < 'a' || r > 'f') {
+			return &imageserver.ParamError{Param: "background", Message: "must only contain characters in 0-9a-f"}
+		}
+	}
+	arguments.PushBack("-background")
+	arguments.PushBack(fmt.Sprintf("#%s", background))
 	return nil
 }
 
 func (processor *Processor) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
-	if width != 0 && height != 0 {
-		if extent, _ := params.GetBool("extent"); extent {
-			arguments.PushBack("-gravity")
-			arguments.PushBack("center")
-
-			arguments.PushBack("-extent")
-			arguments.PushBack(fmt.Sprintf("%dx%d", width, height))
-		}
+	if width == 0 || height == 0 {
+		return nil
 	}
-
+	if !params.Has("extent") {
+		return nil
+	}
+	extent, err := params.GetBool("extent")
+	if err != nil {
+		return err
+	}
+	if extent {
+		arguments.PushBack("-gravity")
+		arguments.PushBack("center")
+		arguments.PushBack("-extent")
+		arguments.PushBack(fmt.Sprintf("%dx%d", width, height))
+	}
 	return nil
 }
 
 func (processor *Processor) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
-	format, _ = params.GetString("format")
-
-	formatSpecified = true
-	if format == "" {
-		format = sourceImage.Format
-		formatSpecified = false
+	if !params.Has("format") {
+		return sourceImage.Format, false, nil
 	}
-
+	format, err = params.GetString("format")
+	if err != nil {
+		return "", false, err
+	}
 	if processor.AllowedFormats != nil {
 		ok := false
 		for _, f := range processor.AllowedFormats {
@@ -239,45 +278,36 @@ func (processor *Processor) buildArgumentsFormat(arguments *list.List, params im
 			}
 		}
 		if !ok {
-			return "", false, newParamError("format", "not allowed")
+			return "", false, &imageserver.ParamError{Param: "format", Message: "not allowed"}
 		}
 	}
-
-	if formatSpecified {
-		arguments.PushBack("-format")
-		arguments.PushBack(format)
-	}
-
-	return format, formatSpecified, nil
+	arguments.PushBack("-format")
+	arguments.PushBack(format)
+	return format, true, nil
 }
 
 func (processor *Processor) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
 	if !params.Has("quality") {
 		return nil
 	}
-
 	quality, err := params.GetInt("quality")
 	if err != nil {
 		return err
 	}
-
 	if quality < 0 {
-		return newParamError("quality", "must be greater than or equal to 0")
+		return &imageserver.ParamError{Param: "quality", Message: "must be greater than or equal to 0"}
 	}
-
 	if format == "jpeg" {
 		if quality < 0 || quality > 100 {
-			return newParamError("quality", "must be between 0 and 100")
+			return &imageserver.ParamError{Param: "quality", Message: "must be between 0 and 100"}
 		}
 	}
-
 	arguments.PushBack("-quality")
 	arguments.PushBack(strconv.Itoa(quality))
-
 	return nil
 }
 
-func (processor *Processor) convertArgumentsToSlice(arguments *list.List) []string {
+func convertArgumentsToSlice(arguments *list.List) []string {
 	argumentSlice := make([]string, 0, arguments.Len())
 	for e := arguments.Front(); e != nil; e = e.Next() {
 		argumentSlice = append(argumentSlice, e.Value.(string))
@@ -290,33 +320,22 @@ func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 	if err != nil {
 		return err
 	}
-
 	cmdChan := make(chan error, 1)
 	go func() {
 		cmdChan <- cmd.Wait()
 	}()
-
 	var timeoutChan <-chan time.Time
 	if processor.Timeout != 0 {
 		timeoutChan = time.After(processor.Timeout)
 	}
-
 	select {
 	case err = <-cmdChan:
 	case <-timeoutChan:
 		cmd.Process.Kill()
 		err = fmt.Errorf("timeout after %s", processor.Timeout)
 	}
-
 	if err != nil {
 		return &imageserver.ImageError{Message: fmt.Sprintf("GraphicsMagick command: %s", err)}
 	}
 	return nil
-}
-
-func newParamError(param string, message string) *imageserver.ParamError {
-	return &imageserver.ParamError{
-		Param:   fmt.Sprintf("graphicsmagick.%s", param),
-		Message: message,
-	}
 }

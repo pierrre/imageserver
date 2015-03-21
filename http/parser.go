@@ -88,9 +88,13 @@ func (parser *SourceURLParser) Parse(request *http.Request, params imageserver.P
 	if err != nil {
 		return err
 	}
+
+	if !params.Has("source") {
+		return nil
+	}
 	source, err := params.Get("source")
 	if err != nil {
-		return &imageserver.ParamError{Param: "source", Message: "missing"}
+		return err
 	}
 
 	u := copyURL(parser.Base)
