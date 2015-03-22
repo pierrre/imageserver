@@ -229,9 +229,7 @@ func TestParamsKeys(t *testing.T) {
 	}
 }
 
-func TestParamErrorInterface(t *testing.T) {
-	var _ error = &ParamError{}
-}
+var _ error = &ParamError{}
 
 func TestParamError(t *testing.T) {
 	err := &ParamError{Param: "param", Message: "my message"}

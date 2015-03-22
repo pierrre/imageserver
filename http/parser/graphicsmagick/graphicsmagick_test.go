@@ -10,9 +10,7 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-func TestInterface(t *testing.T) {
-	var _ imageserver_http.Parser = &Parser{}
-}
+var _ imageserver_http.Parser = &Parser{}
 
 func TestParse(t *testing.T) {
 	urlParams := map[string]interface{}{

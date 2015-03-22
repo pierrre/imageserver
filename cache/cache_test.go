@@ -10,22 +10,16 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestMissErrorInterface(t *testing.T) {
-	var _ error = &MissError{}
-}
+var _ error = &MissError{}
 
 func TestMissError(t *testing.T) {
 	err := &MissError{Key: "foobar"}
 	err.Error()
 }
 
-func TestListInterface(t *testing.T) {
-	var _ Cache = List{}
-}
+var _ Cache = List{}
 
-func TestAsyncInterface(t *testing.T) {
-	var _ Cache = &Async{}
-}
+var _ Cache = &Async{}
 
 func TestAsyncGetSet(t *testing.T) {
 	mapCache := cachetest.NewMapCache()
@@ -78,13 +72,9 @@ func TestAsyncSetErrFunc(t *testing.T) {
 	<-errFuncCallCh
 }
 
-func TestFuncInterface(t *testing.T) {
-	var _ Cache = &Func{}
-}
+var _ Cache = &Func{}
 
-func TestPrefixInterface(t *testing.T) {
-	var _ Cache = &Prefix{}
-}
+var _ Cache = &Prefix{}
 
 func TestPrefixSet(t *testing.T) {
 	c := cachetest.NewMapCache()

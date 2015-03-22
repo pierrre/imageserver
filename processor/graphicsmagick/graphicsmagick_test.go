@@ -9,9 +9,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestInterface(t *testing.T) {
-	var _ imageserver_processor.Processor = &Processor{}
-}
+var _ imageserver_processor.Processor = &Processor{}
 
 func TestProcess(t *testing.T) {
 	image := testdata.Medium

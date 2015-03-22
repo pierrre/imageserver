@@ -11,9 +11,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestServerInterface(t *testing.T) {
-	var _ imageserver.Server = &Server{}
-}
+var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	s := &Server{
@@ -77,9 +75,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 	}
 }
 
-func TestKeyGeneratorFuncInterface(t *testing.T) {
-	var _ KeyGenerator = KeyGeneratorFunc(nil)
-}
+var _ KeyGenerator = KeyGeneratorFunc(nil)
 
 func TestNewParamsHashKeyGenerator(t *testing.T) {
 	NewParamsHashKeyGenerator(sha256.New).GetKey(imageserver.Params{

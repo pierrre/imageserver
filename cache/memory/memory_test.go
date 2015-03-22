@@ -7,19 +7,15 @@ import (
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 )
 
-func TestInterface(t *testing.T) {
-	var _ imageserver_cache.Cache = &Cache{}
-}
+var _ imageserver_cache.Cache = &Cache{}
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
-
 	cachetest.CacheTestGetSetAllImages(t, cache)
 }
 
 func TestGetErrorMiss(t *testing.T) {
 	cache := newTestCache()
-
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 

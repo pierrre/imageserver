@@ -8,9 +8,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestServerInterface(t *testing.T) {
-	var _ imageserver.Server = &Server{}
-}
+var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	s := &Server{

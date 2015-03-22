@@ -8,9 +8,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestFuncInterface(t *testing.T) {
-	var _ Provider = Func(nil)
-}
+var _ Provider = Func(nil)
 
 func TestFunc(t *testing.T) {
 	Func(func(source interface{}, params imageserver.Params) (*imageserver.Image, error) {

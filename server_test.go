@@ -7,9 +7,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestServerFuncInterface(t *testing.T) {
-	var _ Server = ServerFunc(nil)
-}
+var _ Server = ServerFunc(nil)
 
 func TestServerFunc(t *testing.T) {
 	ServerFunc(func(params Params) (*Image, error) {

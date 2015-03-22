@@ -5,9 +5,7 @@ import (
 	"testing"
 )
 
-func TestErrorInterface(t *testing.T) {
-	var _ error = &Error{}
-}
+var _ error = &Error{}
 
 func TestError(t *testing.T) {
 	err := NewErrorDefaultText(http.StatusTeapot)

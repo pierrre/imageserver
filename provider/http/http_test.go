@@ -22,9 +22,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func TestInterface(t *testing.T) {
-	var _ imageserver_provider.Provider = &Provider{}
-}
+var _ imageserver_provider.Provider = &Provider{}
 
 func TestGet(t *testing.T) {
 	listener := createTestHTTPServer(t)

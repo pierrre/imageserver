@@ -7,13 +7,9 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-func TestListParserInterface(t *testing.T) {
-	var _ Parser = ListParser{}
-}
+var _ Parser = ListParser{}
 
-func TestSourceParserInterface(t *testing.T) {
-	var _ Parser = &SourceParser{}
-}
+var _ Parser = &SourceParser{}
 
 func TestSourceParserParse(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://localhost?source=foo", nil)
@@ -51,13 +47,9 @@ func TestSourceParserResolve(t *testing.T) {
 	}
 }
 
-func TestSourcePathParserInterface(t *testing.T) {
-	var _ Parser = &SourcePathParser{}
-}
+var _ Parser = &SourcePathParser{}
 
-func TestSourceURLParserInterface(t *testing.T) {
-	var _ Parser = &SourceURLParser{}
-}
+var _ Parser = &SourceURLParser{}
 
 func TestParseQueryString(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://localhost?string=foo", nil)

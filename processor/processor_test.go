@@ -7,9 +7,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestFuncInterface(t *testing.T) {
-	var _ Processor = Func(nil)
-}
+var _ Processor = Func(nil)
 
 func TestFunc(t *testing.T) {
 	Func(func(image *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
@@ -17,6 +15,4 @@ func TestFunc(t *testing.T) {
 	}).Process(testdata.Small, imageserver.Params{})
 }
 
-func TestListInterface(t *testing.T) {
-	var _ Processor = List{}
-}
+var _ Processor = List{}
