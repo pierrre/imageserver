@@ -93,42 +93,23 @@ func newParser() imageserver_http.Parser {
 }
 
 func newServer() imageserver.Server {
-	server := imageserver.Server(&imageserver_provider.Server{
-		Provider: imageserver_testdata.Provider,
-	})
-	server = &imageserver_processor.Server{
-		Server:    server,
-		Processor: newProcessor(),
-	}
-	server = &imageserver_cache.Server{
-		Server:       server,
-		Cache:        newCache(),
-		KeyGenerator: imageserver_cache.NewParamsHashKeyGenerator(sha256.New),
-	}
+	server := newServerProvider()
+	server = newServerProcessor(server)
+	server = newServerCache(server)
 	return server
 }
 
-func newCache() imageserver_cache.Cache {
-	cache := imageserver_cache.Cache(&imageserver_cache_redis.Cache{
-		Pool: &redigo.Pool{
-			Dial: func() (redigo.Conn, error) {
-				return redigo.Dial("tcp", "localhost:6379")
-			},
-			MaxIdle: 50,
-		},
-		Expire: time.Duration(7 * 24 * time.Hour),
-	})
-	cache = &imageserver_cache.Async{
-		Cache: cache,
-		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
-			log.Println("Cache error:", err)
-		},
+func newServerProvider() imageserver.Server {
+	return &imageserver_provider.Server{
+		Provider: imageserver_testdata.Provider,
 	}
-	cache = imageserver_cache.List{
-		imageserver_cache_memory.New(10 * 1024 * 1024),
-		cache,
+}
+
+func newServerProcessor(server imageserver.Server) imageserver.Server {
+	return &imageserver_processor.Server{
+		Server:    server,
+		Processor: newProcessor(),
 	}
-	return cache
 }
 
 func newProcessor() imageserver_processor.Processor {
@@ -144,4 +125,42 @@ func newProcessor() imageserver_processor.Processor {
 	})
 	processor = imageserver_processor.NewLimit(processor, 16)
 	return processor
+}
+
+func newServerCache(server imageserver.Server) imageserver.Server {
+	keyGenerator := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
+	server = &imageserver_cache.Server{
+		Server:       server,
+		Cache:        newCacheRedis(),
+		KeyGenerator: keyGenerator,
+	}
+	server = &imageserver_cache.Server{
+		Server:       server,
+		Cache:        newCacheMemory(),
+		KeyGenerator: keyGenerator,
+	}
+	return server
+}
+
+func newCacheRedis() imageserver_cache.Cache {
+	cache := imageserver_cache.Cache(&imageserver_cache_redis.Cache{
+		Pool: &redigo.Pool{
+			Dial: func() (redigo.Conn, error) {
+				return redigo.Dial("tcp", "localhost:6379")
+			},
+			MaxIdle: 50,
+		},
+		Expire: time.Duration(7 * 24 * time.Hour),
+	})
+	cache = &imageserver_cache.Async{
+		Cache: cache,
+		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
+			log.Println("Cache error:", err)
+		},
+	}
+	return cache
+}
+
+func newCacheMemory() imageserver_cache.Cache {
+	return imageserver_cache_memory.New(10 * 1024 * 1024)
 }

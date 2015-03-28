@@ -26,46 +26,6 @@ func (err *MissError) Error() string {
 	return fmt.Sprintf("cache miss for key \"%s\"", err.Key)
 }
 
-// List represents a list of Image Cache
-type List []Cache
-
-/*
-Get gets an Image from caches in sequential order.
-
-If an Image is found, previous caches are filled.
-*/
-func (l List) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
-	for i, c := range l {
-		image, err := c.Get(key, params)
-		if err == nil {
-			if i > 0 {
-				err = l.set(key, image, params, i)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return image, nil
-		}
-	}
-
-	return nil, &MissError{Key: key}
-}
-
-func (l List) set(key string, image *imageserver.Image, params imageserver.Params, indexLimit int) error {
-	for i := 0; i < indexLimit; i++ {
-		err := l[i].Set(key, image, params)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Set sets the image to all caches
-func (l List) Set(key string, image *imageserver.Image, params imageserver.Params) error {
-	return l.set(key, image, params, len(l))
-}
-
 // Async represent an asynchronous Cache
 type Async struct {
 	Cache

@@ -17,8 +17,6 @@ func TestMissError(t *testing.T) {
 	err.Error()
 }
 
-var _ Cache = List{}
-
 var _ Cache = &Async{}
 
 func TestAsyncGetSet(t *testing.T) {
