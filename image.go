@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"sync"
 )
 
 /*
 Image represents a raw image.
 
 
-Binary encoding
+Binary encoding:
 
 - Format length (uint32)
 
@@ -27,36 +28,47 @@ type Image struct {
 	Data   []byte // raw image data
 }
 
-// NewImageUnmarshalBinary creates a new Image from serialized bytes
+// NewImageUnmarshalBinary creates a new Image from serialized bytes.
+//
+// The caller must not reuse data after that.
 func NewImageUnmarshalBinary(marshalledData []byte) (*Image, error) {
 	image := new(Image)
-
 	err := image.UnmarshalBinary(marshalledData)
 	if err != nil {
 		return nil, err
 	}
-
 	return image, nil
 }
 
-// MarshalBinary serializes the Image to bytes
-//
-// It's very unlikely that it returns an error (impossible?)
-func (image *Image) MarshalBinary() ([]byte, error) {
-	buffer := new(bytes.Buffer)
-
-	formatLen := uint32(len(image.Format))
-	binary.Write(buffer, binary.LittleEndian, &formatLen)
-	buffer.Write([]byte(image.Format))
-
-	dataLen := uint32(len(image.Data))
-	binary.Write(buffer, binary.LittleEndian, &dataLen)
-	buffer.Write(image.Data)
-
-	return buffer.Bytes(), nil
+var bufferPool = &sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
 }
 
-// UnmarshalBinary unserializes bytes to the Image
+// MarshalBinary serializes the Image to bytes.
+//
+// It's very unlikely that it returns an error. (impossible?)
+func (image *Image) MarshalBinary() ([]byte, error) {
+	buf := bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+
+	formatLen := uint32(len(image.Format))
+	binary.Write(buf, binary.LittleEndian, &formatLen)
+	buf.Write([]byte(image.Format))
+
+	dataLen := uint32(len(image.Data))
+	binary.Write(buf, binary.LittleEndian, &dataLen)
+	buf.Write(image.Data)
+
+	b := buf.Bytes()
+	bufferPool.Put(buf)
+	return b, nil
+}
+
+// UnmarshalBinary unserializes bytes to the Image.
+//
+// The caller must not reuse data after that.
 func (image *Image) UnmarshalBinary(data []byte) error {
 	dataPosition := 0
 	readData := func(length int) ([]byte, error) {
@@ -98,7 +110,7 @@ func (image *Image) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-// ImageEqual compares two images and returns true if they are equal
+// ImageEqual compares two images and returns true if they are equal.
 func ImageEqual(image1, image2 *Image) bool {
 	if image1 == image2 {
 		return true
@@ -119,7 +131,7 @@ func ImageEqual(image1, image2 *Image) bool {
 	return true
 }
 
-// ImageError in an Image error
+// ImageError is an Image error.
 type ImageError struct {
 	Message string
 }
