@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -152,14 +151,12 @@ func TestServer(t *testing.T) {
 			expectedHeight: 200,
 		},
 	} {
-		err := runTestCase(tc)
-		if err != nil {
-			t.Fatalf("%#v: %s", tc, err)
-		}
+		testServerRunTestCase(t, tc)
 	}
 }
 
-func runTestCase(tc testCase) error {
+func testServerRunTestCase(t *testing.T, tc testCase) {
+	t.Logf("%#v", tc)
 	u := newTestURL()
 	if tc.args != nil {
 		query := make(url.Values)
@@ -170,30 +167,29 @@ func runTestCase(tc testCase) error {
 	}
 	resp, err := http.Get(u.String())
 	if err != nil {
-		return err
+		t.Fatal(err)
 	}
 	defer resp.Body.Close()
 	if tc.expectedStatusCode != 0 && resp.StatusCode != tc.expectedStatusCode {
-		return fmt.Errorf("unexpected http status: %d", resp.StatusCode)
+		t.Fatalf("unexpected http status: %d", resp.StatusCode)
 	}
 	if resp.StatusCode != http.StatusOK {
 		if tc.expectedStatusCode != 0 {
-			return nil
+			return
 		}
-		return fmt.Errorf("http status not OK: %d", resp.StatusCode)
+		t.Fatalf("http status not OK: %d", resp.StatusCode)
 	}
 	im, format, err := image.Decode(resp.Body)
 	if err != nil {
-		return err
+		t.Fatal(err)
 	}
 	if tc.expectedFormat != "" && format != tc.expectedFormat {
-		return fmt.Errorf("unexpected format: %s", format)
+		t.Fatalf("unexpected format: %s", format)
 	}
 	if tc.expectedWidth != 0 && im.Bounds().Dx() != tc.expectedWidth {
-		return fmt.Errorf("unexpected width: %d", im.Bounds().Dx())
+		t.Fatalf("unexpected width: %d", im.Bounds().Dx())
 	}
 	if tc.expectedHeight != 0 && im.Bounds().Dy() != tc.expectedHeight {
-		return fmt.Errorf("unexpected height: %d", im.Bounds().Dy())
+		t.Fatalf("unexpected height: %d", im.Bounds().Dy())
 	}
-	return nil
 }
