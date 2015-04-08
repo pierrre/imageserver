@@ -233,5 +233,5 @@ var _ error = &ParamError{}
 
 func TestParamError(t *testing.T) {
 	err := &ParamError{Param: "param", Message: "my message"}
-	err.Error()
+	_ = err.Error()
 }

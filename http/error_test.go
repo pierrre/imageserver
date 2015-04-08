@@ -13,5 +13,5 @@ func TestError(t *testing.T) {
 	if err.Text != text {
 		t.Fatal("invalid text")
 	}
-	err.Error()
+	_ = err.Error()
 }
