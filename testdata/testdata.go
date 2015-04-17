@@ -37,6 +37,10 @@ var (
 	AnimatedFileName = "animated.gif"
 	// Animated is an animated GIF Image
 	Animated = loadImage(AnimatedFileName, "gif")
+	// DalaiGammaFileName is the file name of DalaiGamma
+	DalaiGammaFileName = "dalai_gamma.jpg"
+	// DalaiGamma is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html)
+	DalaiGamma = loadImage(DalaiGammaFileName, "jpeg")
 	// InvalidFileName is the file name of Invalid
 	InvalidFileName = "invalid.jpg"
 	// Invalid is an invalid Image
