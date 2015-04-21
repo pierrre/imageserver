@@ -16,15 +16,13 @@ func TestSourceParserParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
 	parser := &SourceParser{}
 	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	v, err := params.GetString("source")
+	v, err := params.GetString(imageserver.SourceParam)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,12 +33,10 @@ func TestSourceParserParse(t *testing.T) {
 
 func TestSourceParserResolve(t *testing.T) {
 	parser := &SourceParser{}
-
-	httpParam := parser.Resolve("source")
-	if httpParam != "source" {
+	httpParam := parser.Resolve(imageserver.SourceParam)
+	if httpParam != imageserver.SourceParam {
 		t.Fatal("not equals")
 	}
-
 	httpParam = parser.Resolve("foobar")
 	if httpParam != "" {
 		t.Fatal("not equals")
@@ -56,10 +52,8 @@ func TestParseQueryString(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
 	ParseQueryString("string", request, params)
-
 	s, err := params.GetString("string")
 	if err != nil {
 		t.Fatal(err)
@@ -74,10 +68,8 @@ func TestParseQueryInt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
 	ParseQueryInt("int", request, params)
-
 	i, err := params.GetInt("int")
 	if err != nil {
 		t.Fatal(err)
@@ -92,10 +84,8 @@ func TestParseQueryFloat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
 	ParseQueryFloat("float", request, params)
-
 	f, err := params.GetFloat("float")
 	if err != nil {
 		t.Fatal(err)

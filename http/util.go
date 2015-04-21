@@ -8,7 +8,7 @@ import (
 
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-// ExpiresHandler adds "Expires" header
+// ExpiresHandler is a HTTP Handler that adds "Expires" header.
 //
 // It only adds the header if the status code is OK (200) or NotModified (304)
 type ExpiresHandler struct {
@@ -16,6 +16,7 @@ type ExpiresHandler struct {
 	Expires time.Duration
 }
 
+// ServeHTTP implements http.Handler.
 func (eh *ExpiresHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	hrw := &headerResponseWriter{
 		ResponseWriter: w,

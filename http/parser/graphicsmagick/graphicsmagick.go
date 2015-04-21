@@ -9,12 +9,12 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-// Parser represents a GraphicsMagick HTTP Parser
-type Parser struct{}
-
-// Parse parses an http Request for GraphicsMagickProcessor
+// Parser represents a GraphicsMagick HTTP Parser.
 //
 // See Processor for params list.
+type Parser struct{}
+
+// Parse implements Parser.
 func (parser *Parser) Parse(request *http.Request, params imageserver.Params) error {
 	p := make(imageserver.Params)
 	err := parser.parse(request, p)
@@ -60,7 +60,7 @@ func (parser *Parser) parse(request *http.Request, params imageserver.Params) er
 	return nil
 }
 
-// Resolve resolves GraphicsMagick's params
+// Resolve implements Parser.
 func (parser *Parser) Resolve(param string) string {
 	if !strings.HasPrefix(param, "graphicsmagick.") {
 		return ""

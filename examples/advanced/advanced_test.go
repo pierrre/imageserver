@@ -11,6 +11,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -57,96 +58,96 @@ func TestServer(t *testing.T) {
 		},
 		{
 			args: map[string]string{
-				"source": testdata.SmallFileName,
+				imageserver.SourceParam: testdata.SmallFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
+				imageserver.SourceParam: testdata.MediumFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.LargeFileName,
+				imageserver.SourceParam: testdata.LargeFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.HugeFileName,
+				imageserver.SourceParam: testdata.HugeFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.AnimatedFileName,
+				imageserver.SourceParam: testdata.AnimatedFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
+				imageserver.SourceParam: testdata.MediumFileName,
 			},
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"format": "foobar",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"format":                "foobar",
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"format": "png",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"format":                "png",
 			},
 			expectedFormat: "png",
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"format": "gif",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"format":                "gif",
 			},
 			expectedFormat: "gif",
 		},
 		{
 			args: map[string]string{
-				"source":  testdata.MediumFileName,
-				"format":  "jpeg",
-				"quality": "-10",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"format":                "jpeg",
+				"quality":               "-10",
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			args: map[string]string{
-				"source":  testdata.MediumFileName,
-				"format":  "jpeg",
-				"quality": "50",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"format":                "jpeg",
+				"quality":               "50",
 			},
 			expectedFormat: "jpeg",
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"width":  "-100",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"width":                 "-100",
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"width":  "100",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"width":                 "100",
 			},
 			expectedWidth: 100,
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"height": "-100",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"height":                "-100",
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			args: map[string]string{
-				"source": testdata.MediumFileName,
-				"height": "200",
+				imageserver.SourceParam: testdata.MediumFileName,
+				"height":                "200",
 			},
 			expectedHeight: 200,
 		},

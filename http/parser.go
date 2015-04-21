@@ -9,7 +9,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Parser represent an HTTP Request parser.
+// Parser represents a HTTP Request parser.
 type Parser interface {
 	// Parse parses a Request and fill Params.
 	Parse(*http.Request, imageserver.Params) error
@@ -19,10 +19,10 @@ type Parser interface {
 	Resolve(param string) (httpParam string)
 }
 
-// ListParser represents a list of HTTP Parser
+// ListParser is a list of HTTP Parser.
 type ListParser []Parser
 
-// Parse parses an http Request with sub Parsers in sequential order
+// Parse implements Parser
 func (lp ListParser) Parse(request *http.Request, params imageserver.Params) error {
 	for _, subParser := range lp {
 		err := subParser.Parse(request, params)
@@ -33,7 +33,7 @@ func (lp ListParser) Parse(request *http.Request, params imageserver.Params) err
 	return nil
 }
 
-// Resolve resolves the param with sub Parsers in sequential order
+// Resolve implements Parser.
 func (lp ListParser) Resolve(param string) string {
 	for _, subParser := range lp {
 		httpParam := subParser.Resolve(param)
@@ -44,67 +44,64 @@ func (lp ListParser) Resolve(param string) string {
 	return ""
 }
 
-// SourceParser represents an http Parser that takes the "source" param from query
+// SourceParser is a HTTP Parser that takes the source param from the query.
 type SourceParser struct{}
 
-// Parse takes the "source" param from query
+// Parse implements Parser.
 func (parser *SourceParser) Parse(request *http.Request, params imageserver.Params) error {
-	ParseQueryString("source", request, params)
+	ParseQueryString(imageserver.SourceParam, request, params)
 	return nil
 }
 
-// Resolve resolves the "source" param
+// Resolve implements Parser.
 func (parser *SourceParser) Resolve(param string) string {
-	if param != "source" {
+	if param != imageserver.SourceParam {
 		return ""
 	}
-	return "source"
+	return imageserver.SourceParam
 }
 
-// SourcePathParser represents an HTTP Parser that takes the "source" param from the path
+// SourcePathParser is a HTTP Parser that takes the source param from the path.
 type SourcePathParser struct {
 }
 
-// Parse takes the "source" param from the path
+// Parse implements Parser.
 func (parser *SourcePathParser) Parse(request *http.Request, params imageserver.Params) error {
-	params.Set("source", request.URL.Path)
+	params.Set(imageserver.SourceParam, request.URL.Path)
 	return nil
 }
 
-// Resolve resolves the "source" param
+// Resolve implements Parser.
 func (parser *SourcePathParser) Resolve(param string) string {
 	return ""
 }
 
-// SourceURLParser is a Parser that takes the "source" from the sub Parser and adds it to the Base URL.
+// SourceURLParser is a Parser that takes the source from the sub Parser and adds it to the Base URL.
 type SourceURLParser struct {
 	Parser
 	Base *url.URL
 }
 
-// Parse implements Parser
+// Parse implements Parser.
 func (parser *SourceURLParser) Parse(request *http.Request, params imageserver.Params) error {
 	err := parser.Parser.Parse(request, params)
 	if err != nil {
 		return err
 	}
-
-	if !params.Has("source") {
+	if !params.Has(imageserver.SourceParam) {
 		return nil
 	}
-	source, err := params.Get("source")
+	source, err := params.Get(imageserver.SourceParam)
 	if err != nil {
 		return err
 	}
-
 	u := copyURL(parser.Base)
 	u.Path += fmt.Sprint(source)
-	params.Set("source", u)
-
+	params.Set(imageserver.SourceParam, u)
 	return nil
 }
 
-// Resolve implements Parser
+// Resolve implements Parser.
 func (parser *SourceURLParser) Resolve(param string) string {
 	return parser.Parser.Resolve(param)
 }

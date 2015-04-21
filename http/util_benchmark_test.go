@@ -16,7 +16,6 @@ func BenchmarkExpiresHandler(b *testing.B) {
 	nrw := new(nopResponseWriter)
 	req := new(http.Request)
 	b.ResetTimer()
-
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			eh.ServeHTTP(nrw, req)

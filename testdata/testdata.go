@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"github.com/pierrre/imageserver"
-	imageserver_provider "github.com/pierrre/imageserver/provider"
 )
 
 var (
@@ -47,7 +46,21 @@ var (
 	Invalid = loadImage(InvalidFileName, "jpeg")
 
 	// Provider is an Image Provider that uses filename as source
-	Provider = new(testDataProvider)
+	Server imageserver.Server = imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		source, err := params.Get(imageserver.SourceParam)
+		if err != nil {
+			return nil, err
+		}
+		name, ok := source.(string)
+		if !ok {
+			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: "not a string"}
+		}
+		im, ok := Images[name]
+		if !ok {
+			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: "unknown image"}
+		}
+		return im, nil
+	})
 )
 
 func initDir() string {
@@ -55,36 +68,16 @@ func initDir() string {
 	return filepath.Dir(currentFile)
 }
 
-type testDataProvider struct{}
-
-func (provider *testDataProvider) Get(source interface{}, params imageserver.Params) (*imageserver.Image, error) {
-	name, ok := source.(string)
-	if !ok {
-		return nil, &imageserver_provider.SourceError{Message: "not a string"}
-	}
-
-	image, ok := Images[name]
-	if !ok {
-		return nil, &imageserver_provider.SourceError{Message: "unknown image"}
-	}
-
-	return image, nil
-}
-
 func loadImage(filename string, format string) *imageserver.Image {
 	filePath := filepath.Join(Dir, filename)
-
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		panic(err)
 	}
-
-	image := &imageserver.Image{
+	im := &imageserver.Image{
 		Format: format,
 		Data:   data,
 	}
-
-	Images[filename] = image
-
-	return image
+	Images[filename] = im
+	return im
 }

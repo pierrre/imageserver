@@ -19,7 +19,6 @@ import (
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
 	imageserver_processor "github.com/pierrre/imageserver/processor"
 	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
-	imageserver_provider "github.com/pierrre/imageserver/provider"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
@@ -93,16 +92,14 @@ func newParser() imageserver_http.Parser {
 }
 
 func newServer() imageserver.Server {
-	server := newServerProvider()
+	server := newServerTestData()
 	server = newServerProcessor(server)
 	server = newServerCache(server)
 	return server
 }
 
-func newServerProvider() imageserver.Server {
-	return &imageserver_provider.Server{
-		Provider: imageserver_testdata.Provider,
-	}
+func newServerTestData() imageserver.Server {
+	return imageserver_testdata.Server
 }
 
 func newServerProcessor(server imageserver.Server) imageserver.Server {

@@ -25,12 +25,10 @@ func TestParse(t *testing.T) {
 		"format":               "jpeg",
 		"quality":              85,
 	}
-
 	query := make(url.Values)
 	for k, v := range urlParams {
 		query.Add(k, fmt.Sprint(v))
 	}
-
 	request, err := http.NewRequest(
 		"GET",
 		(&url.URL{
@@ -43,21 +41,16 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
-
 	parser := &Parser{}
-
 	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	gmParams, err := params.GetParams("graphicsmagick")
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	for k, v := range urlParams {
 		param, err := gmParams.Get(k)
 		if err != nil {
@@ -81,11 +74,8 @@ func TestParseEmpty(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	params := make(imageserver.Params)
-
 	parser := &Parser{}
-
 	err = parser.Parse(request, params)
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +84,6 @@ func TestParseEmpty(t *testing.T) {
 
 func TestParseError(t *testing.T) {
 	parser := &Parser{}
-
 	for k, v := range map[string]interface{}{
 		"width":                "foo",
 		"height":               "foo",
@@ -107,7 +96,6 @@ func TestParseError(t *testing.T) {
 	} {
 		query := make(url.Values)
 		query.Add(k, fmt.Sprint(v))
-
 		request, err := http.NewRequest(
 			"GET",
 			(&url.URL{
@@ -120,9 +108,7 @@ func TestParseError(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		params := make(imageserver.Params)
-
 		err = parser.Parse(request, params)
 		if err == nil {
 			t.Fatal("no error")
@@ -132,12 +118,10 @@ func TestParseError(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	parser := &Parser{}
-
 	httpParam := parser.Resolve("graphicsmagick.foo")
 	if httpParam != "foo" {
 		t.Fatal("not equals")
 	}
-
 	httpParam = parser.Resolve("bar")
 	if httpParam != "" {
 		t.Fatal("not equals")
