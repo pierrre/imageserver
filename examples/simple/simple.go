@@ -3,20 +3,17 @@ package main
 import (
 	"net/http"
 
+	imageserver_graphicsmagick "github.com/pierrre/imageserver/graphicsmagick"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
-	imageserver_processor "github.com/pierrre/imageserver/processor"
-	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
 func main() {
 	server := imageserver_testdata.Server
-	server = &imageserver_processor.Server{
-		Server: server,
-		Processor: &imageserver_processor_graphicsmagick.Processor{
-			Executable: "gm",
-		},
+	server = &imageserver_graphicsmagick.Server{
+		Server:     server,
+		Executable: "gm",
 	}
 	handler := &imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{

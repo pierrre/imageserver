@@ -73,3 +73,20 @@ func TestSourceServerErrorNoSource(t *testing.T) {
 		t.Fatal("no error")
 	}
 }
+
+func TestNewLimitServer(t *testing.T) {
+	// TODO test limit
+	server := NewLimitServer(testdata.Server, 1)
+	im, err := server.Get(Params{SourceParam: testdata.MediumFileName})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if im != testdata.Medium {
+		t.Fatal("not equal")
+	}
+}
+
+func TestNewLimitServerZero(t *testing.T) {
+	// TODO ?
+	NewLimitServer(testdata.Server, 0)
+}

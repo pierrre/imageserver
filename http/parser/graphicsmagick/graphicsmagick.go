@@ -1,4 +1,4 @@
-// Package graphicsmagick provides a GraphicsMagick HTTP Parser
+// Package graphicsmagick provides a GraphicsMagick HTTP Parser.
 package graphicsmagick
 
 import (
@@ -11,7 +11,7 @@ import (
 
 // Parser represents a GraphicsMagick HTTP Parser.
 //
-// See Processor for params list.
+// See Server for params list.
 type Parser struct{}
 
 // Parse implements Parser.

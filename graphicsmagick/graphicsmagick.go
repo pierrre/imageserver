@@ -1,4 +1,4 @@
-// Package graphicsmagick provides a GraphicsMagick Image Processor
+// Package graphicsmagick provides a GraphicsMagick Image Server.
 package graphicsmagick
 
 import (
@@ -15,25 +15,19 @@ import (
 )
 
 const (
-	globalParamName = "graphicsmagick"
-	tempDirPrefix   = "imageserver_"
+	globalParam   = "graphicsmagick"
+	tempDirPrefix = "imageserver_"
 )
 
-// Processor represents a GraphicsMagick Image Processor
-type Processor struct {
-	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
-	Timeout        time.Duration // timeout for process, optional
-	TempDir        string        // temp directory for image files, optional
-	AllowedFormats []string      // allowed format list, optional
-}
-
-// Process processes Image with the GraphicsMagick command line (mogrify command)
+// Server is a GraphicsMagick Image Server.
+//
+// It gets the Image from the underlying Server then processes it with the GraphicsMagick command line (mogrify command).
 //
 // All params are extracted from the "graphicsmagick" node param and are optionals.
 //
 // See GraphicsMagick documentation for more information about arguments.
 //
-// Params
+// Params:
 //
 // - width / height: sizes for "-resize" argument (both optionals)
 //
@@ -52,18 +46,31 @@ type Processor struct {
 // - format: "-format" param
 //
 // - quality: "-quality" param
-func (processor *Processor) Process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
-	if !params.Has(globalParamName) {
+type Server struct {
+	Server         imageserver.Server
+	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
+	Timeout        time.Duration // timeout for process, optional
+	TempDir        string        // temp directory for image files, optional
+	AllowedFormats []string      // allowed format list, optional
+}
+
+// Get implements Server.
+func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+	im, err := server.Server.Get(params)
+	if err != nil {
+		return nil, err
+	}
+	if !params.Has(globalParam) {
 		return im, nil
 	}
-	params, err := params.GetParams(globalParamName)
+	params, err = params.GetParams(globalParam)
 	if err != nil {
 		return nil, err
 	}
 	if params.Empty() {
 		return im, nil
 	}
-	im, err = processor.process(im, params)
+	im, err = server.process(im, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
 			err.Param = "graphicsmagick." + err.Param
@@ -73,30 +80,30 @@ func (processor *Processor) Process(im *imageserver.Image, params imageserver.Pa
 	return im, nil
 }
 
-func (processor *Processor) process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (server *Server) process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	arguments := list.New()
 
-	width, height, err := processor.buildArgumentsResize(arguments, params)
+	width, height, err := server.buildArgumentsResize(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsBackground(arguments, params)
+	err = server.buildArgumentsBackground(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsExtent(arguments, params, width, height)
+	err = server.buildArgumentsExtent(arguments, params, width, height)
 	if err != nil {
 		return nil, err
 	}
 
-	format, formatSpecified, err := processor.buildArgumentsFormat(arguments, params, im)
+	format, formatSpecified, err := server.buildArgumentsFormat(arguments, params, im)
 	if err != nil {
 		return nil, err
 	}
 
-	err = processor.buildArgumentsQuality(arguments, params, format)
+	err = server.buildArgumentsQuality(arguments, params, format)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +114,7 @@ func (processor *Processor) process(im *imageserver.Image, params imageserver.Pa
 
 	arguments.PushFront("mogrify")
 
-	tempDir, err := ioutil.TempDir(processor.TempDir, tempDirPrefix)
+	tempDir, err := ioutil.TempDir(server.TempDir, tempDirPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +128,8 @@ func (processor *Processor) process(im *imageserver.Image, params imageserver.Pa
 	}
 
 	argumentSlice := convertArgumentsToSlice(arguments)
-	cmd := exec.Command(processor.Executable, argumentSlice...)
-	err = processor.runCommand(cmd)
+	cmd := exec.Command(server.Executable, argumentSlice...)
+	err = server.runCommand(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +149,7 @@ func (processor *Processor) process(im *imageserver.Image, params imageserver.Pa
 	return im, nil
 }
 
-func (processor *Processor) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
+func (server *Server) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
 	width, err = getDimension("width", params)
 	if err != nil {
 		return 0, 0, err
@@ -218,7 +225,7 @@ func getDimension(name string, params imageserver.Params) (int, error) {
 	return dimension, nil
 }
 
-func (processor *Processor) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
+func (server *Server) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
 	if !params.Has("background") {
 		return nil
 	}
@@ -241,7 +248,7 @@ func (processor *Processor) buildArgumentsBackground(arguments *list.List, param
 	return nil
 }
 
-func (processor *Processor) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
+func (server *Server) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
 	if width == 0 || height == 0 {
 		return nil
 	}
@@ -261,7 +268,7 @@ func (processor *Processor) buildArgumentsExtent(arguments *list.List, params im
 	return nil
 }
 
-func (processor *Processor) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
+func (server *Server) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
 	if !params.Has("format") {
 		return sourceImage.Format, false, nil
 	}
@@ -269,9 +276,9 @@ func (processor *Processor) buildArgumentsFormat(arguments *list.List, params im
 	if err != nil {
 		return "", false, err
 	}
-	if processor.AllowedFormats != nil {
+	if server.AllowedFormats != nil {
 		ok := false
-		for _, f := range processor.AllowedFormats {
+		for _, f := range server.AllowedFormats {
 			if f == format {
 				ok = true
 				break
@@ -286,7 +293,7 @@ func (processor *Processor) buildArgumentsFormat(arguments *list.List, params im
 	return format, true, nil
 }
 
-func (processor *Processor) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
+func (server *Server) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
 	if !params.Has("quality") {
 		return nil
 	}
@@ -315,7 +322,7 @@ func convertArgumentsToSlice(arguments *list.List) []string {
 	return argumentSlice
 }
 
-func (processor *Processor) runCommand(cmd *exec.Cmd) error {
+func (server *Server) runCommand(cmd *exec.Cmd) error {
 	err := cmd.Start()
 	if err != nil {
 		return err
@@ -325,14 +332,14 @@ func (processor *Processor) runCommand(cmd *exec.Cmd) error {
 		cmdChan <- cmd.Wait()
 	}()
 	var timeoutChan <-chan time.Time
-	if processor.Timeout != 0 {
-		timeoutChan = time.After(processor.Timeout)
+	if server.Timeout != 0 {
+		timeoutChan = time.After(server.Timeout)
 	}
 	select {
 	case err = <-cmdChan:
 	case <-timeoutChan:
 		cmd.Process.Kill()
-		err = fmt.Errorf("timeout after %s", processor.Timeout)
+		err = fmt.Errorf("timeout after %s", server.Timeout)
 	}
 	if err != nil {
 		return &imageserver.ImageError{Message: fmt.Sprintf("GraphicsMagick command: %s", err)}

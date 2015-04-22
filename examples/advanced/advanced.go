@@ -15,10 +15,9 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
+	imageserver_graphicsmagick "github.com/pierrre/imageserver/graphicsmagick"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
-	imageserver_processor "github.com/pierrre/imageserver/processor"
-	imageserver_processor_graphicsmagick "github.com/pierrre/imageserver/processor/graphicsmagick"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
@@ -93,7 +92,8 @@ func newParser() imageserver_http.Parser {
 
 func newServer() imageserver.Server {
 	server := newServerTestData()
-	server = newServerProcessor(server)
+	server = newServerGraphicsMagick(server)
+	server = newServerLimit(server)
 	server = newServerCache(server)
 	return server
 }
@@ -102,15 +102,9 @@ func newServerTestData() imageserver.Server {
 	return imageserver_testdata.Server
 }
 
-func newServerProcessor(server imageserver.Server) imageserver.Server {
-	return &imageserver_processor.Server{
-		Server:    server,
-		Processor: newProcessor(),
-	}
-}
-
-func newProcessor() imageserver_processor.Processor {
-	processor := imageserver_processor.Processor(&imageserver_processor_graphicsmagick.Processor{
+func newServerGraphicsMagick(server imageserver.Server) imageserver.Server {
+	return &imageserver_graphicsmagick.Server{
+		Server:     server,
 		Executable: "gm",
 		Timeout:    time.Duration(10 * time.Second),
 		AllowedFormats: []string{
@@ -119,9 +113,11 @@ func newProcessor() imageserver_processor.Processor {
 			"bmp",
 			"gif",
 		},
-	})
-	processor = imageserver_processor.NewLimit(processor, 16)
-	return processor
+	}
+}
+
+func newServerLimit(server imageserver.Server) imageserver.Server {
+	return imageserver.NewLimitServer(server, runtime.GOMAXPROCS(0)*2)
 }
 
 func newServerCache(server imageserver.Server) imageserver.Server {

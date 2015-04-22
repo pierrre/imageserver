@@ -33,3 +33,20 @@ func (s *SourceServer) Get(params Params) (*Image, error) {
 	params = Params{SourceParam: source}
 	return s.Server.Get(params)
 }
+
+// NewLimitServer creates a new Server that limits the number of concurrent executions.
+//
+// It uses a buffered channel to limit the number of concurrent executions.
+func NewLimitServer(s Server, limit int) Server {
+	if limit <= 0 {
+		return s
+	}
+	limitCh := make(chan struct{}, limit)
+	return ServerFunc(func(params Params) (*Image, error) {
+		limitCh <- struct{}{}
+		defer func() {
+			<-limitCh
+		}()
+		return s.Get(params)
+	})
+}
