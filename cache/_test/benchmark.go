@@ -8,15 +8,13 @@ import (
 )
 
 // CacheBenchmarkGet is a helper to benchmark cache Get()
-func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, image *imageserver.Image) {
+func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, im *imageserver.Image) {
 	key := "test"
-	err := cache.Set(key, image, imageserver.Params{})
+	err := cache.Set(key, im, imageserver.Params{})
 	if err != nil {
 		b.Fatal(err)
 	}
-
 	b.ResetTimer()
-
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			_, err := cache.Get(key, imageserver.Params{})
@@ -25,6 +23,5 @@ func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, image *image
 			}
 		}
 	})
-
-	b.SetBytes(int64(len(image.Data)))
+	b.SetBytes(int64(len(im.Data)))
 }

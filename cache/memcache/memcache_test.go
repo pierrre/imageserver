@@ -14,26 +14,23 @@ var _ imageserver_cache.Cache = &Cache{}
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
-
 	// maximum object size is only 1MB
-	for _, image := range []*imageserver.Image{
+	for _, im := range []*imageserver.Image{
 		testdata.Small,
 		testdata.Medium,
 		testdata.Large,
 	} {
-		cachetest.CacheTestGetSet(t, cache, image)
+		cachetest.CacheTestGetSet(t, cache, im)
 	}
 }
 
 func TestGetErrorMiss(t *testing.T) {
 	cache := newTestCache(t)
-
 	cachetest.CacheTestGetErrorMiss(t, cache)
 }
 
 func TestGetErrorServer(t *testing.T) {
 	cache := newTestCacheInvalidServer(t)
-
 	_, err := cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -42,7 +39,6 @@ func TestGetErrorServer(t *testing.T) {
 
 func TestSetErrorServer(t *testing.T) {
 	cache := newTestCacheInvalidServer(t)
-
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -51,15 +47,12 @@ func TestSetErrorServer(t *testing.T) {
 
 func TestGetErrorUnmarshal(t *testing.T) {
 	cache := newTestCache(t)
-
 	data, _ := testdata.Medium.MarshalBinary()
 	data = data[:len(data)-1]
-
 	err := cache.setData(cachetest.KeyValid, data)
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	_, err = cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")

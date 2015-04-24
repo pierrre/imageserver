@@ -27,17 +27,16 @@ func BenchmarkImageMarshalBinaryAnimated(b *testing.B) {
 	benchmarkImageMarshalBinary(b, testdata.Animated)
 }
 
-func benchmarkImageMarshalBinary(b *testing.B, image *Image) {
+func benchmarkImageMarshalBinary(b *testing.B, im *Image) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := image.MarshalBinary()
+			_, err := im.MarshalBinary()
 			if err != nil {
 				b.Fatal(err)
 			}
 		}
 	})
-
-	b.SetBytes(int64(len(image.Data)))
+	b.SetBytes(int64(len(im.Data)))
 }
 
 func BenchmarkImageUnmarshalBinarySmall(b *testing.B) {
@@ -60,18 +59,52 @@ func BenchmarkImageUnmarshalBinaryAnimated(b *testing.B) {
 	benchmarkImageUnmarshalBinary(b, testdata.Animated)
 }
 
-func benchmarkImageUnmarshalBinary(b *testing.B, image *Image) {
-	data, _ := image.MarshalBinary()
+func benchmarkImageUnmarshalBinary(b *testing.B, im *Image) {
+	data, _ := im.MarshalBinary()
+	imNew := new(Image)
 	b.ResetTimer()
-
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := NewImageUnmarshalBinary(data)
+			err := imNew.UnmarshalBinary(data)
 			if err != nil {
 				b.Fatal(err)
 			}
 		}
 	})
+	b.SetBytes(int64(len(im.Data)))
+}
 
-	b.SetBytes(int64(len(data)))
+func BenchmarkImageUnmarshalBinaryNoCopySmall(b *testing.B) {
+	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Small)
+}
+
+func BenchmarkImageUnmarshalBinaryNoCopyMedium(b *testing.B) {
+	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Medium)
+}
+
+func BenchmarkImageUnmarshalBinaryNoCopyLarge(b *testing.B) {
+	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Large)
+}
+
+func BenchmarkImageUnmarshalBinaryNoCopyHuge(b *testing.B) {
+	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Huge)
+}
+
+func BenchmarkImageUnmarshalBinaryNoCopyAnimated(b *testing.B) {
+	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Animated)
+}
+
+func benchmarkImageUnmarshalBinaryNoCopy(b *testing.B, im *Image) {
+	data, _ := im.MarshalBinary()
+	imNew := new(Image)
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			err := imNew.UnmarshalBinaryNoCopy(data)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.SetBytes(int64(len(im.Data)))
 }

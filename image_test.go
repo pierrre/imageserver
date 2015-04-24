@@ -1,41 +1,44 @@
 package imageserver_test
 
 import (
+	"encoding"
 	"testing"
 
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestImage(t *testing.T) {
-	for _, image := range testdata.Images {
-		data, _ := image.MarshalBinary()
+var _ encoding.BinaryMarshaler = new(Image)
+var _ encoding.BinaryUnmarshaler = new(Image)
 
-		newImage, err := NewImageUnmarshalBinary(data)
+func TestImageMarshal(t *testing.T) {
+	for _, im := range testdata.Images {
+		data, _ := im.MarshalBinary()
+		imNew := new(Image)
+		err := imNew.UnmarshalBinary(data)
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		if !ImageEqual(newImage, image) {
+		if !ImageEqual(imNew, im) {
 			t.Fatal("image not equals")
 		}
 	}
 }
 
 func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
-	for _, image := range testdata.Images {
-		data, _ := image.MarshalBinary()
-
+	for _, im := range testdata.Images {
+		data, _ := im.MarshalBinary()
 		index := -1 // Always truncate 1 byte
 		for _, offset := range []int{
 			4,
-			len(image.Format),
+			len(im.Format),
 			4,
-			len(image.Data),
+			len(im.Data),
 		} {
 			index += offset
 			errorData := data[0:index]
-			_, err := NewImageUnmarshalBinary(errorData)
+			imNew := new(Image)
+			err := imNew.UnmarshalBinary(errorData)
 			if err == nil {
 				t.Fatal("no error")
 			}
@@ -44,10 +47,10 @@ func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 }
 
 func TestImageEqual(t *testing.T) {
-	for _, test := range []struct {
-		image1      *Image
-		image2      *Image
-		result      bool
+	for _, tc := range []struct {
+		im1         *Image
+		im2         *Image
+		equal       bool
 		description string
 	}{
 		{nil, nil, true, "both nil"},
@@ -58,8 +61,8 @@ func TestImageEqual(t *testing.T) {
 		{testdata.Medium, testdata.Animated, false, "different format"},
 		{testdata.Medium, testdata.Small, false, "different data"},
 	} {
-		if ImageEqual(test.image1, test.image2) != test.result {
-			t.Fatalf("invalid result for test: %s", test.description)
+		if ImageEqual(tc.im1, tc.im2) != tc.equal {
+			t.Fatalf("invalid result for test: %s", tc.description)
 		}
 	}
 }
@@ -69,7 +72,7 @@ func TestImageError(t *testing.T) {
 	_ = err.Error()
 }
 
-func imageCopy(image *Image) *Image {
-	value := *image
+func imageCopy(im *Image) *Image {
+	value := *im
 	return &value
 }

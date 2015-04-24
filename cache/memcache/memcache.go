@@ -20,13 +20,12 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 	if err != nil {
 		return nil, err
 	}
-
-	image, err := imageserver.NewImageUnmarshalBinary(data)
+	im := new(imageserver.Image)
+	err = im.UnmarshalBinaryNoCopy(data)
 	if err != nil {
 		return nil, err
 	}
-
-	return image, nil
+	return im, nil
 }
 
 func (cache *Cache) getData(key string) ([]byte, error) {
@@ -34,19 +33,16 @@ func (cache *Cache) getData(key string) ([]byte, error) {
 	if err != nil {
 		return nil, &imageserver_cache.MissError{Key: key}
 	}
-
 	return item.Value, nil
 }
 
 // Set sets an Image to Memcache
-func (cache *Cache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
-	data, _ := image.MarshalBinary()
-
+func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
+	data, _ := im.MarshalBinary()
 	err := cache.setData(key, data)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -58,6 +54,5 @@ func (cache *Cache) setData(key string, data []byte) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

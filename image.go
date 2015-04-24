@@ -28,48 +28,45 @@ type Image struct {
 	Data   []byte // raw image data
 }
 
-// NewImageUnmarshalBinary creates a new Image from serialized bytes.
-//
-// The caller must not reuse data after that.
-func NewImageUnmarshalBinary(marshalledData []byte) (*Image, error) {
-	image := new(Image)
-	err := image.UnmarshalBinary(marshalledData)
-	if err != nil {
-		return nil, err
-	}
-	return image, nil
-}
-
 var bufferPool = &sync.Pool{
 	New: func() interface{} {
 		return new(bytes.Buffer)
 	},
 }
 
-// MarshalBinary serializes the Image to bytes.
+// MarshalBinary implements encoding.BinaryMarshaler.
 //
 // It's very unlikely that it returns an error. (impossible?)
-func (image *Image) MarshalBinary() ([]byte, error) {
+func (im *Image) MarshalBinary() ([]byte, error) {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 
-	formatLen := uint32(len(image.Format))
+	formatLen := uint32(len(im.Format))
 	binary.Write(buf, binary.LittleEndian, &formatLen)
-	buf.Write([]byte(image.Format))
+	buf.Write([]byte(im.Format))
 
-	dataLen := uint32(len(image.Data))
+	dataLen := uint32(len(im.Data))
 	binary.Write(buf, binary.LittleEndian, &dataLen)
-	buf.Write(image.Data)
+	buf.Write(im.Data)
 
 	b := buf.Bytes()
 	bufferPool.Put(buf)
 	return b, nil
 }
 
-// UnmarshalBinary unserializes bytes to the Image.
+// UnmarshalBinary implements encoding.BinaryUnmarshaler.
+//
+// It copies data then call UnmarshalBinaryNoCopy().
+func (im *Image) UnmarshalBinary(data []byte) error {
+	dataCopy := make([]byte, len(data))
+	copy(dataCopy, data)
+	return im.UnmarshalBinaryNoCopy(dataCopy)
+}
+
+// UnmarshalBinaryNoCopy is like encoding.BinaryUnmarshaler but does no copy.
 //
 // The caller must not reuse data after that.
-func (image *Image) UnmarshalBinary(data []byte) error {
+func (im *Image) UnmarshalBinaryNoCopy(data []byte) error {
 	dataPosition := 0
 	readData := func(length int) ([]byte, error) {
 		dataEnd := dataPosition + length
@@ -81,28 +78,28 @@ func (image *Image) UnmarshalBinary(data []byte) error {
 		return d, nil
 	}
 
-	var imageFormatLength uint32
+	var formatLen uint32
 	if d, err := readData(4); err == nil {
-		binary.Read(bytes.NewReader(d), binary.LittleEndian, &imageFormatLength)
+		binary.Read(bytes.NewReader(d), binary.LittleEndian, &formatLen)
 	} else {
 		return err
 	}
 
-	if d, err := readData(int(imageFormatLength)); err == nil {
-		image.Format = string(d)
+	if d, err := readData(int(formatLen)); err == nil {
+		im.Format = string(d)
 	} else {
 		return err
 	}
 
-	var imageDataLength uint32
+	var dataLen uint32
 	if d, err := readData(4); err == nil {
-		binary.Read(bytes.NewReader(d), binary.LittleEndian, &imageDataLength)
+		binary.Read(bytes.NewReader(d), binary.LittleEndian, &dataLen)
 	} else {
 		return err
 	}
 
-	if d, err := readData(int(imageDataLength)); err == nil {
-		image.Data = d
+	if d, err := readData(int(dataLen)); err == nil {
+		im.Data = d
 	} else {
 		return err
 	}
@@ -111,23 +108,19 @@ func (image *Image) UnmarshalBinary(data []byte) error {
 }
 
 // ImageEqual compares two images and returns true if they are equal.
-func ImageEqual(image1, image2 *Image) bool {
-	if image1 == image2 {
+func ImageEqual(im1, im2 *Image) bool {
+	if im1 == im2 {
 		return true
 	}
-
-	if image1 == nil || image2 == nil {
+	if im1 == nil || im2 == nil {
 		return false
 	}
-
-	if image1.Format != image2.Format {
+	if im1.Format != im2.Format {
 		return false
 	}
-
-	if !bytes.Equal(image1.Data, image2.Data) {
+	if !bytes.Equal(im1.Data, im2.Data) {
 		return false
 	}
-
 	return true
 }
 
