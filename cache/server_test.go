@@ -82,3 +82,18 @@ func TestNewParamsHashKeyGenerator(t *testing.T) {
 		"foo": "bar",
 	})
 }
+
+var _ KeyGenerator = &PrefixKeyGenerator{}
+
+func TestPrefixKeyGenerator(t *testing.T) {
+	g := &PrefixKeyGenerator{
+		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "bar"
+		}),
+		Prefix: "foo",
+	}
+	key := g.GetKey(imageserver.Params{})
+	if key != "foobar" {
+		t.Fatal("not equal")
+	}
+}

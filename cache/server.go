@@ -67,3 +67,14 @@ func NewParamsHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 		return hex.EncodeToString(data)
 	})
 }
+
+// PrefixKeyGenerator is a KeyGenerator that adds a prefix to the key.
+type PrefixKeyGenerator struct {
+	KeyGenerator
+	Prefix string
+}
+
+// GetKey implements KeyGenerator.
+func (g *PrefixKeyGenerator) GetKey(params imageserver.Params) string {
+	return g.Prefix + g.KeyGenerator.GetKey(params)
+}

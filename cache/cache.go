@@ -59,19 +59,3 @@ func (c *Func) Get(key string, params imageserver.Params) (*imageserver.Image, e
 func (c *Func) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	return c.SetFunc(key, image, params)
 }
-
-// Prefix is an Image Cache that adds a prefix to the key.
-type Prefix struct {
-	Cache
-	Prefix string
-}
-
-// Get adds the prefix to the key and calls the underlying cache.
-func (c *Prefix) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
-	return c.Cache.Get(c.Prefix+key, params)
-}
-
-// Set adds the prefix to the key and calls the underlying cache.
-func (c *Prefix) Set(key string, image *imageserver.Image, params imageserver.Params) error {
-	return c.Cache.Set(c.Prefix+key, image, params)
-}

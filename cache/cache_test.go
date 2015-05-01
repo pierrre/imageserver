@@ -71,33 +71,3 @@ func TestAsyncSetErrFunc(t *testing.T) {
 }
 
 var _ Cache = &Func{}
-
-var _ Cache = &Prefix{}
-
-func TestPrefixSet(t *testing.T) {
-	c := cachetest.NewMapCache()
-	pc := &Prefix{Cache: c, Prefix: "foo"}
-
-	err := pc.Set("bar", testdata.Medium, imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = c.Get("foobar", imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestPrefixGet(t *testing.T) {
-	c := cachetest.NewMapCache()
-	pc := &Prefix{Cache: c, Prefix: "foo"}
-
-	err := c.Set("foobar", testdata.Medium, imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = pc.Get("bar", imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
