@@ -38,8 +38,7 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 	}
 	params := imageserver.Params{
 		globalParam: imageserver.Params{
-			"width":  100,
-			"height": 100,
+			"width": 100,
 		},
 	}
 	b.RunParallel(func(pb *testing.PB) {

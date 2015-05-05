@@ -9,7 +9,7 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-// Parser represents a GraphicsMagick HTTP Parser.
+// Parser is a GraphicsMagick HTTP Parser.
 //
 // See Server for params list.
 type Parser struct{}
