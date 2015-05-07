@@ -17,7 +17,7 @@ import (
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
 	imageserver_graphicsmagick "github.com/pierrre/imageserver/graphicsmagick"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
+	imageserver_http_graphicsmagick "github.com/pierrre/imageserver/http/graphicsmagick"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
@@ -86,7 +86,7 @@ func newImageHTTPHandler() http.Handler {
 func newParser() imageserver_http.Parser {
 	return &imageserver_http.ListParser{
 		&imageserver_http.SourceParser{},
-		&imageserver_http_parser_graphicsmagick.Parser{},
+		&imageserver_http_graphicsmagick.Parser{},
 	}
 }
 

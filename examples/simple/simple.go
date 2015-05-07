@@ -5,7 +5,7 @@ import (
 
 	imageserver_graphicsmagick "github.com/pierrre/imageserver/graphicsmagick"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_http_parser_graphicsmagick "github.com/pierrre/imageserver/http/parser/graphicsmagick"
+	imageserver_http_graphicsmagick "github.com/pierrre/imageserver/http/graphicsmagick"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	handler := &imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{
 			&imageserver_http.SourceParser{},
-			&imageserver_http_parser_graphicsmagick.Parser{},
+			&imageserver_http_graphicsmagick.Parser{},
 		},
 		Server: server,
 	}
