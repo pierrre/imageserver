@@ -1,4 +1,4 @@
-// Package redis provides a Redis Image Cache
+// Package redis provides a Redis Image Cache.
 package redis
 
 import (
@@ -10,15 +10,15 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
-// Cache represents a Redis Image Cache
+// Cache is a Redis Image Cache.
 //
-// It uses Gary Burd's Redis client https://github.com/garyburd/redigo
+// It uses Gary Burd's Redis client https://github.com/garyburd/redigo .
 type Cache struct {
 	Pool   *redigo.Pool
 	Expire time.Duration // optional
 }
 
-// Get gets an Image from Redis
+// Get implements Cache.
 func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
@@ -38,7 +38,7 @@ func (cache *Cache) getData(key string) ([]byte, error) {
 	return redigo.Bytes(conn.Do("GET", key))
 }
 
-// Set sets an Image to Redis
+// Set implements Cache.
 func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
 	data, _ := im.MarshalBinary()
 	err := cache.setData(key, data)

@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-// Params represents params used in imageserver package.
+// Params are params used in Image Server.
 //
 // This is a wrapper around map[string]interface{} and provides utility methods.
 //

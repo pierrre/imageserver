@@ -7,22 +7,20 @@ import (
 	"sync"
 )
 
-/*
-Image represents a raw image.
-
-
-Binary encoding:
-
-- Format length (uint32)
-
-- Format (string)
-
-- Data length (uint32)
-
-- Data([]byte)
-
-Numbers are encoded using little-endian order.
-*/
+// Image is a raw image.
+//
+//
+// Binary encoding:
+//
+// - Format length (uint32)
+//
+// - Format (string)
+//
+// - Data length (uint32)
+//
+// - Data([]byte)
+//
+// Numbers are encoded using little-endian order.
 type Image struct {
 	Format string // png, jpeg, bmp, gif, ...
 	Data   []byte // raw image data

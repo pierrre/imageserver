@@ -1,4 +1,4 @@
-// Package memory provides an in-memory Image Cache
+// Package memory provides an in-memory Image Cache.
 package memory
 
 import (
@@ -7,23 +7,23 @@ import (
 	"github.com/pierrre/lrucache"
 )
 
-// Cache represents an in-memory Image Cache
+// Cache is an in-memory Image Cache.
 //
-// It uses an LRU implementation from https://github.com/pierrre/lrucache (copy of https://github.com/youtube/vitess/tree/master/go/cache)
+// It uses an LRU implementation from https://github.com/pierrre/lrucache (copy of https://github.com/youtube/vitess/tree/master/go/cache) .
 type Cache struct {
 	lru *lrucache.LRUCache
 }
 
-// New creates a Cache
+// New creates a new Cache.
 //
-// capacity is the maximum cache size (in bytes)
+// capacity is the maximum cache size (in bytes).
 func New(capacity int64) *Cache {
 	return &Cache{
 		lru: lrucache.NewLRUCache(capacity),
 	}
 }
 
-// Get gets an image from the in-memory Cache
+// Get implements Cache.
 func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
@@ -34,7 +34,7 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 	return image, nil
 }
 
-// Set sets an Image to the in-memory Cache
+// Set implements Cache.
 func (cache *Cache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	item := &item{
 		image: image,

@@ -1,4 +1,4 @@
-// Package httpsource provides a HTTP source Image Server
+// Package httpsource provides a HTTP source Image Server.
 package httpsource
 
 import (
@@ -13,10 +13,10 @@ import (
 
 var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
-// Server represents a HTTP source Image Server
+// Server is a HTTP source Image Server.
 type Server struct{}
 
-// Get returns an Image for a HTTP source
+// Get returns an Image for a HTTP source.
 //
 // If the source is not an url, the string representation of the source will be used to create one.
 //

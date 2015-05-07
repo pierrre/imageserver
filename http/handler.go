@@ -1,4 +1,4 @@
-// Package http provides a HTTP Handler for an Image Server
+// Package http provides a HTTP Handler for an Image Server.
 package http
 
 import (

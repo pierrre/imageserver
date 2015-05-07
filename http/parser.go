@@ -22,7 +22,7 @@ type Parser interface {
 // ListParser is a list of HTTP Parser.
 type ListParser []Parser
 
-// Parse implements Parser
+// Parse implements Parser.
 func (lp ListParser) Parse(request *http.Request, params imageserver.Params) error {
 	for _, subParser := range lp {
 		err := subParser.Parse(request, params)

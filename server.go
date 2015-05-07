@@ -1,20 +1,20 @@
-// Package imageserver provides an Image server
+// Package imageserver provides an Image server toolkit.
 package imageserver
 
-// Server is an interface for an Image server
+// Server represents an Image server
 type Server interface {
 	Get(Params) (*Image, error)
 }
 
-// ServerFunc is a Server func
+// ServerFunc is a Server func.
 type ServerFunc func(params Params) (*Image, error)
 
-// Get calls the func
+// Get implements Server.
 func (f ServerFunc) Get(params Params) (*Image, error) {
 	return f(params)
 }
 
-// SourceParam is the source Param name
+// SourceParam is the source Param name.
 const SourceParam = "source"
 
 // SourceServer is a source Server.
@@ -24,7 +24,7 @@ type SourceServer struct {
 	Server
 }
 
-// Get implements Server
+// Get implements Server.
 func (s *SourceServer) Get(params Params) (*Image, error) {
 	source, err := params.Get(SourceParam)
 	if err != nil {

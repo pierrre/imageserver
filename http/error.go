@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Error represent a HTTP error.
+// Error is a HTTP error.
 type Error struct {
 	Code int
 	Text string
