@@ -73,7 +73,7 @@ func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error)
 	im, err = server.process(im, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = "graphicsmagick." + err.Param
+			err.Param = globalParam + "." + err.Param
 		}
 		return nil, err
 	}

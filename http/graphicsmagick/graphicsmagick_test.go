@@ -47,7 +47,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gmParams, err := params.GetParams("graphicsmagick")
+	gmParams, err := params.GetParams(globalParam)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func TestParseError(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	parser := &Parser{}
-	httpParam := parser.Resolve("graphicsmagick.foo")
+	httpParam := parser.Resolve(globalParam + ".foo")
 	if httpParam != "foo" {
 		t.Fatal("not equals")
 	}

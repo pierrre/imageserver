@@ -9,6 +9,10 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
+const (
+	globalParam = "graphicsmagick"
+)
+
 // Parser is a GraphicsMagick HTTP Parser.
 //
 // See Server for params list.
@@ -20,12 +24,12 @@ func (parser *Parser) Parse(request *http.Request, params imageserver.Params) er
 	err := parser.parse(request, p)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = "graphicsmagick." + err.Param
+			err.Param = globalParam + "." + err.Param
 		}
 		return err
 	}
 	if !p.Empty() {
-		params.Set("graphicsmagick", p)
+		params.Set(globalParam, p)
 	}
 	return nil
 }
@@ -62,8 +66,8 @@ func (parser *Parser) parse(request *http.Request, params imageserver.Params) er
 
 // Resolve implements Parser.
 func (parser *Parser) Resolve(param string) string {
-	if !strings.HasPrefix(param, "graphicsmagick.") {
+	if !strings.HasPrefix(param, globalParam+".") {
 		return ""
 	}
-	return strings.TrimPrefix(param, "graphicsmagick.")
+	return strings.TrimPrefix(param, globalParam+".")
 }
