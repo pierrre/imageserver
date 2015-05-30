@@ -1,7 +1,7 @@
 package cache_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -10,31 +10,52 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-var _ error = &MissError{}
+var _ Cache = &IgnoreError{}
 
-func TestMissError(t *testing.T) {
-	err := &MissError{Key: "foobar"}
-	_ = err.Error()
+func TestIgnoreErrorGetSet(t *testing.T) {
+	c := &IgnoreError{
+		Cache: cachetest.NewMapCache(),
+	}
+	cachetest.TestGetSet(t, c, testdata.Medium)
+}
+
+func TestIgnoreErrorGetSetError(t *testing.T) {
+	c := &IgnoreError{
+		Cache: &Func{
+			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+				return nil, errors.New("error")
+			},
+			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
+				return errors.New("error")
+			},
+		},
+	}
+	_, err := c.Get("test", imageserver.Params{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = c.Set("test", testdata.Medium, imageserver.Params{})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 var _ Cache = &Async{}
 
 func TestAsyncGetSet(t *testing.T) {
 	mapCache := cachetest.NewMapCache()
-
 	setCallCh := make(chan struct{})
-	funcCache := &Func{
-		GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
-			return mapCache.Get(key, params)
-		},
-		SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
-			setCallCh <- struct{}{}
-			return mapCache.Set(key, image, params)
-		},
-	}
-
 	asyncCache := &Async{
-		Cache: funcCache,
+		Cache: &Func{
+			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+				return mapCache.Get(key, params)
+			},
+			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
+				err := mapCache.Set(key, image, params)
+				setCallCh <- struct{}{}
+				return err
+			},
+		},
 	}
 
 	err := asyncCache.Set("foo", testdata.Small, imageserver.Params{})
@@ -42,32 +63,13 @@ func TestAsyncGetSet(t *testing.T) {
 		panic(err)
 	}
 	<-setCallCh
-	_, err = asyncCache.Get("foo", imageserver.Params{})
+	im, err := asyncCache.Get("foo", imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}
-}
-
-func TestAsyncSetErrFunc(t *testing.T) {
-	funcCache := &Func{
-		SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
-			return fmt.Errorf("error")
-		},
+	if im == nil {
+		t.Fatal("no image")
 	}
-
-	errFuncCallCh := make(chan struct{})
-	asyncCache := &Async{
-		Cache: funcCache,
-		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
-			errFuncCallCh <- struct{}{}
-		},
-	}
-
-	err := asyncCache.Set("foo", testdata.Small, imageserver.Params{})
-	if err != nil {
-		panic(err)
-	}
-	<-errFuncCallCh
 }
 
 var _ Cache = &Func{}

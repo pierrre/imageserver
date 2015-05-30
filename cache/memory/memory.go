@@ -3,7 +3,6 @@ package memory
 
 import (
 	"github.com/pierrre/imageserver"
-	imageserver_cache "github.com/pierrre/imageserver/cache"
 	"github.com/pierrre/lrucache"
 )
 
@@ -27,7 +26,7 @@ func New(capacity int64) *Cache {
 func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
-		return nil, &imageserver_cache.MissError{Key: key}
+		return nil, nil
 	}
 	item := value.(*item)
 	image := item.image

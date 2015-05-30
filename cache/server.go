@@ -32,23 +32,22 @@ type Server struct {
 // Get implements Server.
 func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	key := s.KeyGenerator.GetKey(params)
-
-	image, err := s.Cache.Get(key, params)
-	if err == nil {
-		return image, nil
-	}
-
-	image, err = s.Server.Get(params)
+	im, err := s.Cache.Get(key, params)
 	if err != nil {
 		return nil, err
 	}
-
-	err = s.Cache.Set(key, image, params)
+	if im != nil {
+		return im, nil
+	}
+	im, err = s.Server.Get(params)
 	if err != nil {
 		return nil, err
 	}
-
-	return image, nil
+	err = s.Cache.Set(key, im, params)
+	if err != nil {
+		return nil, err
+	}
+	return im, nil
 }
 
 // KeyGenerator represents a Cache key generator.

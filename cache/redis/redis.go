@@ -7,7 +7,6 @@ import (
 
 	redigo "github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
-	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
 // Cache is a Redis Image Cache.
@@ -22,7 +21,10 @@ type Cache struct {
 func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
-		return nil, &imageserver_cache.MissError{Key: key}
+		return nil, err
+	}
+	if data == nil {
+		return nil, nil
 	}
 	im := new(imageserver.Image)
 	err = im.UnmarshalBinaryNoCopy(data)
@@ -35,17 +37,20 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 func (cache *Cache) getData(key string) ([]byte, error) {
 	conn := cache.Pool.Get()
 	defer conn.Close()
-	return redigo.Bytes(conn.Do("GET", key))
+	data, err := redigo.Bytes(conn.Do("GET", key))
+	if err != nil {
+		if err == redigo.ErrNil {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return data, nil
 }
 
 // Set implements Cache.
 func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
 	data, _ := im.MarshalBinary()
-	err := cache.setData(key, data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return cache.setData(key, data)
 }
 
 func (cache *Cache) setData(key string, data []byte) error {
@@ -56,10 +61,7 @@ func (cache *Cache) setData(key string, data []byte) error {
 	conn := cache.Pool.Get()
 	defer conn.Close()
 	_, err := conn.Do("SET", params...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Close closes the underlying Redigo pool

@@ -1,47 +1,48 @@
 // Package cache provides an Image cache.
 package cache
 
-import (
-	"fmt"
-
-	"github.com/pierrre/imageserver"
-)
+import "github.com/pierrre/imageserver"
 
 // Cache represents an Image cache.
 //
 // The Params can be used for custom behavior (no-cache, expiration, ...).
 type Cache interface {
-	// Must return a MissError if it is a cache related problem.
+	// Must return nil and no error if the image is not found.
 	Get(key string, params imageserver.Params) (*imageserver.Image, error)
 	Set(key string, image *imageserver.Image, params imageserver.Params) error
 }
 
-// MissError is a Cache miss error.
-type MissError struct {
-	Key string
+// IgnoreError is a Cache that ignores error from the underlying Cache.
+type IgnoreError struct {
+	Cache
 }
 
-func (err *MissError) Error() string {
-	return fmt.Sprintf("cache miss for key \"%s\"", err.Key)
+// Get implements Cache.
+func (c *IgnoreError) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
+	im, err := c.Cache.Get(key, params)
+	if err != nil {
+		return nil, nil
+	}
+	return im, nil
+}
+
+// Set implements Cache.
+func (c *IgnoreError) Set(key string, image *imageserver.Image, params imageserver.Params) error {
+	c.Cache.Set(key, image, params)
+	return nil
 }
 
 // Async is an asynchronous Cache.
 //
 // The Images are set from a new goroutine.
-//
-// ErrFunc is called if there is an error.
 type Async struct {
 	Cache
-	ErrFunc func(err error, key string, image *imageserver.Image, params imageserver.Params)
 }
 
 // Set implements Cache.
 func (a *Async) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	go func() {
-		err := a.Cache.Set(key, image, params)
-		if err != nil && a.ErrFunc != nil {
-			a.ErrFunc(err, key, image, params)
-		}
+		a.Cache.Set(key, image, params)
 	}()
 	return nil
 }

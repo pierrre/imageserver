@@ -30,6 +30,5 @@ func BenchmarkGetAnimated(b *testing.B) {
 
 func benchmarkGet(b *testing.B, image *imageserver.Image) {
 	cache := newTestCache()
-
-	cachetest.CacheBenchmarkGet(b, cache, image)
+	cachetest.BenchmarkGet(b, cache, image)
 }

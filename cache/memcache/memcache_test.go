@@ -20,13 +20,13 @@ func TestGetSet(t *testing.T) {
 		testdata.Medium,
 		testdata.Large,
 	} {
-		cachetest.CacheTestGetSet(t, cache, im)
+		cachetest.TestGetSet(t, cache, im)
 	}
 }
 
-func TestGetErrorMiss(t *testing.T) {
+func TestGetMiss(t *testing.T) {
 	cache := newTestCache(t)
-	cachetest.CacheTestGetErrorMiss(t, cache)
+	cachetest.TestGetMiss(t, cache)
 }
 
 func TestGetErrorServer(t *testing.T) {

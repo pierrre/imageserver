@@ -18,14 +18,14 @@ func TestGetSet(t *testing.T) {
 	defer cache.Close()
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire
-		cachetest.CacheTestGetSetAllImages(t, cache)
+		cachetest.TestGetSetAllImages(t, cache)
 	}
 }
 
-func TestGetErrorMiss(t *testing.T) {
+func TestGetMiss(t *testing.T) {
 	cache := newTestCache(t)
 	defer cache.Close()
-	cachetest.CacheTestGetErrorMiss(t, cache)
+	cachetest.TestGetMiss(t, cache)
 }
 
 func TestGetErrorAddress(t *testing.T) {

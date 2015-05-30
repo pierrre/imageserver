@@ -145,11 +145,11 @@ func newCacheRedis() imageserver_cache.Cache {
 		},
 		Expire: time.Duration(7 * 24 * time.Hour),
 	})
+	cache = &imageserver_cache.IgnoreError{
+		Cache: cache,
+	}
 	cache = &imageserver_cache.Async{
 		Cache: cache,
-		ErrFunc: func(err error, key string, image *imageserver.Image, params imageserver.Params) {
-			log.Println("Cache error:", err)
-		},
 	}
 	return cache
 }

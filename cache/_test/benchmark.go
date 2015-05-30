@@ -7,8 +7,8 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 )
 
-// CacheBenchmarkGet is a helper to benchmark cache Get().
-func CacheBenchmarkGet(b *testing.B, cache imageserver_cache.Cache, im *imageserver.Image) {
+// BenchmarkGet is a helper to benchmark cache Get().
+func BenchmarkGet(b *testing.B, cache imageserver_cache.Cache, im *imageserver.Image) {
 	key := "test"
 	err := cache.Set(key, im, imageserver.Params{})
 	if err != nil {

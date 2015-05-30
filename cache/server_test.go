@@ -36,6 +36,23 @@ func TestServer(t *testing.T) {
 	}
 }
 
+func TestServerErrorCacheGet(t *testing.T) {
+	s := &Server{
+		Cache: &Func{
+			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+				return nil, errors.New("error")
+			},
+		},
+		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "test"
+		}),
+	}
+	_, err := s.Get(imageserver.Params{})
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func TestServerErrorServer(t *testing.T) {
 	s := &Server{
 		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
@@ -59,7 +76,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 		}),
 		Cache: &Func{
 			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
-				return nil, &MissError{Key: key}
+				return nil, nil
 			},
 			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
 				return errors.New("error")

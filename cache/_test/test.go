@@ -17,8 +17,8 @@ const (
 	KeyMiss = "unknown"
 )
 
-// CacheTestGetSet is a helper to test cache Get()/Set().
-func CacheTestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.Image) {
+// TestGetSet is a helper to test cache Get()/Set().
+func TestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.Image) {
 	err := cache.Set(KeyValid, image, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
@@ -32,21 +32,21 @@ func CacheTestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imagese
 	}
 }
 
-// CacheTestGetSetAllImages is a helper to test cache Get()/Set() with all images from test data.
-func CacheTestGetSetAllImages(t *testing.T, cache imageserver_cache.Cache) {
+// TestGetSetAllImages is a helper to test cache Get()/Set() with all images from test data.
+func TestGetSetAllImages(t *testing.T, cache imageserver_cache.Cache) {
 	for _, image := range testdata.Images {
-		CacheTestGetSet(t, cache, image)
+		TestGetSet(t, cache, image)
 	}
 }
 
-// CacheTestGetErrorMiss is a helper to test cache Get() with a "cache miss" error.
-func CacheTestGetErrorMiss(t *testing.T, cache imageserver_cache.Cache) {
-	_, err := cache.Get(KeyMiss, imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
+// CacheTestGetMiss is a helper to test cache Get() with a "cache miss" error.
+func TestGetMiss(t *testing.T, cache imageserver_cache.Cache) {
+	im, err := cache.Get(KeyMiss, imageserver.Params{})
+	if err != nil {
+		t.Fatal(err)
 	}
-	if _, ok := err.(*imageserver_cache.MissError); !ok {
-		t.Fatal("invalid error type")
+	if im != nil {
+		t.Fatal("image not nil")
 	}
 }
 
@@ -67,11 +67,7 @@ func NewMapCache() *MapCache {
 func (cache *MapCache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
-	image, ok := cache.data[key]
-	if !ok {
-		return nil, &imageserver_cache.MissError{Key: key}
-	}
-	return image, nil
+	return cache.data[key], nil
 }
 
 // Set implements Cache.
