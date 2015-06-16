@@ -2,7 +2,11 @@ package imageserver_test
 
 import (
 	"encoding"
+	"encoding/binary"
+	"reflect"
+	"strings"
 	"testing"
+	"unsafe"
 
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
@@ -25,6 +29,29 @@ func TestImageMarshal(t *testing.T) {
 	}
 }
 
+func TestImageMarshallErrorFormatMaxLen(t *testing.T) {
+	im := &Image{
+		Format: strings.Repeat("a", ImageFormatMaxLen+1),
+	}
+	_, err := im.MarshalBinary()
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
+func TestImageMarshallErrorDataMaxLen(t *testing.T) {
+	data := make([]byte, 0)
+	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
+	dataHeader.Len = ImageDataMaxLen + 1
+	im := &Image{
+		Data: data,
+	}
+	_, err := im.MarshalBinary()
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 	for _, im := range testdata.Images {
 		data, _ := im.MarshalBinary()
@@ -43,6 +70,34 @@ func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 				t.Fatal("no error")
 			}
 		}
+	}
+}
+
+func TestImageUnmarshalBinaryErrorFormatMaxLen(t *testing.T) {
+	data, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	formatLenPosition := 0
+	binary.LittleEndian.PutUint32(data[formatLenPosition:formatLenPosition+4], uint32(ImageFormatMaxLen+1))
+	im := new(Image)
+	err = im.UnmarshalBinary(data)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
+func TestImageUnmarshalBinaryErrorDataMaxLen(t *testing.T) {
+	data, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	dataLenPosition := 4 + len(testdata.Medium.Format)
+	binary.LittleEndian.PutUint32(data[dataLenPosition:dataLenPosition+4], uint32(ImageDataMaxLen+1))
+	im := new(Image)
+	err = im.UnmarshalBinary(data)
+	if err == nil {
+		t.Fatal("no error")
 	}
 }
 

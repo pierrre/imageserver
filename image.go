@@ -6,6 +6,17 @@ import (
 	"fmt"
 )
 
+const (
+	// ImageFormatMaxLen is the maximum length for the image's format.
+	ImageFormatMaxLen = 1 << 8 // 256 B
+	// ImageDataMaxLen is the maximum length for the image's data.
+	ImageDataMaxLen = 1 << 30 // 1 GiB
+)
+
+var (
+	imageByteOrder = binary.LittleEndian
+)
+
 // Image is a raw image.
 //
 //
@@ -26,20 +37,26 @@ type Image struct {
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler.
-//
-// It's very unlikely that it returns an error. (impossible?)
 func (im *Image) MarshalBinary() ([]byte, error) {
-	buf := new(bytes.Buffer)
+	if len(im.Format) > ImageFormatMaxLen {
+		return nil, &ImageError{Message: fmt.Sprintf("marshal: format length %d is greater than the maximum value %d", len(im.Format), ImageFormatMaxLen)}
+	}
+	if len(im.Data) > ImageDataMaxLen {
+		return nil, &ImageError{Message: fmt.Sprintf("marshal: data length %d is greater than the maximum value %d", len(im.Data), ImageDataMaxLen)}
+	}
 
-	formatLen := uint32(len(im.Format))
-	binary.Write(buf, binary.LittleEndian, &formatLen)
-	buf.Write([]byte(im.Format))
+	data := make([]byte, 0, 4+len(im.Format)+4+len(im.Data))
+	buf := make([]byte, 4)
 
-	dataLen := uint32(len(im.Data))
-	binary.Write(buf, binary.LittleEndian, &dataLen)
-	buf.Write(im.Data)
+	imageByteOrder.PutUint32(buf, uint32(len(im.Format)))
+	data = append(data, buf...)
+	data = append(data, im.Format...)
 
-	return buf.Bytes(), nil
+	imageByteOrder.PutUint32(buf, uint32(len(im.Data)))
+	data = append(data, buf...)
+	data = append(data, im.Data...)
+
+	return data, nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
@@ -57,40 +74,47 @@ func (im *Image) UnmarshalBinary(data []byte) error {
 func (im *Image) UnmarshalBinaryNoCopy(data []byte) error {
 	dataPosition := 0
 	readData := func(length int) ([]byte, error) {
+		dataStart := dataPosition
 		dataEnd := dataPosition + length
 		if dataEnd > len(data) {
 			return nil, &ImageError{Message: fmt.Sprintf("unmarshal: unexpected end of data at index %d instead of %d", len(data), dataEnd)}
 		}
-		d := data[dataPosition:dataEnd]
 		dataPosition = dataEnd
-		return d, nil
+		return data[dataStart:dataEnd], nil
 	}
 
-	var formatLen uint32
-	if d, err := readData(4); err == nil {
-		binary.Read(bytes.NewReader(d), binary.LittleEndian, &formatLen)
-	} else {
+	var buf []byte
+	var err error
+
+	buf, err = readData(4)
+	if err != nil {
 		return err
+	}
+	formatLen := imageByteOrder.Uint32(buf)
+	if formatLen > ImageFormatMaxLen {
+		return &ImageError{Message: fmt.Sprintf("unmarshal: format length %d is greater than the maximum value %d", formatLen, ImageFormatMaxLen)}
 	}
 
-	if d, err := readData(int(formatLen)); err == nil {
-		im.Format = string(d)
-	} else {
+	buf, err = readData(int(formatLen))
+	if err != nil {
 		return err
+	}
+	im.Format = string(buf)
+
+	buf, err = readData(4)
+	if err != nil {
+		return err
+	}
+	dataLen := imageByteOrder.Uint32(buf)
+	if dataLen > ImageDataMaxLen {
+		return &ImageError{Message: fmt.Sprintf("unmarshal: data length %d is greater than the maximum value %d", dataLen, ImageDataMaxLen)}
 	}
 
-	var dataLen uint32
-	if d, err := readData(4); err == nil {
-		binary.Read(bytes.NewReader(d), binary.LittleEndian, &dataLen)
-	} else {
+	buf, err = readData(int(dataLen))
+	if err != nil {
 		return err
 	}
-
-	if d, err := readData(int(dataLen)); err == nil {
-		im.Data = d
-	} else {
-		return err
-	}
+	im.Data = buf
 
 	return nil
 }
