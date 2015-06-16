@@ -46,6 +46,30 @@ func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 	}
 }
 
+// TestImageMarshalBugBuffer is a test for a bug with a misused byte buffer pool.
+// Successive calls to Image.MarshalBinary() write to the same byte slice.
+func TestImageMarshalBugByteBufferPool(t *testing.T) {
+	d1, err := testdata.Small.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	d2, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	im1 := new(Image)
+	err = im1.UnmarshalBinary(d1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	im2 := new(Image)
+	err = im2.UnmarshalBinary(d2)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestImageEqual(t *testing.T) {
 	for _, tc := range []struct {
 		im1         *Image

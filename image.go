@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"sync"
 )
 
 // Image is a raw image.
@@ -26,18 +25,11 @@ type Image struct {
 	Data   []byte // raw image data
 }
 
-var bufferPool = &sync.Pool{
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
-
 // MarshalBinary implements encoding.BinaryMarshaler.
 //
 // It's very unlikely that it returns an error. (impossible?)
 func (im *Image) MarshalBinary() ([]byte, error) {
-	buf := bufferPool.Get().(*bytes.Buffer)
-	buf.Reset()
+	buf := new(bytes.Buffer)
 
 	formatLen := uint32(len(im.Format))
 	binary.Write(buf, binary.LittleEndian, &formatLen)
@@ -47,9 +39,7 @@ func (im *Image) MarshalBinary() ([]byte, error) {
 	binary.Write(buf, binary.LittleEndian, &dataLen)
 	buf.Write(im.Data)
 
-	b := buf.Bytes()
-	bufferPool.Put(buf)
-	return b, nil
+	return buf.Bytes(), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
