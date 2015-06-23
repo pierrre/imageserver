@@ -14,12 +14,16 @@ func BenchmarkGet(b *testing.B, cache imageserver_cache.Cache, im *imageserver.I
 	if err != nil {
 		b.Fatal(err)
 	}
+	params := imageserver.Params{}
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := cache.Get(key, imageserver.Params{})
+			newIm, err := cache.Get(key, params)
 			if err != nil {
 				b.Fatal(err)
+			}
+			if newIm == nil {
+				b.Fatal("image nil")
 			}
 		}
 	})

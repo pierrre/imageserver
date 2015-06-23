@@ -23,11 +23,14 @@ func TestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.
 	if err != nil {
 		t.Fatal(err)
 	}
-	newImage, err := cache.Get(KeyValid, imageserver.Params{})
+	newIm, err := cache.Get(KeyValid, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !imageserver.ImageEqual(newImage, image) {
+	if newIm == nil {
+		t.Fatal("image nil")
+	}
+	if !imageserver.ImageEqual(newIm, image) {
 		t.Fatal("image not equals")
 	}
 }
@@ -71,9 +74,9 @@ func (cache *MapCache) Get(key string, params imageserver.Params) (*imageserver.
 }
 
 // Set implements Cache.
-func (cache *MapCache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
+func (cache *MapCache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
-	cache.data[key] = image
+	cache.data[key] = im
 	return nil
 }
