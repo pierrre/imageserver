@@ -38,17 +38,23 @@ func (s *SourceServer) Get(params Params) (*Image, error) {
 //
 // It uses a buffered channel to limit the number of concurrent executions.
 func NewLimitServer(s Server, limit int) Server {
-	if limit <= 0 {
-		return s
+	return &limitServer{
+		Server:  s,
+		limitCh: make(chan struct{}, limit),
 	}
-	limitCh := make(chan struct{}, limit)
-	return ServerFunc(func(params Params) (*Image, error) {
-		limitCh <- struct{}{}
-		defer func() {
-			<-limitCh
-		}()
-		return s.Get(params)
-	})
+}
+
+type limitServer struct {
+	Server
+	limitCh chan struct{}
+}
+
+func (s *limitServer) Get(params Params) (*Image, error) {
+	s.limitCh <- struct{}{}
+	defer func() {
+		<-s.limitCh
+	}()
+	return s.Server.Get(params)
 }
 
 // StaticServer is an Image Server that always returns the same Image and error.
