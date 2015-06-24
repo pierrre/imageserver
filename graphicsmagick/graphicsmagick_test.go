@@ -11,13 +11,8 @@ import (
 var _ imageserver.Server = &Server{}
 
 func TestGet(t *testing.T) {
-	im := testdata.Medium
-	var server imageserver.Server
-	server = imageserver.ServerFunc(func(imageserver.Params) (*imageserver.Image, error) {
-		return im, nil
-	})
-	server = &Server{
-		Server:     server,
+	server := &Server{
+		Server:     &imageserver.StaticServer{Image: testdata.Medium},
 		Executable: "gm",
 	}
 	params := imageserver.Params{
@@ -33,13 +28,8 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetErrorTimeout(t *testing.T) {
-	im := testdata.Medium
-	var server imageserver.Server
-	server = imageserver.ServerFunc(func(imageserver.Params) (*imageserver.Image, error) {
-		return im, nil
-	})
-	server = &Server{
-		Server:     server,
+	server := &Server{
+		Server:     &imageserver.StaticServer{Image: testdata.Medium},
 		Executable: "gm",
 		Timeout:    1 * time.Nanosecond,
 	}

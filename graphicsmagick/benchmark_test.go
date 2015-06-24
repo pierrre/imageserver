@@ -28,12 +28,8 @@ func BenchmarkResizeAnimated(b *testing.B) {
 }
 
 func benchmarkResize(b *testing.B, im *imageserver.Image) {
-	var server imageserver.Server
-	server = imageserver.ServerFunc(func(imageserver.Params) (*imageserver.Image, error) {
-		return im, nil
-	})
-	server = &Server{
-		Server:     server,
+	server := &Server{
+		Server:     &imageserver.StaticServer{Image: im},
 		Executable: "gm",
 	}
 	params := imageserver.Params{

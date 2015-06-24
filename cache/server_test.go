@@ -15,9 +15,7 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
-			return testdata.Medium, nil
-		}),
+		Server:       &imageserver.StaticServer{Image: testdata.Medium},
 		Cache:        cachetest.NewMapCache(),
 		KeyGenerator: StringKeyGenerator("test"),
 	}
@@ -51,9 +49,7 @@ func TestServerErrorCacheGet(t *testing.T) {
 
 func TestServerErrorServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
-			return nil, errors.New("error")
-		}),
+		Server:       &imageserver.StaticServer{Error: errors.New("error")},
 		Cache:        cachetest.NewMapCache(),
 		KeyGenerator: StringKeyGenerator("test"),
 	}
@@ -65,9 +61,7 @@ func TestServerErrorServer(t *testing.T) {
 
 func TestServerErrorCacheSet(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
-			return testdata.Medium, nil
-		}),
+		Server: &imageserver.StaticServer{Image: testdata.Medium},
 		Cache: &Func{
 			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, nil

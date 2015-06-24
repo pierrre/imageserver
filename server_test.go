@@ -90,3 +90,19 @@ func TestNewLimitServerZero(t *testing.T) {
 	// TODO ?
 	NewLimitServer(testdata.Server, 0)
 }
+
+var _ Server = &StaticServer{}
+
+func TestStaticServer(t *testing.T) {
+	s := &StaticServer{
+		Image: testdata.Medium,
+		Error: nil,
+	}
+	im, err := s.Get(Params{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ImageEqual(im, testdata.Medium) {
+		t.Fatal("not equal")
+	}
+}

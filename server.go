@@ -50,3 +50,14 @@ func NewLimitServer(s Server, limit int) Server {
 		return s.Get(params)
 	})
 }
+
+// StaticServer is an Image Server that always returns the same Image and error.
+type StaticServer struct {
+	Image *Image
+	Error error
+}
+
+// Get implements Server.
+func (s *StaticServer) Get(params Params) (*Image, error) {
+	return s.Image, s.Error
+}
