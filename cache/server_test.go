@@ -18,10 +18,8 @@ func TestServer(t *testing.T) {
 		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
-		Cache: cachetest.NewMapCache(),
-		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
-			return "test"
-		}),
+		Cache:        cachetest.NewMapCache(),
+		KeyGenerator: StringKeyGenerator("test"),
 	}
 	image1, err := s.Get(imageserver.Params{})
 	if err != nil {
@@ -43,9 +41,7 @@ func TestServerErrorCacheGet(t *testing.T) {
 				return nil, errors.New("error")
 			},
 		},
-		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
-			return "test"
-		}),
+		KeyGenerator: StringKeyGenerator("test"),
 	}
 	_, err := s.Get(imageserver.Params{})
 	if err == nil {
@@ -58,10 +54,8 @@ func TestServerErrorServer(t *testing.T) {
 		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return nil, errors.New("error")
 		}),
-		Cache: cachetest.NewMapCache(),
-		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
-			return "test"
-		}),
+		Cache:        cachetest.NewMapCache(),
+		KeyGenerator: StringKeyGenerator("test"),
 	}
 	_, err := s.Get(imageserver.Params{})
 	if err == nil {
@@ -82,9 +76,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 				return errors.New("error")
 			},
 		},
-		KeyGenerator: KeyGeneratorFunc(func(params imageserver.Params) string {
-			return "test"
-		}),
+		KeyGenerator: StringKeyGenerator("test"),
 	}
 	_, err := s.Get(imageserver.Params{})
 	if err == nil {
@@ -111,6 +103,16 @@ func TestPrefixKeyGenerator(t *testing.T) {
 	}
 	key := g.GetKey(imageserver.Params{})
 	if key != "foobar" {
+		t.Fatal("not equal")
+	}
+}
+
+var _ KeyGenerator = StringKeyGenerator("")
+
+func TestStringKeyGenerator(t *testing.T) {
+	g := StringKeyGenerator("foo")
+	key := g.GetKey(imageserver.Params{})
+	if key != "foo" {
 		t.Fatal("not equal")
 	}
 }
