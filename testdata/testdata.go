@@ -2,6 +2,7 @@
 package testdata
 
 import (
+	"errors"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
@@ -47,21 +48,26 @@ var (
 
 	// Server is an Image Server that uses filename as source.
 	Server imageserver.Server = imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
-		source, err := params.Get(imageserver.SourceParam)
+		source, err := params.GetString(imageserver.SourceParam)
 		if err != nil {
 			return nil, err
 		}
-		name, ok := source.(string)
-		if !ok {
-			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: "not a string"}
-		}
-		im, ok := Images[name]
-		if !ok {
-			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: "unknown image"}
+		im, err := Get(source)
+		if err != nil {
+			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}
 		}
 		return im, nil
 	})
 )
+
+// Get returns an Image for a name.
+func Get(name string) (*imageserver.Image, error) {
+	im, ok := Images[name]
+	if !ok {
+		return nil, errors.New("unknown image")
+	}
+	return im, nil
+}
 
 func initDir() string {
 	_, currentFile, _, _ := runtime.Caller(0)
