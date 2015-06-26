@@ -21,35 +21,55 @@ import (
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
+var (
+	flagHTTPAddr            = ":8080"
+	flagGitHubWebhookSecret string
+	flagHTTPExpires         = time.Duration(7 * 24 * time.Hour)
+	flagRedis               = "localhost:6379"
+	flagRedisExpire         = time.Duration(7 * 24 * time.Hour)
+	flagCacheMemory         = int64(64 * (1 << 20))
+)
+
 func main() {
-	var httpAddr string
-	flag.StringVar(&httpAddr, "http", ":8080", "Http")
-	var gitHubWebhookSecret string
-	flag.StringVar(&gitHubWebhookSecret, "github-webhook-secret", "", "GitHub webhook secret")
-	flag.Parse()
-
+	parseFlags()
 	log.Println("Start")
-	log.Printf("Go version: %s", runtime.Version())
-	log.Printf("Go max procs: %d", runtime.GOMAXPROCS(0))
-
-	startHTTPServerAddr(httpAddr, gitHubWebhookSecret)
+	logEnv()
+	startHTTPServer()
 }
 
-func startHTTPServerAddr(addr string, gitHubWebhookSecret string) {
+func parseFlags() {
+	flag.StringVar(&flagHTTPAddr, "http", flagHTTPAddr, "HTTP addr")
+	flag.DurationVar(&flagHTTPExpires, "http-expires", flagHTTPExpires, "HTTP expires")
+	flag.StringVar(&flagGitHubWebhookSecret, "github-webhook-secret", "", "GitHub webhook secret")
+	flag.StringVar(&flagRedis, "redis", flagRedis, "Redis addr")
+	flag.DurationVar(&flagRedisExpire, "redis-expire", flagRedisExpire, "Redis expire")
+	flag.Int64Var(&flagCacheMemory, "cache-memory", flagCacheMemory, "Cache memory")
+	flag.Parse()
+}
+
+func logEnv() {
+	log.Printf("Go version: %s", runtime.Version())
+	log.Printf("Go max procs: %d", runtime.GOMAXPROCS(0))
+}
+
+func startHTTPServer() {
 	http.Handle("/", newImageHTTPHandler())
-	if gitHubWebhookSecret != "" {
-		http.Handle("/github_webhook", newGitHubWebhookHTTPHandler(gitHubWebhookSecret))
+	if h := newGitHubWebhookHTTPHandler(); h != nil {
+		http.Handle("/github_webhook", h)
 	}
-	log.Printf("Start HTTP server on %s", addr)
-	err := http.ListenAndServe(addr, nil)
+	log.Printf("Start HTTP server on %s", flagHTTPAddr)
+	err := http.ListenAndServe(flagHTTPAddr, nil)
 	if err != nil {
 		log.Panic(err)
 	}
 }
 
-func newGitHubWebhookHTTPHandler(secret string) http.Handler {
+func newGitHubWebhookHTTPHandler() http.Handler {
+	if flagGitHubWebhookSecret == "" {
+		return nil
+	}
 	return &githubhook.Handler{
-		Secret: secret,
+		Secret: flagGitHubWebhookSecret,
 		Delivery: func(event string, deliveryID string, payload interface{}) {
 			log.Printf("Received GitHub webhook: %s", event)
 			if event == "push" {
@@ -76,9 +96,11 @@ func newImageHTTPHandler() http.Handler {
 			log.Println("Error:", err)
 		},
 	})
-	handler = &imageserver_http.ExpiresHandler{
-		Handler: handler,
-		Expires: time.Duration(7 * 24 * time.Hour),
+	if flagHTTPExpires != 0 {
+		handler = &imageserver_http.ExpiresHandler{
+			Handler: handler,
+			Expires: flagHTTPExpires,
+		}
 	}
 	return handler
 }
@@ -122,28 +144,35 @@ func newServerLimit(server imageserver.Server) imageserver.Server {
 
 func newServerCache(server imageserver.Server) imageserver.Server {
 	keyGenerator := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
-	server = &imageserver_cache.Server{
-		Server:       server,
-		Cache:        newCacheRedis(),
-		KeyGenerator: keyGenerator,
+	if cache := newCacheRedis(); cache != nil {
+		server = &imageserver_cache.Server{
+			Server:       server,
+			Cache:        cache,
+			KeyGenerator: keyGenerator,
+		}
 	}
-	server = &imageserver_cache.Server{
-		Server:       server,
-		Cache:        newCacheMemory(),
-		KeyGenerator: keyGenerator,
+	if cache := newCacheMemory(); cache != nil {
+		server = &imageserver_cache.Server{
+			Server:       server,
+			Cache:        cache,
+			KeyGenerator: keyGenerator,
+		}
 	}
 	return server
 }
 
 func newCacheRedis() imageserver_cache.Cache {
+	if flagRedis == "" {
+		return nil
+	}
 	cache := imageserver_cache.Cache(&imageserver_cache_redis.Cache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
-				return redigo.Dial("tcp", "localhost:6379")
+				return redigo.Dial("tcp", flagRedis)
 			},
 			MaxIdle: 50,
 		},
-		Expire: time.Duration(7 * 24 * time.Hour),
+		Expire: flagRedisExpire,
 	})
 	cache = &imageserver_cache.IgnoreError{
 		Cache: cache,
@@ -155,5 +184,8 @@ func newCacheRedis() imageserver_cache.Cache {
 }
 
 func newCacheMemory() imageserver_cache.Cache {
-	return imageserver_cache_memory.New(10 * 1024 * 1024)
+	if flagCacheMemory == 0 {
+		return nil
+	}
+	return imageserver_cache_memory.New(flagCacheMemory)
 }
