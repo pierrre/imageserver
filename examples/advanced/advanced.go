@@ -184,7 +184,7 @@ func newCacheRedis() imageserver_cache.Cache {
 }
 
 func newCacheMemory() imageserver_cache.Cache {
-	if flagCacheMemory == 0 {
+	if flagCacheMemory <= 0 {
 		return nil
 	}
 	return imageserver_cache_memory.New(flagCacheMemory)
