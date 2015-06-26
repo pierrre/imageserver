@@ -15,6 +15,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
+	h := newImageHTTPHandler()
 	type TC struct {
 		query              url.Values
 		expectedStatusCode int
@@ -128,7 +129,6 @@ func TestServer(t *testing.T) {
 					t.Logf("%#v", tc)
 				}
 			}()
-			h := newImageHTTPHandler()
 			u := &url.URL{
 				Scheme:   "http",
 				Host:     "localhost",
