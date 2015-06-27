@@ -54,6 +54,7 @@ func logEnv() {
 
 func startHTTPServer() {
 	http.Handle("/", newImageHTTPHandler())
+	http.Handle("/favicon.ico", http.NotFoundHandler())
 	if h := newGitHubWebhookHTTPHandler(); h != nil {
 		http.Handle("/github_webhook", h)
 	}
