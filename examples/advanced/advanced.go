@@ -90,11 +90,14 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 
 func newImageHTTPHandler() http.Handler {
 	handler := http.Handler(&imageserver_http.Handler{
-		Parser:   newParser(),
+		Parser: &imageserver_http.ListParser{
+			&imageserver_http.SourceParser{},
+			&imageserver_http_graphicsmagick.Parser{},
+		},
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
 		ErrorFunc: func(err error, request *http.Request) {
-			log.Println("Error:", err)
+			log.Printf("Internal error: %s", err)
 		},
 	})
 	if flagHTTPExpires != 0 {
@@ -106,30 +109,20 @@ func newImageHTTPHandler() http.Handler {
 	return handler
 }
 
-func newParser() imageserver_http.Parser {
-	return &imageserver_http.ListParser{
-		&imageserver_http.SourceParser{},
-		&imageserver_http_graphicsmagick.Parser{},
-	}
-}
-
 func newServer() imageserver.Server {
-	server := newServerTestData()
+	server := imageserver_testdata.Server
 	server = newServerGraphicsMagick(server)
 	server = newServerLimit(server)
-	server = newServerCache(server)
+	server = newServerCacheRedis(server)
+	server = newServerCacheMemory(server)
 	return server
-}
-
-func newServerTestData() imageserver.Server {
-	return imageserver_testdata.Server
 }
 
 func newServerGraphicsMagick(server imageserver.Server) imageserver.Server {
 	return &imageserver_graphicsmagick.Server{
 		Server:     server,
 		Executable: "gm",
-		Timeout:    time.Duration(10 * time.Second),
+		Timeout:    time.Duration(30 * time.Second),
 		AllowedFormats: []string{
 			"jpeg",
 			"png",
@@ -143,30 +136,12 @@ func newServerLimit(server imageserver.Server) imageserver.Server {
 	return imageserver.NewLimitServer(server, runtime.GOMAXPROCS(0)*2)
 }
 
-func newServerCache(server imageserver.Server) imageserver.Server {
-	keyGenerator := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
-	if cache := newCacheRedis(); cache != nil {
-		server = &imageserver_cache.Server{
-			Server:       server,
-			Cache:        cache,
-			KeyGenerator: keyGenerator,
-		}
-	}
-	if cache := newCacheMemory(); cache != nil {
-		server = &imageserver_cache.Server{
-			Server:       server,
-			Cache:        cache,
-			KeyGenerator: keyGenerator,
-		}
-	}
-	return server
-}
-
-func newCacheRedis() imageserver_cache.Cache {
+func newServerCacheRedis(server imageserver.Server) imageserver.Server {
 	if flagRedis == "" {
-		return nil
+		return server
 	}
-	cache := imageserver_cache.Cache(&imageserver_cache_redis.Cache{
+	var cache imageserver_cache.Cache
+	cache = &imageserver_cache_redis.Cache{
 		Pool: &redigo.Pool{
 			Dial: func() (redigo.Conn, error) {
 				return redigo.Dial("tcp", flagRedis)
@@ -174,19 +149,27 @@ func newCacheRedis() imageserver_cache.Cache {
 			MaxIdle: 50,
 		},
 		Expire: flagRedisExpire,
-	})
+	}
 	cache = &imageserver_cache.IgnoreError{
 		Cache: cache,
 	}
 	cache = &imageserver_cache.Async{
 		Cache: cache,
 	}
-	return cache
+	return &imageserver_cache.Server{
+		Server:       server,
+		Cache:        cache,
+		KeyGenerator: imageserver_cache.NewParamsHashKeyGenerator(sha256.New),
+	}
 }
 
-func newCacheMemory() imageserver_cache.Cache {
+func newServerCacheMemory(server imageserver.Server) imageserver.Server {
 	if flagCacheMemory <= 0 {
-		return nil
+		return server
 	}
-	return imageserver_cache_memory.New(flagCacheMemory)
+	return &imageserver_cache.Server{
+		Server:       server,
+		Cache:        imageserver_cache_memory.New(flagCacheMemory),
+		KeyGenerator: imageserver_cache.NewParamsHashKeyGenerator(sha256.New),
+	}
 }
