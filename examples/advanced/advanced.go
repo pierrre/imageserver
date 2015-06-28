@@ -89,7 +89,8 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 }
 
 func newImageHTTPHandler() http.Handler {
-	handler := http.Handler(&imageserver_http.Handler{
+	var handler http.Handler
+	handler = &imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{
 			&imageserver_http.SourceParser{},
 			&imageserver_http_graphicsmagick.Parser{},
@@ -99,7 +100,7 @@ func newImageHTTPHandler() http.Handler {
 		ErrorFunc: func(err error, request *http.Request) {
 			log.Printf("Internal error: %s", err)
 		},
-	})
+	}
 	if flagHTTPExpires != 0 {
 		handler = &imageserver_http.ExpiresHandler{
 			Handler: handler,
