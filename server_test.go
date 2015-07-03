@@ -76,8 +76,8 @@ func TestSourceServerErrorNoSource(t *testing.T) {
 
 func TestNewLimitServer(t *testing.T) {
 	// TODO test limit
-	server := NewLimitServer(testdata.Server, 1)
-	im, err := server.Get(Params{SourceParam: testdata.MediumFileName})
+	server := NewLimitServer(&StaticServer{Image: testdata.Medium}, 1)
+	im, err := server.Get(Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestNewLimitServer(t *testing.T) {
 
 func TestNewLimitServerZero(t *testing.T) {
 	// TODO ?
-	NewLimitServer(testdata.Server, 0)
+	NewLimitServer(&StaticServer{Image: testdata.Medium}, 0)
 }
 
 var _ Server = &StaticServer{}
