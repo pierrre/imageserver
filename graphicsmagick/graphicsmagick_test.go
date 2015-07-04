@@ -43,4 +43,7 @@ func TestGetErrorTimeout(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*imageserver.ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }

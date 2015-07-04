@@ -42,6 +42,9 @@ func TestGetErrorNoSource(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestGetErrorNotFound(t *testing.T) {
@@ -55,6 +58,9 @@ func TestGetErrorNotFound(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestGetErrorInvalidUrl(t *testing.T) {
@@ -63,6 +69,9 @@ func TestGetErrorInvalidUrl(t *testing.T) {
 	_, err := server.Get(params)
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 
@@ -73,6 +82,9 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestGetErrorRequest(t *testing.T) {
@@ -81,6 +93,9 @@ func TestGetErrorRequest(t *testing.T) {
 	_, err := server.Get(params)
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 
@@ -102,6 +117,9 @@ func TestParseResponseErrorData(t *testing.T) {
 	_, err := parseResponse(response)
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 

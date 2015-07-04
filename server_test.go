@@ -72,6 +72,9 @@ func TestSourceServerErrorNoSource(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestNewLimitServer(t *testing.T) {

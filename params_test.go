@@ -181,7 +181,7 @@ func testParamsCheckErrorType(err error, t *testing.T) {
 		t.Fatal("no error")
 	}
 	if _, ok := err.(*ParamError); !ok {
-		t.Fatal("not a *ParamError")
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 

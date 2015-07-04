@@ -40,6 +40,9 @@ func TestImageMarshallErrorFormatMaxLen(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestImageMarshallErrorDataMaxLen(t *testing.T) {
@@ -52,6 +55,9 @@ func TestImageMarshallErrorDataMaxLen(t *testing.T) {
 	_, err := im.MarshalBinary()
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 
@@ -75,6 +81,9 @@ func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 			if err == nil {
 				t.Fatal("no error")
 			}
+			if _, ok := err.(*ImageError); !ok {
+				t.Fatalf("unexpected error type: %T", err)
+			}
 		}
 	}
 }
@@ -91,6 +100,9 @@ func TestImageUnmarshalBinaryErrorFormatMaxLen(t *testing.T) {
 	if err == nil {
 		t.Fatal("no error")
 	}
+	if _, ok := err.(*ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
 }
 
 func TestImageUnmarshalBinaryErrorDataMaxLen(t *testing.T) {
@@ -104,6 +116,9 @@ func TestImageUnmarshalBinaryErrorDataMaxLen(t *testing.T) {
 	err = im.UnmarshalBinary(data)
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 
