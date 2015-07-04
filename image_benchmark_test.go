@@ -60,7 +60,10 @@ func BenchmarkImageUnmarshalBinaryAnimated(b *testing.B) {
 }
 
 func benchmarkImageUnmarshalBinary(b *testing.B, im *Image) {
-	data, _ := im.MarshalBinary()
+	data, err := im.MarshalBinary()
+	if err != nil {
+		b.Fatal(err)
+	}
 	imNew := new(Image)
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
@@ -95,7 +98,10 @@ func BenchmarkImageUnmarshalBinaryNoCopyAnimated(b *testing.B) {
 }
 
 func benchmarkImageUnmarshalBinaryNoCopy(b *testing.B, im *Image) {
-	data, _ := im.MarshalBinary()
+	data, err := im.MarshalBinary()
+	if err != nil {
+		b.Fatal(err)
+	}
 	imNew := new(Image)
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {

@@ -17,9 +17,12 @@ var _ encoding.BinaryUnmarshaler = new(Image)
 
 func TestImageMarshal(t *testing.T) {
 	for _, im := range testdata.Images {
-		data, _ := im.MarshalBinary()
+		data, err := im.MarshalBinary()
+		if err != nil {
+			t.Fatal(err)
+		}
 		imNew := new(Image)
-		err := imNew.UnmarshalBinary(data)
+		err = imNew.UnmarshalBinary(data)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -54,7 +57,10 @@ func TestImageMarshallErrorDataMaxLen(t *testing.T) {
 
 func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
 	for _, im := range testdata.Images {
-		data, _ := im.MarshalBinary()
+		data, err := im.MarshalBinary()
+		if err != nil {
+			t.Fatal(err)
+		}
 		index := -1 // Always truncate 1 byte
 		for _, offset := range []int{
 			4,

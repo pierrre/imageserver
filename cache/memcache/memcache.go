@@ -43,7 +43,10 @@ func (cache *Cache) getData(key string) ([]byte, error) {
 
 // Set implements Cache.
 func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
-	data, _ := im.MarshalBinary()
+	data, err := im.MarshalBinary()
+	if err != nil {
+		return err
+	}
 	return cache.setData(key, data)
 }
 

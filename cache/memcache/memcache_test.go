@@ -1,6 +1,7 @@
 package memcache
 
 import (
+	"strings"
 	"testing"
 
 	memcache_impl "github.com/bradfitz/gomemcache/memcache"
@@ -47,15 +48,35 @@ func TestSetErrorServer(t *testing.T) {
 
 func TestGetErrorUnmarshal(t *testing.T) {
 	cache := newTestCache(t)
-	data, _ := testdata.Medium.MarshalBinary()
+	data, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
 	data = data[:len(data)-1]
-	err := cache.setData(cachetest.KeyValid, data)
+	err = cache.setData(cachetest.KeyValid, data)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_, err = cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
+}
+
+func TestSetErrorMarshal(t *testing.T) {
+	cache := newTestCache(t)
+	im := &imageserver.Image{
+		Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
+	}
+	err := cache.Set(cachetest.KeyValid, im, imageserver.Params{})
+	if err == nil {
+		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ImageError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
 	}
 }
 
