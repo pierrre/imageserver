@@ -45,5 +45,4 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 			}
 		}
 	})
-	b.SetBytes(int64(len(im.Data)))
 }
