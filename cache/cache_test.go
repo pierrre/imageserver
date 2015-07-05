@@ -16,7 +16,7 @@ func TestIgnoreErrorGetSet(t *testing.T) {
 	c := &IgnoreError{
 		Cache: cachetest.NewMapCache(),
 	}
-	cachetest.TestGetSet(t, c, testdata.Medium)
+	cachetest.TestGetSet(t, c)
 }
 
 func TestIgnoreErrorGetSetError(t *testing.T) {

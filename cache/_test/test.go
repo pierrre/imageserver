@@ -18,27 +18,20 @@ const (
 )
 
 // TestGetSet is a helper to test cache Get()/Set().
-func TestGetSet(t *testing.T, cache imageserver_cache.Cache, image *imageserver.Image) {
-	err := cache.Set(KeyValid, image, imageserver.Params{})
+func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
+	err := cache.Set(KeyValid, testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	newIm, err := cache.Get(KeyValid, imageserver.Params{})
+	im, err := cache.Get(KeyValid, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if newIm == nil {
+	if im == nil {
 		t.Fatal("image nil")
 	}
-	if !imageserver.ImageEqual(newIm, image) {
+	if !imageserver.ImageEqual(im, testdata.Medium) {
 		t.Fatal("image not equals")
-	}
-}
-
-// TestGetSetAllImages is a helper to test cache Get()/Set() with all images from test data.
-func TestGetSetAllImages(t *testing.T, cache imageserver_cache.Cache) {
-	for _, image := range testdata.Images {
-		TestGetSet(t, cache, image)
 	}
 }
 

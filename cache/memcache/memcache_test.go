@@ -15,14 +15,7 @@ var _ imageserver_cache.Cache = &Cache{}
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
-	// maximum object size is only 1MB
-	for _, im := range []*imageserver.Image{
-		testdata.Small,
-		testdata.Medium,
-		testdata.Large,
-	} {
-		cachetest.TestGetSet(t, cache, im)
-	}
+	cachetest.TestGetSet(t, cache)
 }
 
 func TestGetMiss(t *testing.T) {

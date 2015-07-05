@@ -11,7 +11,7 @@ var _ imageserver_cache.Cache = &Cache{}
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache()
-	cachetest.TestGetSetAllImages(t, cache)
+	cachetest.TestGetSet(t, cache)
 }
 
 func TestGetMiss(t *testing.T) {

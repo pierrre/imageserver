@@ -19,7 +19,7 @@ func TestGetSet(t *testing.T) {
 	defer cache.Close()
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire
-		cachetest.TestGetSetAllImages(t, cache)
+		cachetest.TestGetSet(t, cache)
 	}
 }
 

@@ -16,19 +16,17 @@ var _ encoding.BinaryMarshaler = new(Image)
 var _ encoding.BinaryUnmarshaler = new(Image)
 
 func TestImageMarshal(t *testing.T) {
-	for _, im := range testdata.Images {
-		data, err := im.MarshalBinary()
-		if err != nil {
-			t.Fatal(err)
-		}
-		imNew := new(Image)
-		err = imNew.UnmarshalBinary(data)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if !ImageEqual(imNew, im) {
-			t.Fatal("image not equals")
-		}
+	data, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	im := new(Image)
+	err = im.UnmarshalBinary(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ImageEqual(im, testdata.Medium) {
+		t.Fatal("image not equals")
 	}
 }
 
@@ -62,28 +60,26 @@ func TestImageMarshallErrorDataMaxLen(t *testing.T) {
 }
 
 func TestImageUnmarshalBinaryErrorEndOfData(t *testing.T) {
-	for _, im := range testdata.Images {
-		data, err := im.MarshalBinary()
-		if err != nil {
-			t.Fatal(err)
+	data, err := testdata.Medium.MarshalBinary()
+	if err != nil {
+		t.Fatal(err)
+	}
+	index := -1 // Always truncate 1 byte
+	for _, offset := range []int{
+		4,
+		len(testdata.Medium.Format),
+		4,
+		len(testdata.Medium.Data),
+	} {
+		index += offset
+		errorData := data[0:index]
+		im := new(Image)
+		err := im.UnmarshalBinary(errorData)
+		if err == nil {
+			t.Fatal("no error")
 		}
-		index := -1 // Always truncate 1 byte
-		for _, offset := range []int{
-			4,
-			len(im.Format),
-			4,
-			len(im.Data),
-		} {
-			index += offset
-			errorData := data[0:index]
-			imNew := new(Image)
-			err := imNew.UnmarshalBinary(errorData)
-			if err == nil {
-				t.Fatal("no error")
-			}
-			if _, ok := err.(*ImageError); !ok {
-				t.Fatalf("unexpected error type: %T", err)
-			}
+		if _, ok := err.(*ImageError); !ok {
+			t.Fatalf("unexpected error type: %T", err)
 		}
 	}
 }
