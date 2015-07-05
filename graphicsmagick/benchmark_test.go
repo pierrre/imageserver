@@ -23,10 +23,6 @@ func BenchmarkResizeHuge(b *testing.B) {
 	benchmarkResize(b, testdata.Huge)
 }
 
-func BenchmarkResizeAnimated(b *testing.B) {
-	benchmarkResize(b, testdata.Animated)
-}
-
 func benchmarkResize(b *testing.B, im *imageserver.Image) {
 	server := &Server{
 		Server:     &imageserver.StaticServer{Image: im},

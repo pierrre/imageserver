@@ -24,10 +24,6 @@ func BenchmarkGetHuge(b *testing.B) {
 	benchmarkGet(b, testdata.Huge)
 }
 
-func BenchmarkGetAnimated(b *testing.B) {
-	benchmarkGet(b, testdata.Animated)
-}
-
 func benchmarkGet(b *testing.B, image *imageserver.Image) {
 	cache := newTestCache()
 	cachetest.BenchmarkGet(b, cache, image)

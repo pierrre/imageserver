@@ -23,10 +23,6 @@ func BenchmarkImageMarshalBinaryHuge(b *testing.B) {
 	benchmarkImageMarshalBinary(b, testdata.Huge)
 }
 
-func BenchmarkImageMarshalBinaryAnimated(b *testing.B) {
-	benchmarkImageMarshalBinary(b, testdata.Animated)
-}
-
 func benchmarkImageMarshalBinary(b *testing.B, im *Image) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
@@ -53,10 +49,6 @@ func BenchmarkImageUnmarshalBinaryLarge(b *testing.B) {
 
 func BenchmarkImageUnmarshalBinaryHuge(b *testing.B) {
 	benchmarkImageUnmarshalBinary(b, testdata.Huge)
-}
-
-func BenchmarkImageUnmarshalBinaryAnimated(b *testing.B) {
-	benchmarkImageUnmarshalBinary(b, testdata.Animated)
 }
 
 func benchmarkImageUnmarshalBinary(b *testing.B, im *Image) {
@@ -91,10 +83,6 @@ func BenchmarkImageUnmarshalBinaryNoCopyLarge(b *testing.B) {
 
 func BenchmarkImageUnmarshalBinaryNoCopyHuge(b *testing.B) {
 	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Huge)
-}
-
-func BenchmarkImageUnmarshalBinaryNoCopyAnimated(b *testing.B) {
-	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Animated)
 }
 
 func benchmarkImageUnmarshalBinaryNoCopy(b *testing.B, im *Image) {
