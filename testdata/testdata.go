@@ -41,6 +41,10 @@ var (
 	DalaiGammaFileName = "dalai_gamma.jpg"
 	// DalaiGamma is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html).
 	DalaiGamma = loadImage(DalaiGammaFileName, "jpeg")
+	// RandomFileName is the file name of Random.
+	RandomFileName = "random.png"
+	// Random is a random Image.
+	Random = loadImage(RandomFileName, "png")
 	// InvalidFileName is the file name of Invalid.
 	InvalidFileName = "invalid.jpg"
 	// Invalid is an invalid Image.
