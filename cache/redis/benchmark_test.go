@@ -27,5 +27,5 @@ func BenchmarkGetHuge(b *testing.B) {
 func benchmarkGet(b *testing.B, image *imageserver.Image) {
 	cache := newTestCache(b)
 	defer cache.Close()
-	cachetest.BenchmarkGet(b, cache, image)
+	cachetest.BenchmarkGet(b, cache, 16, image)
 }
