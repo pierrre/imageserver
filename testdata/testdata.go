@@ -19,15 +19,15 @@ var (
 
 	// SmallFileName is the file name of Small.
 	SmallFileName = "small.jpg"
-	// Small is a small Image.
+	// Small is a small Image (from https://www.flickr.com/photos/maradentro/3600833235/).
 	Small = loadImage(SmallFileName, "jpeg")
 	// MediumFileName is the file name of Medium.
 	MediumFileName = "medium.jpg"
-	// Medium is a medium Image.
+	// Medium is a medium Image (from https://www.flickr.com/photos/doug88888/5793867021/).
 	Medium = loadImage(MediumFileName, "jpeg")
 	// LargeFileName is the file name of Large.
 	LargeFileName = "large.jpg"
-	// Large is a large image.
+	// Large is a large image (from https://www.flickr.com/photos/doug88888/4130990745/).
 	Large = loadImage(LargeFileName, "jpeg")
 	// HugeFileName is the file name of Huge.
 	HugeFileName = "huge.jpg"
@@ -41,6 +41,10 @@ var (
 	DalaiGammaFileName = "dalai_gamma.jpg"
 	// DalaiGamma is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html).
 	DalaiGamma = loadImage(DalaiGammaFileName, "jpeg")
+	// GraySquaresFileName is the file name of GraySquares.
+	GraySquaresFileName = "gray_squares.jpg"
+	// GraySquares is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html)
+	GraySquares = loadImage(GraySquaresFileName, "jpeg")
 	// RandomFileName is the file name of Random.
 	RandomFileName = "random.png"
 	// Random is a random Image.
