@@ -1,5 +1,7 @@
 language: go
 
+sudo: false
+
 go:
   - 1.4.2
   - tip
@@ -8,8 +10,12 @@ services:
   - memcached
   - redis-server
 
+addons:
+  apt:
+    packages:
+      - graphicsmagick
+
 before_install:
-  - sudo apt-get install graphicsmagick
   - go get -v golang.org/x/tools/cmd/cover
   - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/golang/lint/golint
