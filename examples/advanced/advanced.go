@@ -15,9 +15,15 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
-	imageserver_graphicsmagick "github.com/pierrre/imageserver/graphicsmagick"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_http_graphicsmagick "github.com/pierrre/imageserver/http/graphicsmagick"
+	imageserver_http_nfntresize "github.com/pierrre/imageserver/http/nfntresize"
+	imageserver_image "github.com/pierrre/imageserver/image"
+	_ "github.com/pierrre/imageserver/image/bmp"
+	_ "github.com/pierrre/imageserver/image/gif"
+	_ "github.com/pierrre/imageserver/image/jpeg"
+	imageserver_image_nfntresize "github.com/pierrre/imageserver/image/nfntresize"
+	_ "github.com/pierrre/imageserver/image/png"
+	_ "github.com/pierrre/imageserver/image/tiff"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
 )
 
@@ -93,7 +99,9 @@ func newImageHTTPHandler() http.Handler {
 	handler = &imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{
 			&imageserver_http.SourceParser{},
-			&imageserver_http_graphicsmagick.Parser{},
+			&imageserver_http_nfntresize.Parser{},
+			&imageserver_http.FormatParser{},
+			&imageserver_http.QualityParser{},
 		},
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
@@ -112,29 +120,31 @@ func newImageHTTPHandler() http.Handler {
 
 func newServer() imageserver.Server {
 	server := imageserver_testdata.Server
-	server = newServerGraphicsMagick(server)
+	server = newServerImage(server)
 	server = newServerLimit(server)
+	server = newServerValidate(server)
 	server = newServerCacheRedis(server)
 	server = newServerCacheMemory(server)
 	return server
 }
 
-func newServerGraphicsMagick(server imageserver.Server) imageserver.Server {
-	return &imageserver_graphicsmagick.Server{
-		Server:     server,
-		Executable: "gm",
-		Timeout:    time.Duration(30 * time.Second),
-		AllowedFormats: []string{
-			"jpeg",
-			"png",
-			"bmp",
-			"gif",
-		},
+func newServerImage(server imageserver.Server) imageserver.Server {
+	return &imageserver_image.Server{
+		Server:    server,
+		Processor: &imageserver_image_nfntresize.Processor{},
 	}
 }
 
 func newServerLimit(server imageserver.Server) imageserver.Server {
 	return imageserver.NewLimitServer(server, runtime.GOMAXPROCS(0)*2)
+}
+
+func newServerValidate(server imageserver.Server) imageserver.Server {
+	return &imageserver_image_nfntresize.ValidateParamsServer{
+		Server:    server,
+		WidthMax:  2048,
+		HeightMax: 2048,
+	}
 }
 
 func newServerCacheRedis(server imageserver.Server) imageserver.Server {

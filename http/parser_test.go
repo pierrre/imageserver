@@ -47,6 +47,108 @@ var _ Parser = &SourcePathParser{}
 
 var _ Parser = &SourceURLParser{}
 
+func TestFormatParserInterface(t *testing.T) {
+	var _ Parser = &FormatParser{}
+}
+
+func TestFormatParserParse(t *testing.T) {
+	request, err := http.NewRequest("GET", "http://localhost?format=jpg", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	params := make(imageserver.Params)
+	parser := &FormatParser{}
+	err = parser.Parse(request, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	format, err := params.GetString("format")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if format != "jpeg" {
+		t.Fatal("wrong value")
+	}
+}
+
+func TestFormatParserResolve(t *testing.T) {
+	parser := &FormatParser{}
+
+	httpParam := parser.Resolve("format")
+	if httpParam != "format" {
+		t.Fatal("not equals")
+	}
+
+	httpParam = parser.Resolve("foobar")
+	if httpParam != "" {
+		t.Fatal("not equals")
+	}
+}
+
+func TestQualityParserInterface(t *testing.T) {
+	var _ Parser = &QualityParser{}
+}
+
+func TestQualityParserParse(t *testing.T) {
+	request, err := http.NewRequest("GET", "http://localhost?quality=50", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	params := make(imageserver.Params)
+	parser := &QualityParser{}
+	err = parser.Parse(request, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	quality, err := params.GetInt("quality")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if quality != 50 {
+		t.Fatal("wrong value")
+	}
+}
+
+func TestQualityParserParseError(t *testing.T) {
+	request, err := http.NewRequest("GET", "http://localhost?quality=foobar", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	params := make(imageserver.Params)
+	parser := &QualityParser{}
+	err = parser.Parse(request, params)
+	if err == nil {
+		t.Fatal("no error")
+	}
+	if err, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatal("wrong error type")
+	} else {
+		param := err.Param
+		if param != "quality" {
+			t.Fatal("wrong param")
+		}
+	}
+}
+
+func TestQualityParserResolve(t *testing.T) {
+	parser := &QualityParser{}
+
+	httpParam := parser.Resolve("quality")
+	if httpParam != "quality" {
+		t.Fatal("not equals")
+	}
+
+	httpParam = parser.Resolve("foobar")
+	if httpParam != "" {
+		t.Fatal("not equals")
+	}
+}
+
 func TestParseQueryString(t *testing.T) {
 	request, err := http.NewRequest("GET", "http://localhost?string=foo", nil)
 	if err != nil {

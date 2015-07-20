@@ -7,47 +7,48 @@ An image server toolkit in Go (Golang)
 
 ## Features
 - Http server
-- Resize / convert / process (Graphicsmagick)
-- Cache (Redis, Memcache, in memory)
+- Resize / convert ([nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
+- Cache ([Redis](https://github.com/garyburd/redigo), [Memcache](https://github.com/bradfitz/gomemcache), in memory)
 - Fully modular
-
-## Demo
-```
-Normal
-http://fuckingfrogs.fr:8080/?source=small.jpg
-```
-![Normal](http://fuckingfrogs.fr:8080/?source=small.jpg)
-
-```
-Resize animated gif
-http://fuckingfrogs.fr:8080/?source=animated.gif&width=300&height=300
-```
-![Resize animated gif](http://fuckingfrogs.fr:8080/?source=animated.gif&width=300&height=300)
-
-```
-Resize and crop
-http://fuckingfrogs.fr:8080/?source=medium.jpg&width=200&height=200&extent=1&fill=1
-```
-![Resize and crop](http://fuckingfrogs.fr:8080/?source=medium.jpg&width=200&height=200&extent=1&fill=1)
-
-```
-Resize jpeg low quality
-http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=jpeg&quality=50
-```
-![Resize jpeg low quality](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=jpeg&quality=50)
-
-```
-Resize huge image (5000x5000)
-http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300
-```
-![Resize huge image (5000x5000)](http://fuckingfrogs.fr:8080/?source=huge.jpg&width=300&height=300)
 
 ## Examples
 - [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
 - [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
 
-## TODO
-- more tests
-- don't ignore error from cache
-- add GroupcacheServer
-- add timeout in LimitProcessor
+## Demo
+
+### Normal
+![Normal](http://fuckingfrogs.fr:8080/?source=small.jpg)
+```
+http://fuckingfrogs.fr:8080/?source=small.jpg
+```
+
+### Resize (width=400)
+![Resize](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400)
+```
+http://fuckingfrogs.fr:8080/?source=large.jpg&width=400
+```
+
+### Thumbnail (100x100)
+![Thumbnail 1](http://fuckingfrogs.fr:8080/?source=small.jpg&width=100&height=100&mode=thumbnail)
+![Thumbnail 2](http://fuckingfrogs.fr:8080/?source=medium.jpg&width=100&height=100&mode=thumbnail)
+![Thumbnail 3](http://fuckingfrogs.fr:8080/?source=large.jpg&width=100&height=100&mode=thumbnail)
+![Thumbnail 4](http://fuckingfrogs.fr:8080/?source=huge.jpg&width=100&height=100&mode=thumbnail)
+```
+http://fuckingfrogs.fr:8080/?source=small.jpg&width=100&height=100&mode=thumbnail
+http://fuckingfrogs.fr:8080/?source=medium.jpg&width=100&height=100&mode=thumbnail
+http://fuckingfrogs.fr:8080/?source=large.jpg&width=100&height=100&mode=thumbnail
+http://fuckingfrogs.fr:8080/?source=huge.jpg&width=100&height=100&mode=thumbnail
+```
+
+### Convert (JPEG to GIF)
+![Convert](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif)
+```
+http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif
+```
+
+### Quality (JPEG 5%)
+![Convert](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&quality=5)
+```
+http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&quality=5
+```

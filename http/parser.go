@@ -106,6 +106,52 @@ func (parser *SourceURLParser) Resolve(param string) string {
 	return parser.Parser.Resolve(param)
 }
 
+// FormatParser represents an http Parser that takes the "format" param from query
+type FormatParser struct {
+}
+
+// Parse takes the "format" param from query
+func (parser *FormatParser) Parse(request *http.Request, params imageserver.Params) error {
+	ParseQueryString("format", request, params)
+	if !params.Has("format") {
+		return nil
+	}
+	format, err := params.GetString("format")
+	if err != nil {
+		return err
+	}
+	if format == "jpg" {
+		format = "jpeg"
+	}
+	params.Set("format", format)
+	return nil
+}
+
+// Resolve resolves the "format" param
+func (parser *FormatParser) Resolve(param string) string {
+	if param != "format" {
+		return ""
+	}
+	return "format"
+}
+
+// QualityParser represents an http Parser that takes the "quality" param from query
+type QualityParser struct {
+}
+
+// Parse takes the "quality" param from query
+func (parser *QualityParser) Parse(request *http.Request, params imageserver.Params) error {
+	return ParseQueryInt("quality", request, params)
+}
+
+// Resolve resolves the "quality" param
+func (parser *QualityParser) Resolve(param string) string {
+	if param != "quality" {
+		return ""
+	}
+	return "quality"
+}
+
 // ParseQueryString takes the param from the query string and add it to params.
 func ParseQueryString(param string, request *http.Request, params imageserver.Params) {
 	s := request.URL.Query().Get(param)

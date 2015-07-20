@@ -2,9 +2,6 @@ package main
 
 import (
 	"image"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -104,6 +101,13 @@ func TestServer(t *testing.T) {
 		{
 			query: url.Values{
 				imageserver.SourceParam: {testdata.MediumFileName},
+				"width":                 {"9001"},
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
+			query: url.Values{
+				imageserver.SourceParam: {testdata.MediumFileName},
 				"width":                 {"100"},
 			},
 			expectedWidth: 100,
@@ -118,9 +122,16 @@ func TestServer(t *testing.T) {
 		{
 			query: url.Values{
 				imageserver.SourceParam: {testdata.MediumFileName},
-				"height":                {"200"},
+				"height":                {"9001"},
 			},
-			expectedHeight: 200,
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
+			query: url.Values{
+				imageserver.SourceParam: {testdata.MediumFileName},
+				"height":                {"100"},
+			},
+			expectedHeight: 100,
 		},
 	} {
 		func() {
