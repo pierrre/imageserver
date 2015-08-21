@@ -16,12 +16,16 @@ addons:
       - graphicsmagick
 
 before_install:
+  - go get -v github.com/pierrre/gotestcover
   - go get -v github.com/golang/lint/golint
 
 install: go get -v -t ./...
 
 script:
-  - go test -v -cover ./...
+  - gotestcover -v -coverprofile=coverage.txt -covermode=atomic ./...
   - gofmt -d .
   - go tool vet .
   - golint ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
