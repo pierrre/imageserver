@@ -3,7 +3,7 @@ language: go
 sudo: false
 
 go:
-  - 1.4.2
+  - 1.5
   - tip
 
 services:
@@ -16,8 +16,6 @@ addons:
       - graphicsmagick
 
 before_install:
-  - go get -v golang.org/x/tools/cmd/cover
-  - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/golang/lint/golint
 
 install: go get -v -t ./...
