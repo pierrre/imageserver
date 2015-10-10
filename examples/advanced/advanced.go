@@ -19,6 +19,7 @@ import (
 	imageserver_http_nfntresize "github.com/pierrre/imageserver/http/nfntresize"
 	imageserver_image "github.com/pierrre/imageserver/image"
 	_ "github.com/pierrre/imageserver/image/bmp"
+	imageserver_image_gamma "github.com/pierrre/imageserver/image/gamma"
 	_ "github.com/pierrre/imageserver/image/gif"
 	_ "github.com/pierrre/imageserver/image/jpeg"
 	imageserver_image_nfntresize "github.com/pierrre/imageserver/image/nfntresize"
@@ -102,6 +103,7 @@ func newImageHTTPHandler() http.Handler {
 			&imageserver_http_nfntresize.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
+			&imageserver_http.GammaCorrectionParser{},
 		},
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
@@ -130,8 +132,11 @@ func newServer() imageserver.Server {
 
 func newServerImage(server imageserver.Server) imageserver.Server {
 	return &imageserver_image.Server{
-		Server:    server,
-		Processor: &imageserver_image_nfntresize.Processor{},
+		Server: server,
+		Processor: imageserver_image_gamma.NewCorrectionProcessor(
+			&imageserver_image_nfntresize.Processor{},
+			true,
+		),
 	}
 }
 

@@ -152,6 +152,22 @@ func (parser *QualityParser) Resolve(param string) string {
 	return "quality"
 }
 
+// GammaCorrectionParser is a HTTP Parser for gamma correct.
+type GammaCorrectionParser struct{}
+
+// Parse implements Parser.
+func (parser *GammaCorrectionParser) Parse(req *http.Request, params imageserver.Params) error {
+	return ParseQueryBool("gamma_correction", req, params)
+}
+
+// Resolve implements Parser.
+func (parser *GammaCorrectionParser) Resolve(param string) string {
+	if param == "gamma_correction" {
+		return "gamma_correction"
+	}
+	return ""
+}
+
 // ParseQueryString takes the param from the query string and add it to params.
 func ParseQueryString(param string, request *http.Request, params imageserver.Params) {
 	s := request.URL.Query().Get(param)

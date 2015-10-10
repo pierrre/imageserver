@@ -9,6 +9,7 @@ An image server toolkit in Go (Golang)
 - Http server
 - Resize / convert ([nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
 - Cache ([Redis](https://github.com/garyburd/redigo), [Memcache](https://github.com/bradfitz/gomemcache), in memory)
+- Gamma correction
 - Fully modular
 
 ## Examples
@@ -41,14 +42,21 @@ http://fuckingfrogs.fr:8080/?source=large.jpg&width=100&height=100&mode=thumbnai
 http://fuckingfrogs.fr:8080/?source=huge.jpg&width=100&height=100&mode=thumbnail
 ```
 
-### Convert (JPEG to GIF)
-![Convert](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif)
-```
-http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif
-```
+### Gamma correction
+Original | Disabled | Enabled
+----- | ----- | -----
+[Dalai Gamma](http://fuckingfrogs.fr:8080/?source=dalai_gamma.jpg) | ![Disabled](http://fuckingfrogs.fr:8080/?source=dalai_gamma.jpg&width=200&gamma_correction=false) | ![Disabled](http://fuckingfrogs.fr:8080/?source=dalai_gamma.jpg&width=200&gamma_correction=true)
+[Gray squares](http://fuckingfrogs.fr:8080/?source=gray_squares.jpg) | ![Disabled](http://fuckingfrogs.fr:8080/?source=gray_squares.jpg&width=200&gamma_correction=false) | ![Disabled](http://fuckingfrogs.fr:8080/?source=gray_squares.jpg&width=200&gamma_correction=true)
+[Random](http://fuckingfrogs.fr:8080/?source=random.png) | ![Disabled](http://fuckingfrogs.fr:8080/?source=random.png&width=200&gamma_correction=false) | ![Disabled](http://fuckingfrogs.fr:8080/?source=random.png&width=200&gamma_correction=true)
 
 ### Quality (JPEG 5%)
 ![Convert](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&quality=5)
 ```
 http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&quality=5
+```
+
+### Convert (JPEG to GIF)
+![Convert](http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif)
+```
+http://fuckingfrogs.fr:8080/?source=large.jpg&width=400&format=gif
 ```
