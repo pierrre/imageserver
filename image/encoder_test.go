@@ -75,7 +75,7 @@ func TestEncode(t *testing.T) {
 		t.Fatal("image nil")
 	}
 	if im.Format != "jpeg" {
-		t.Fatalf("unexpected format: got %s, wanted %s", im.Format, "jpeg")
+		t.Fatalf("unexpected format: got %s, want %s", im.Format, "jpeg")
 	}
 }
 

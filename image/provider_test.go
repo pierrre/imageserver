@@ -102,7 +102,7 @@ func TestProviderServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	if im.Format != "jpeg" {
-		t.Fatalf("unexpected format: got %s, wanted %s", im.Format, "jpeg")
+		t.Fatalf("unexpected format: got %s, want %s", im.Format, "jpeg")
 	}
 	_, err = Decode(im)
 	if err != nil {

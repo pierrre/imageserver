@@ -13,14 +13,13 @@ import (
 
 func TestServer(t *testing.T) {
 	h := newImageHTTPHandler()
-	type TC struct {
+	for _, tc := range []struct {
 		query              url.Values
 		expectedStatusCode int
 		expectedFormat     string
 		expectedWidth      int
 		expectedHeight     int
-	}
-	for _, tc := range []TC{
+	}{
 		{
 			expectedStatusCode: http.StatusBadRequest,
 		},

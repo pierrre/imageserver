@@ -26,7 +26,7 @@ func TestEncoderParams(t *testing.T, enc imageserver_image.Encoder, params image
 		t.Fatal(err)
 	}
 	if format != expectedFormat {
-		t.Fatalf("unexpected format: got %s, wanted %s", format, expectedFormat)
+		t.Fatalf("unexpected format: got %s, want %s", format, expectedFormat)
 	}
 }
 

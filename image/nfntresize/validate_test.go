@@ -10,13 +10,12 @@ import (
 var _ imageserver.Server = &ValidateParamsServer{}
 
 func TestValidateParamsServer(t *testing.T) {
-	type TC struct {
+	for _, tc := range []struct {
 		widthMax           uint
 		heightMax          uint
 		params             imageserver.Params
 		expectedParamError string
-	}
-	for _, tc := range []TC{
+	}{
 		{
 			params: imageserver.Params{},
 		},

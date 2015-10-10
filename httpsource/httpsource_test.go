@@ -26,10 +26,10 @@ func TestGet(t *testing.T) {
 		t.Fatal("no image")
 	}
 	if im.Format != testdata.Medium.Format {
-		t.Fatalf("unexpected image format: got \"%s\", wanted \"%s\"", im.Format, testdata.Medium.Format)
+		t.Fatalf("unexpected image format: got \"%s\", want \"%s\"", im.Format, testdata.Medium.Format)
 	}
 	if len(im.Data) != len(testdata.Medium.Data) {
-		t.Fatalf("unexpected image data length: got %d, wanted %d", len(im.Data), len(testdata.Medium.Data))
+		t.Fatalf("unexpected image data length: got %d, want %d", len(im.Data), len(testdata.Medium.Data))
 	}
 }
 

@@ -12,13 +12,13 @@ import (
 var _ imageserver_image.Processor = &Processor{}
 
 func TestProcessor(t *testing.T) {
-	type TC struct {
+	prc := &Processor{}
+	for _, tc := range []struct {
 		params             imageserver.Params
 		expectedWidth      int
 		expectedHeight     int
 		expectedParamError string
-	}
-	for _, tc := range []TC{
+	}{
 		// no size
 		{
 			params:         imageserver.Params{},
@@ -189,8 +189,7 @@ func TestProcessor(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			p := &Processor{}
-			im, err = p.Process(im, tc.params)
+			im, err = prc.Process(im, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
 					return
@@ -198,21 +197,21 @@ func TestProcessor(t *testing.T) {
 				t.Fatal(err)
 			}
 			if tc.expectedWidth != 0 && im.Bounds().Dx() != tc.expectedWidth {
-				t.Fatalf("unexpected width %d, wanted %d", im.Bounds().Dx(), tc.expectedWidth)
+				t.Fatalf("unexpected width: got %d, want %d", im.Bounds().Dx(), tc.expectedWidth)
 			}
 			if tc.expectedHeight != 0 && im.Bounds().Dy() != tc.expectedHeight {
-				t.Fatalf("unexpected height %d, wanted %d", im.Bounds().Dy(), tc.expectedHeight)
+				t.Fatalf("unexpected height: got %d, want %d", im.Bounds().Dy(), tc.expectedHeight)
 			}
 		}()
 	}
 }
 
 func TestProcessorChange(t *testing.T) {
-	type TC struct {
+	prc := &Processor{}
+	for _, tc := range []struct {
 		params   imageserver.Params
 		expected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
 			params:   imageserver.Params{},
 			expected: false,
@@ -262,9 +261,9 @@ func TestProcessorChange(t *testing.T) {
 					t.Logf("%#v", tc)
 				}
 			}()
-			c := (&Processor{}).Change(tc.params)
+			c := prc.Change(tc.params)
 			if c != tc.expected {
-				t.Fatalf("got %t, wanted %t", c, tc.expected)
+				t.Fatalf("unexpected result: got %t, want %t", c, tc.expected)
 			}
 		}()
 	}
