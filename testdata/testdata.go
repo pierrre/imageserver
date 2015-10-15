@@ -45,6 +45,10 @@ var (
 	GraySquaresFileName = "gray_squares.jpg"
 	// GraySquares is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html)
 	GraySquares = loadImage(GraySquaresFileName, "jpeg")
+	// RingsFileName is the file name of Rings.
+	RingsFileName = "rings.png"
+	// GraySquares is a moiré test Image
+	Rings = loadImage(RingsFileName, "png")
 	// RandomFileName is the file name of Random.
 	RandomFileName = "random.png"
 	// Random is a random Image.
