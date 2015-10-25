@@ -143,12 +143,13 @@ func TestImageMarshalBugByteBufferPool(t *testing.T) {
 }
 
 func TestImageEqual(t *testing.T) {
-	for _, tc := range []struct {
+	type TC struct {
 		im1         *Image
 		im2         *Image
 		equal       bool
 		description string
-	}{
+	}
+	for _, tc := range []TC{
 		{nil, nil, true, "both nil"},
 		{nil, testdata.Medium, false, "nil / not nil"},
 		{testdata.Medium, nil, false, "not nil / nil"},

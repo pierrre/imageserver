@@ -23,10 +23,11 @@ func TestNewDrawable(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-	for _, tc := range []struct {
+	type TC struct {
 		srcSize image.Rectangle
 		dstSize image.Rectangle
-	}{
+	}
+	for _, tc := range []TC{
 		{
 			srcSize: image.Rect(0, 0, 10, 10),
 			dstSize: image.Rect(0, 0, 10, 10),
@@ -40,31 +41,38 @@ func TestCopy(t *testing.T) {
 			dstSize: image.Rect(0, 0, 20, 20),
 		},
 	} {
-		t.Logf("test case: %#v", tc)
-		src := image.NewRGBA(tc.srcSize)
-		testDrawRandom(src)
-		dst := image.NewRGBA(tc.dstSize)
-		Copy(dst, src)
-		bds := src.Bounds().Intersect(dst.Bounds())
-		for y := 0; y < bds.Dy(); y++ {
-			for x := 0; x < bds.Dx(); x++ {
-				cSrc := src.At(x, y)
-				cDst := dst.At(x, y)
-				if cSrc != cDst {
-					t.Errorf("different colors at %d,%d: src=%#v, dst=%#v", x, y, cSrc, cDst)
+		func() {
+			defer func() {
+				if t.Failed() {
+					t.Logf("%#v", tc)
+				}
+			}()
+			src := image.NewRGBA(tc.srcSize)
+			testDrawRandom(src)
+			dst := image.NewRGBA(tc.dstSize)
+			Copy(dst, src)
+			bds := src.Bounds().Intersect(dst.Bounds())
+			for y := 0; y < bds.Dy(); y++ {
+				for x := 0; x < bds.Dx(); x++ {
+					cSrc := src.At(x, y)
+					cDst := dst.At(x, y)
+					if cSrc != cDst {
+						t.Errorf("different colors at %d,%d: src=%#v, dst=%#v", x, y, cSrc, cDst)
+					}
 				}
 			}
-		}
+		}()
 	}
 
 }
 
 func TestParallel(t *testing.T) {
-	for _, tc := range []struct {
+	type TC struct {
 		n        int
 		p        int
 		expected map[int]int
-	}{
+	}
+	for _, tc := range []TC{
 		{
 			n: 0,
 			p: 0,

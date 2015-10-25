@@ -12,11 +12,12 @@ import (
 var _ imageserver_http.Parser = &Parser{}
 
 func TestParse(t *testing.T) {
-	for _, tc := range []struct {
+	type TC struct {
 		query              url.Values
 		expectedParams     imageserver.Params
 		expectedParamError string
-	}{
+	}
+	for _, tc := range []TC{
 		{},
 		{
 			query: url.Values{"width": {"100"}},

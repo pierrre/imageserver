@@ -13,12 +13,13 @@ var _ imageserver_image.Processor = &Processor{}
 
 func TestProcessor(t *testing.T) {
 	prc := &Processor{}
-	for _, tc := range []struct {
+	type TC struct {
 		params             imageserver.Params
 		expectedWidth      int
 		expectedHeight     int
 		expectedParamError string
-	}{
+	}
+	for _, tc := range []TC{
 		// no size
 		{
 			params:         imageserver.Params{},
@@ -208,10 +209,11 @@ func TestProcessor(t *testing.T) {
 
 func TestProcessorChange(t *testing.T) {
 	prc := &Processor{}
-	for _, tc := range []struct {
+	type TC struct {
 		params   imageserver.Params
 		expected bool
-	}{
+	}
+	for _, tc := range []TC{
 		{
 			params:   imageserver.Params{},
 			expected: false,

@@ -48,12 +48,13 @@ func TestCorrectionProcessor(t *testing.T) {
 	errPrc := imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
 		return nil, fmt.Errorf("error")
 	})
-	for _, tc := range []struct {
+	type TC struct {
 		processor     imageserver_image.Processor
 		enabled       bool
 		params        imageserver.Params
 		errorExpected bool
-	}{
+	}
+	for _, tc := range []TC{
 		{
 			processor: simplePrc,
 			enabled:   true,
@@ -118,10 +119,11 @@ func TestCorrectionProcessor(t *testing.T) {
 
 func TestIsHighQuality(t *testing.T) {
 	r := image.Rect(0, 0, 1, 1)
-	for _, tc := range []struct {
+	type TC struct {
 		p        image.Image
 		expected bool
-	}{
+	}
+	for _, tc := range []TC{
 		{
 			p:        image.NewRGBA64(r),
 			expected: true,
