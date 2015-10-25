@@ -17,9 +17,9 @@ type ExpiresHandler struct {
 }
 
 // ServeHTTP implements http.Handler.
-func (eh *ExpiresHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (eh *ExpiresHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	hrw := &headerResponseWriter{
-		ResponseWriter: w,
+		ResponseWriter: rw,
 		OnWriteHeaderFunc: func(code int) {
 			if code != http.StatusOK && code != http.StatusNotModified {
 				return
@@ -27,10 +27,10 @@ func (eh *ExpiresHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			t := time.Now()
 			t = t.Add(eh.Expires)
 			t = t.In(expiresHeaderLocation)
-			w.Header().Set("Expires", t.Format(time.RFC1123))
+			rw.Header().Set("Expires", t.Format(time.RFC1123))
 		},
 	}
-	eh.Handler.ServeHTTP(hrw, r)
+	eh.Handler.ServeHTTP(hrw, req)
 }
 
 type headerResponseWriter struct {

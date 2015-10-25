@@ -107,7 +107,7 @@ func newImageHTTPHandler() http.Handler {
 		},
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
-		ErrorFunc: func(err error, request *http.Request) {
+		ErrorFunc: func(err error, req *http.Request) {
 			log.Printf("Internal error: %s", err)
 		},
 	}

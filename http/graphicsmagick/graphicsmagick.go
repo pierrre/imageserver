@@ -19,9 +19,9 @@ const (
 type Parser struct{}
 
 // Parse implements Parser.
-func (parser *Parser) Parse(request *http.Request, params imageserver.Params) error {
-	p := make(imageserver.Params)
-	err := parser.parse(request, p)
+func (parser *Parser) Parse(req *http.Request, params imageserver.Params) error {
+	p := imageserver.Params{}
+	err := parser.parse(req, p)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
 			err.Param = globalParam + "." + err.Param
@@ -34,31 +34,31 @@ func (parser *Parser) Parse(request *http.Request, params imageserver.Params) er
 	return nil
 }
 
-func (parser *Parser) parse(request *http.Request, params imageserver.Params) error {
-	if err := imageserver_http.ParseQueryInt("width", request, params); err != nil {
+func (parser *Parser) parse(req *http.Request, params imageserver.Params) error {
+	if err := imageserver_http.ParseQueryInt("width", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryInt("height", request, params); err != nil {
+	if err := imageserver_http.ParseQueryInt("height", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryBool("fill", request, params); err != nil {
+	if err := imageserver_http.ParseQueryBool("fill", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryBool("ignore_ratio", request, params); err != nil {
+	if err := imageserver_http.ParseQueryBool("ignore_ratio", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryBool("only_shrink_larger", request, params); err != nil {
+	if err := imageserver_http.ParseQueryBool("only_shrink_larger", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryBool("only_enlarge_smaller", request, params); err != nil {
+	if err := imageserver_http.ParseQueryBool("only_enlarge_smaller", req, params); err != nil {
 		return err
 	}
-	imageserver_http.ParseQueryString("background", request, params)
-	if err := imageserver_http.ParseQueryBool("extent", request, params); err != nil {
+	imageserver_http.ParseQueryString("background", req, params)
+	if err := imageserver_http.ParseQueryBool("extent", req, params); err != nil {
 		return err
 	}
-	imageserver_http.ParseQueryString("format", request, params)
-	if err := imageserver_http.ParseQueryInt("quality", request, params); err != nil {
+	imageserver_http.ParseQueryString("format", req, params)
+	if err := imageserver_http.ParseQueryInt("quality", req, params); err != nil {
 		return err
 	}
 	return nil

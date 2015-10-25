@@ -23,9 +23,9 @@ type Parser interface {
 type ListParser []Parser
 
 // Parse implements Parser.
-func (lp ListParser) Parse(request *http.Request, params imageserver.Params) error {
+func (lp ListParser) Parse(req *http.Request, params imageserver.Params) error {
 	for _, subParser := range lp {
-		err := subParser.Parse(request, params)
+		err := subParser.Parse(req, params)
 		if err != nil {
 			return err
 		}
@@ -48,8 +48,8 @@ func (lp ListParser) Resolve(param string) string {
 type SourceParser struct{}
 
 // Parse implements Parser.
-func (parser *SourceParser) Parse(request *http.Request, params imageserver.Params) error {
-	ParseQueryString(imageserver.SourceParam, request, params)
+func (parser *SourceParser) Parse(req *http.Request, params imageserver.Params) error {
+	ParseQueryString(imageserver.SourceParam, req, params)
 	return nil
 }
 
@@ -66,8 +66,8 @@ type SourcePathParser struct {
 }
 
 // Parse implements Parser.
-func (parser *SourcePathParser) Parse(request *http.Request, params imageserver.Params) error {
-	params.Set(imageserver.SourceParam, request.URL.Path)
+func (parser *SourcePathParser) Parse(req *http.Request, params imageserver.Params) error {
+	params.Set(imageserver.SourceParam, req.URL.Path)
 	return nil
 }
 
@@ -83,18 +83,15 @@ type SourceURLParser struct {
 }
 
 // Parse implements Parser.
-func (parser *SourceURLParser) Parse(request *http.Request, params imageserver.Params) error {
-	err := parser.Parser.Parse(request, params)
+func (parser *SourceURLParser) Parse(req *http.Request, params imageserver.Params) error {
+	err := parser.Parser.Parse(req, params)
 	if err != nil {
 		return err
 	}
 	if !params.Has(imageserver.SourceParam) {
 		return nil
 	}
-	source, err := params.Get(imageserver.SourceParam)
-	if err != nil {
-		return err
-	}
+	source, _ := params.Get(imageserver.SourceParam)
 	u := copyURL(parser.Base)
 	u.Path += fmt.Sprint(source)
 	params.Set(imageserver.SourceParam, u)
@@ -106,13 +103,13 @@ func (parser *SourceURLParser) Resolve(param string) string {
 	return parser.Parser.Resolve(param)
 }
 
-// FormatParser represents an http Parser that takes the "format" param from query
+// FormatParser is an http Parser that takes the "format" param from query.
 type FormatParser struct {
 }
 
-// Parse takes the "format" param from query
-func (parser *FormatParser) Parse(request *http.Request, params imageserver.Params) error {
-	ParseQueryString("format", request, params)
+// Parse implements Parser.
+func (parser *FormatParser) Parse(req *http.Request, params imageserver.Params) error {
+	ParseQueryString("format", req, params)
 	if !params.Has("format") {
 		return nil
 	}
@@ -127,7 +124,7 @@ func (parser *FormatParser) Parse(request *http.Request, params imageserver.Para
 	return nil
 }
 
-// Resolve resolves the "format" param
+// Resolve implements Parser.
 func (parser *FormatParser) Resolve(param string) string {
 	if param != "format" {
 		return ""
@@ -135,16 +132,16 @@ func (parser *FormatParser) Resolve(param string) string {
 	return "format"
 }
 
-// QualityParser represents an http Parser that takes the "quality" param from query
+// QualityParser is an http Parser that takes the "quality" param from query.
 type QualityParser struct {
 }
 
-// Parse takes the "quality" param from query
-func (parser *QualityParser) Parse(request *http.Request, params imageserver.Params) error {
-	return ParseQueryInt("quality", request, params)
+// Parse implements Parser.
+func (parser *QualityParser) Parse(req *http.Request, params imageserver.Params) error {
+	return ParseQueryInt("quality", req, params)
 }
 
-// Resolve resolves the "quality" param
+// Resolve implements Parser.
 func (parser *QualityParser) Resolve(param string) string {
 	if param != "quality" {
 		return ""
@@ -169,30 +166,30 @@ func (parser *GammaCorrectionParser) Resolve(param string) string {
 }
 
 // ParseQueryString takes the param from the query string and add it to params.
-func ParseQueryString(param string, request *http.Request, params imageserver.Params) {
-	s := request.URL.Query().Get(param)
+func ParseQueryString(param string, req *http.Request, params imageserver.Params) {
+	s := req.URL.Query().Get(param)
 	if s != "" {
 		params.Set(param, s)
 	}
 }
 
 // ParseQueryInt takes the param from the query string, parse it as an int and add it to params.
-func ParseQueryInt(param string, request *http.Request, params imageserver.Params) error {
-	s := request.URL.Query().Get(param)
+func ParseQueryInt(param string, req *http.Request, params imageserver.Params) error {
+	s := req.URL.Query().Get(param)
 	if s == "" {
 		return nil
 	}
 	i, err := strconv.Atoi(s)
 	if err != nil {
-		return newParseTypeParamError(param, "string", err)
+		return newParseTypeParamError(param, "int", err)
 	}
 	params.Set(param, i)
 	return nil
 }
 
 // ParseQueryFloat takes the param from the query string, parse it as a float64 and add it to params.
-func ParseQueryFloat(param string, request *http.Request, params imageserver.Params) error {
-	s := request.URL.Query().Get(param)
+func ParseQueryFloat(param string, req *http.Request, params imageserver.Params) error {
+	s := req.URL.Query().Get(param)
 	if s == "" {
 		return nil
 	}
@@ -205,8 +202,8 @@ func ParseQueryFloat(param string, request *http.Request, params imageserver.Par
 }
 
 // ParseQueryBool takes the param from the query string, parse it as an bool and add it to params.
-func ParseQueryBool(param string, request *http.Request, params imageserver.Params) error {
-	s := request.URL.Query().Get(param)
+func ParseQueryBool(param string, req *http.Request, params imageserver.Params) error {
+	s := req.URL.Query().Get(param)
 	if s == "" {
 		return nil
 	}

@@ -19,9 +19,9 @@ const (
 type Parser struct{}
 
 // Parse implements Parser.
-func (parser *Parser) Parse(request *http.Request, params imageserver.Params) error {
-	p := make(imageserver.Params)
-	err := parser.parse(request, p)
+func (parser *Parser) Parse(req *http.Request, params imageserver.Params) error {
+	p := imageserver.Params{}
+	err := parser.parse(req, p)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
 			err.Param = globalParam + "." + err.Param
@@ -34,15 +34,15 @@ func (parser *Parser) Parse(request *http.Request, params imageserver.Params) er
 	return nil
 }
 
-func (parser *Parser) parse(request *http.Request, params imageserver.Params) error {
-	if err := imageserver_http.ParseQueryInt("width", request, params); err != nil {
+func (parser *Parser) parse(req *http.Request, params imageserver.Params) error {
+	if err := imageserver_http.ParseQueryInt("width", req, params); err != nil {
 		return err
 	}
-	if err := imageserver_http.ParseQueryInt("height", request, params); err != nil {
+	if err := imageserver_http.ParseQueryInt("height", req, params); err != nil {
 		return err
 	}
-	imageserver_http.ParseQueryString("interpolation", request, params)
-	imageserver_http.ParseQueryString("mode", request, params)
+	imageserver_http.ParseQueryString("interpolation", req, params)
+	imageserver_http.ParseQueryString("mode", req, params)
 	return nil
 }
 
