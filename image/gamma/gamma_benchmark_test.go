@@ -17,9 +17,11 @@ func BenchmarkProcessor(b *testing.B) {
 	prc := NewProcessor(2.2, false)
 	params := imageserver.Params{}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		prc.Process(nim, params)
-	}
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			prc.Process(nim, params)
+		}
+	})
 }
 
 func BenchmarkProcessorHighQuality(b *testing.B) {
@@ -30,9 +32,11 @@ func BenchmarkProcessorHighQuality(b *testing.B) {
 	prc := NewProcessor(2.2, true)
 	params := imageserver.Params{}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		prc.Process(nim, params)
-	}
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			prc.Process(nim, params)
+		}
+	})
 }
 
 func BenchmarkCorrectionProcessor(b *testing.B) {
@@ -47,7 +51,9 @@ func BenchmarkCorrectionProcessor(b *testing.B) {
 		true,
 	)
 	params := imageserver.Params{}
-	for i := 0; i < b.N; i++ {
-		prc.Process(nim, params)
-	}
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			prc.Process(nim, params)
+		}
+	})
 }

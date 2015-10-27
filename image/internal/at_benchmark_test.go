@@ -88,7 +88,10 @@ func BenchmarkNewAtFuncDefault(b *testing.B) {
 
 func benchmarkNewAtFunc(b *testing.B, p image.Image) {
 	at := NewAtFunc(p)
-	for i := 0; i < b.N; i++ {
-		at(0, 0)
-	}
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			at(0, 0)
+		}
+	})
 }

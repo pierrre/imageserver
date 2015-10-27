@@ -10,7 +10,9 @@ func BenchmarkCopy(b *testing.B) {
 	testDrawRandom(src)
 	dst := image.NewRGBA(image.Rect(0, 0, 100, 100))
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		Copy(dst, src)
-	}
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			Copy(dst, src)
+		}
+	})
 }
