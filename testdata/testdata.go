@@ -47,7 +47,7 @@ var (
 	GraySquares = loadImage(GraySquaresFileName, "jpeg")
 	// RingsFileName is the file name of Rings.
 	RingsFileName = "rings.png"
-	// GraySquares is a moiré test Image
+	// Rings is a moiré test Image
 	Rings = loadImage(RingsFileName, "png")
 	// RandomFileName is the file name of Random.
 	RandomFileName = "random.png"
