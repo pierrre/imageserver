@@ -8,7 +8,7 @@ An image server toolkit in Go (Golang)
 ## Features
 - Http server
 - Resize / convert ([nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
-- Cache ([Redis](https://github.com/garyburd/redigo), [Memcache](https://github.com/bradfitz/gomemcache), in memory)
+- Cache ([groupcache](https://github.com/golang/groupcache), [Redis](https://github.com/garyburd/redigo), [Memcache](https://github.com/bradfitz/gomemcache), in memory)
 - Gamma correction
 - Fully modular
 
