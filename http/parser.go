@@ -98,11 +98,6 @@ func (parser *SourceURLParser) Parse(req *http.Request, params imageserver.Param
 	return nil
 }
 
-// Resolve implements Parser.
-func (parser *SourceURLParser) Resolve(param string) string {
-	return parser.Parser.Resolve(param)
-}
-
 // FormatParser is an http Parser that takes the "format" param from query.
 type FormatParser struct {
 }

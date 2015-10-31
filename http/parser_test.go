@@ -216,21 +216,6 @@ func TestSourceURLParserParseError(t *testing.T) {
 	}
 }
 
-func TestSourceURLParserResolve(t *testing.T) {
-	storeURL, err := url.Parse("http://store/image")
-	if err != nil {
-		t.Fatal(err)
-	}
-	parser := &SourceURLParser{
-		Parser: &SourceParser{},
-		Base:   storeURL,
-	}
-	httpParam := parser.Resolve(imageserver.SourceParam)
-	if httpParam != imageserver.SourceParam {
-		t.Fatal("not equals")
-	}
-}
-
 var _ Parser = &FormatParser{}
 
 func TestFormatParserParse(t *testing.T) {
