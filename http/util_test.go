@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/pierrre/imageserver"
 )
 
 func TestExpiresHandler(t *testing.T) {
@@ -88,4 +90,14 @@ func (nrw *nopResponseWriter) Write(data []byte) (int, error) {
 }
 
 func (nrw *nopResponseWriter) WriteHeader(int) {
+}
+
+type nopParser struct{}
+
+func (p *nopParser) Parse(req *http.Request, params imageserver.Params) error {
+	return nil
+}
+
+func (p *nopParser) Resolve(param string) string {
+	return ""
 }

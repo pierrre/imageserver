@@ -7,14 +7,11 @@ import (
 	"hash"
 	"io"
 	"net/http"
-	"regexp"
 	"strconv"
 	"sync"
 
 	"github.com/pierrre/imageserver"
 )
-
-var inmHeaderRegexp = regexp.MustCompile("^\"(.+)\"$")
 
 // Handler is a HTTP Handler for imageserver.Server.
 //
@@ -31,70 +28,72 @@ type Handler struct {
 
 // ServeHTTP implements http.Handler.
 func (handler *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "GET" && req.Method != "HEAD" {
-		handler.sendError(rw, req, NewErrorDefaultText(http.StatusMethodNotAllowed))
-		return
-	}
-	params := imageserver.Params{}
-	if err := handler.Parser.Parse(req, params); err != nil {
-		handler.sendError(rw, req, err)
-		return
-	}
-	if handler.checkNotModified(rw, req, params) {
-		return
-	}
-	image, err := handler.Server.Get(params)
+	err := handler.serveHTTP(rw, req)
 	if err != nil {
 		handler.sendError(rw, req, err)
-		return
-	}
-	if err := handler.sendImage(rw, req, params, image); err != nil {
-		handler.callErrorFunc(err, req)
-		return
 	}
 }
 
-func (handler *Handler) checkNotModified(rw http.ResponseWriter, req *http.Request, params imageserver.Params) bool {
-	if handler.ETagFunc == nil {
+func (handler *Handler) serveHTTP(rw http.ResponseWriter, req *http.Request) error {
+	if req.Method != "GET" && req.Method != "HEAD" {
+		return NewErrorDefaultText(http.StatusMethodNotAllowed)
+	}
+	params := imageserver.Params{}
+	err := handler.Parser.Parse(req, params)
+	if err != nil {
+		return err
+	}
+	etag := handler.getETag(params)
+	if handler.checkNotModified(rw, req, etag) {
+		return nil
+	}
+	image, err := handler.Server.Get(params)
+	if err != nil {
+		return err
+	}
+	handler.sendImage(rw, req, image, etag)
+	return nil
+}
+
+func (handler *Handler) getETag(params imageserver.Params) string {
+	if handler.ETagFunc != nil {
+		return "\"" + handler.ETagFunc(params) + "\""
+	}
+	return ""
+}
+
+func (handler *Handler) checkNotModified(rw http.ResponseWriter, req *http.Request, etag string) bool {
+	if etag == "" {
 		return false
 	}
-	inmHeader := req.Header.Get("If-None-Match")
-	if inmHeader == "" {
-		return false
-	}
-	matches := inmHeaderRegexp.FindStringSubmatch(inmHeader)
-	if matches == nil || len(matches) != 2 {
-		return false
-	}
-	inm := matches[1]
-	etag := handler.ETagFunc(params)
+	inm := req.Header.Get("If-None-Match")
 	if inm != etag {
 		return false
 	}
-	handler.setImageHeaderCommon(rw, req, params)
+	handler.setImageHeaderCommon(rw, req, etag)
 	rw.WriteHeader(http.StatusNotModified)
 	return true
 }
 
-func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, params imageserver.Params, image *imageserver.Image) error {
-	handler.setImageHeaderCommon(rw, req, params)
+func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, image *imageserver.Image, etag string) {
+	handler.setImageHeaderCommon(rw, req, etag)
 	if image.Format != "" {
 		rw.Header().Set("Content-Type", "image/"+image.Format)
 	}
 	rw.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 	if req.Method == "GET" {
-		if _, err := rw.Write(image.Data); err != nil {
-			return err
+		_, err := rw.Write(image.Data)
+		if err != nil {
+			handler.callErrorFunc(err, req)
 		}
 	}
-	return nil
 }
 
-func (handler *Handler) setImageHeaderCommon(rw http.ResponseWriter, req *http.Request, params imageserver.Params) {
+func (handler *Handler) setImageHeaderCommon(rw http.ResponseWriter, req *http.Request, etag string) {
 	header := rw.Header()
 	header.Set("Cache-Control", "public")
-	if handler.ETagFunc != nil {
-		header.Set("ETag", fmt.Sprintf("\"%s\"", handler.ETagFunc(params)))
+	if etag != "" {
+		header.Set("ETag", etag)
 	}
 }
 
