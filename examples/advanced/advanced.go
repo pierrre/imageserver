@@ -91,7 +91,46 @@ func newHTTPHandler() http.Handler {
 	if h := newGitHubWebhookHTTPHandler(); h != nil {
 		mux.Handle("/github_webhook", h)
 	}
-	return mux
+	h := newLoggerHTTPHandler(mux)
+	return h
+}
+
+func newLoggerHTTPHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		lrw := &logResponseWriter{ResponseWriter: rw}
+		start := time.Now()
+		h.ServeHTTP(lrw, req)
+		end := time.Now()
+		dur := end.Sub(start)
+		log.Printf(
+			"HTTP %s %s (%s %s) => %d %d %s",
+			req.Method, req.URL,
+			req.RemoteAddr, req.UserAgent(),
+			lrw.Code, lrw.Size, dur,
+		)
+	})
+}
+
+type logResponseWriter struct {
+	http.ResponseWriter
+	Code int
+	Size int
+}
+
+func (rw *logResponseWriter) WriteHeader(code int) {
+	rw.ResponseWriter.WriteHeader(code)
+	rw.Code = code
+}
+
+func (rw *logResponseWriter) Write(b []byte) (int, error) {
+	if rw.Code == 0 {
+		rw.WriteHeader(http.StatusOK)
+	}
+	size, err := rw.ResponseWriter.Write(b)
+	if err == nil {
+		rw.Size += size
+	}
+	return size, err
 }
 
 func newGitHubWebhookHTTPHandler() http.Handler {
