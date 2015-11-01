@@ -48,7 +48,7 @@ var (
 
 func main() {
 	parseFlags()
-	log.Println("Start")
+	initLog()
 	logEnv()
 	startGroupcacheHTTPServer()
 	startHTTPServer()
@@ -65,22 +65,33 @@ func parseFlags() {
 	flag.Parse()
 }
 
+func initLog() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	log.SetOutput(os.Stdout)
+	log.Println("Start")
+}
+
 func logEnv() {
 	log.Printf("Go version: %s", runtime.Version())
 	log.Printf("Go max procs: %d", runtime.GOMAXPROCS(0))
 }
 
 func startHTTPServer() {
-	http.Handle("/", newImageHTTPHandler())
-	http.Handle("/favicon.ico", http.NotFoundHandler())
-	if h := newGitHubWebhookHTTPHandler(); h != nil {
-		http.Handle("/github_webhook", h)
-	}
 	log.Printf("Start HTTP server on %s", flagHTTPAddr)
-	err := http.ListenAndServe(flagHTTPAddr, nil)
+	err := http.ListenAndServe(flagHTTPAddr, newHTTPHandler())
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func newHTTPHandler() http.Handler {
+	mux := http.NewServeMux()
+	mux.Handle("/", newImageHTTPHandler())
+	mux.Handle("/favicon.ico", http.NotFoundHandler())
+	if h := newGitHubWebhookHTTPHandler(); h != nil {
+		mux.Handle("/github_webhook", h)
+	}
+	return mux
 }
 
 func newGitHubWebhookHTTPHandler() http.Handler {
@@ -190,17 +201,21 @@ func startGroupcacheHTTPServer() {
 	if flagGroupcacheSelf == "" {
 		return
 	}
-	mux := http.NewServeMux()
-	mux.Handle("/", newGroupcacheHTTPPool())
-	mux.HandleFunc("/stats", groupcacheStatsHTTPHandler)
-	mux.Handle("/favicon.ico", http.NotFoundHandler())
 	go func() {
 		log.Printf("Start groupcache HTTP server on %s", flagGroupcacheSelf)
-		err := http.ListenAndServe(flagGroupcacheSelf, mux)
+		err := http.ListenAndServe(flagGroupcacheSelf, newGroupcacheHTTPHandler())
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
+}
+
+func newGroupcacheHTTPHandler() http.Handler {
+	mux := http.NewServeMux()
+	mux.Handle("/", newGroupcacheHTTPPool())
+	mux.HandleFunc("/stats", groupcacheStatsHTTPHandler)
+	mux.Handle("/favicon.ico", http.NotFoundHandler())
+	return mux
 }
 
 func newGroupcacheHTTPPool() *groupcache.HTTPPool {
