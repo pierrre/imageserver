@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
+	"sync"
 )
 
 // Params are params used in Image Server.
@@ -124,13 +125,26 @@ func (params Params) Keys() []string {
 	return keys
 }
 
+var bufferPool = &sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
 // String returns the string representation.
 //
 // Keys are sorted alphabetically.
 func (params Params) String() string {
+	buf := bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer bufferPool.Put(buf)
+	params.toBuffer(buf)
+	return buf.String()
+}
+
+func (params Params) toBuffer(buf *bytes.Buffer) {
 	keys := params.Keys()
 	sort.Strings(keys)
-	buf := new(bytes.Buffer)
 	buf.WriteString("map[")
 	for i, key := range keys {
 		if i != 0 {
@@ -138,10 +152,15 @@ func (params Params) String() string {
 		}
 		buf.WriteString(key)
 		buf.WriteString(":")
-		buf.WriteString(fmt.Sprint(params[key]))
+		switch value := params[key].(type) {
+		case Params:
+			value.toBuffer(buf)
+		default:
+			fmt.Fprint(buf, value)
+		}
+
 	}
 	buf.WriteString("]")
-	return buf.String()
 }
 
 // ParamError is an error for a param.
