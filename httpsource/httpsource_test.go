@@ -2,9 +2,9 @@ package httpsource
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -16,7 +16,7 @@ var _ imageserver.Server = &Server{}
 func TestGet(t *testing.T) {
 	listener := createTestHTTPServer(t)
 	defer listener.Close()
-	params := imageserver.Params{imageserver.SourceParam: createTestURL(listener, testdata.MediumFileName)}
+	params := imageserver.Params{imageserver.SourceParam: createTestSource(listener, testdata.MediumFileName)}
 	server := &Server{}
 	im, err := server.Get(params)
 	if err != nil {
@@ -50,8 +50,8 @@ func TestGetErrorNoSource(t *testing.T) {
 func TestGetErrorNotFound(t *testing.T) {
 	listener := createTestHTTPServer(t)
 	defer listener.Close()
-	source := createTestURL(listener, testdata.MediumFileName)
-	source.Path += "foobar"
+	source := createTestSource(listener, testdata.MediumFileName)
+	source += "foobar"
 	params := imageserver.Params{imageserver.SourceParam: source}
 	server := &Server{}
 	_, err := server.Get(params)
@@ -139,10 +139,6 @@ func createTestHTTPServer(t *testing.T) *net.TCPListener {
 	return listener
 }
 
-func createTestURL(listener *net.TCPListener, filename string) *url.URL {
-	return &url.URL{
-		Scheme: "http",
-		Host:   listener.Addr().String(),
-		Path:   filename,
-	}
+func createTestSource(listener *net.TCPListener, filename string) string {
+	return fmt.Sprintf("http://%s/%s", listener.Addr(), filename)
 }

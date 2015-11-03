@@ -41,18 +41,15 @@ func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error)
 }
 
 func getSourceURL(params imageserver.Params) (*url.URL, error) {
-	source, err := params.Get(imageserver.SourceParam)
+	source, err := params.GetString(imageserver.SourceParam)
 	if err != nil {
 		return nil, err
 	}
-	sourceURL, ok := source.(*url.URL)
-	if !ok {
-		sourceURL, err = url.ParseRequestURI(fmt.Sprint(source))
-		if err != nil {
-			return nil, &imageserver.ParamError{
-				Param:   imageserver.SourceParam,
-				Message: "parse url error",
-			}
+	sourceURL, err := url.ParseRequestURI(source)
+	if err != nil {
+		return nil, &imageserver.ParamError{
+			Param:   imageserver.SourceParam,
+			Message: fmt.Sprintf("parse url error: %s", err),
 		}
 	}
 	if sourceURL.Scheme != "http" && sourceURL.Scheme != "https" {

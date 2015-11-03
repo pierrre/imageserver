@@ -3,7 +3,6 @@ package http
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/pierrre/imageserver"
@@ -44,7 +43,7 @@ func (lp ListParser) Resolve(param string) string {
 	return ""
 }
 
-// SourceParser is a HTTP Parser that takes the source param from the query.
+// SourceParser is a HTTP Parser that takes the "source" param from the query.
 type SourceParser struct{}
 
 // Parse implements Parser.
@@ -55,13 +54,13 @@ func (parser *SourceParser) Parse(req *http.Request, params imageserver.Params) 
 
 // Resolve implements Parser.
 func (parser *SourceParser) Resolve(param string) string {
-	if param != imageserver.SourceParam {
-		return ""
+	if param == imageserver.SourceParam {
+		return imageserver.SourceParam
 	}
-	return imageserver.SourceParam
+	return ""
 }
 
-// SourcePathParser is a HTTP Parser that takes the source param from the path.
+// SourcePathParser is a HTTP Parser that takes the "source" param from the path.
 type SourcePathParser struct {
 }
 
@@ -73,29 +72,51 @@ func (parser *SourcePathParser) Parse(req *http.Request, params imageserver.Para
 
 // Resolve implements Parser.
 func (parser *SourcePathParser) Resolve(param string) string {
+	if param == imageserver.SourceParam {
+		return "path"
+	}
 	return ""
 }
 
-// SourceURLParser is a Parser that takes the source from the sub Parser and adds it to the Base URL.
-type SourceURLParser struct {
+// SourceTransformParser is a HTTP Parser that transforms the "source" param.
+type SourceTransformParser struct {
 	Parser
-	Base *url.URL
+	Transform func(source string) string
 }
 
 // Parse implements Parser.
-func (parser *SourceURLParser) Parse(req *http.Request, params imageserver.Params) error {
-	err := parser.Parser.Parse(req, params)
+func (ps *SourceTransformParser) Parse(req *http.Request, params imageserver.Params) error {
+	return parseSourceTransform(ps.Parser, req, params, ps.Transform)
+}
+
+func parseSourceTransform(ps Parser, req *http.Request, params imageserver.Params, f func(string) string) error {
+	err := ps.Parse(req, params)
 	if err != nil {
 		return err
 	}
 	if !params.Has(imageserver.SourceParam) {
 		return nil
 	}
-	source, _ := params.Get(imageserver.SourceParam)
-	u := copyURL(parser.Base)
-	u.Path += fmt.Sprint(source)
-	params.Set(imageserver.SourceParam, u)
+	source, err := params.GetString(imageserver.SourceParam)
+	if err != nil {
+		return err
+	}
+	source = f(source)
+	params.Set(imageserver.SourceParam, source)
 	return nil
+}
+
+// SourcePrefixParser is a HTTP Parser that adds a prefix to the "source" param.
+type SourcePrefixParser struct {
+	Parser
+	Prefix string
+}
+
+// Parse implements Parser.
+func (ps *SourcePrefixParser) Parse(req *http.Request, params imageserver.Params) error {
+	return parseSourceTransform(ps.Parser, req, params, func(source string) string {
+		return ps.Prefix + source
+	})
 }
 
 // FormatParser is an http Parser that takes the "format" param from query.
@@ -121,10 +142,10 @@ func (parser *FormatParser) Parse(req *http.Request, params imageserver.Params) 
 
 // Resolve implements Parser.
 func (parser *FormatParser) Resolve(param string) string {
-	if param != "format" {
-		return ""
+	if param == "format" {
+		return "format"
 	}
-	return "format"
+	return ""
 }
 
 // QualityParser is an http Parser that takes the "quality" param from query.
@@ -138,10 +159,10 @@ func (parser *QualityParser) Parse(req *http.Request, params imageserver.Params)
 
 // Resolve implements Parser.
 func (parser *QualityParser) Resolve(param string) string {
-	if param != "quality" {
-		return ""
+	if param == "quality" {
+		return "quality"
 	}
-	return "quality"
+	return ""
 }
 
 // GammaCorrectionParser is a HTTP Parser for gamma correct.

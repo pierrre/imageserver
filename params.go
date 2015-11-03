@@ -10,6 +10,7 @@ import (
 // Params are params used in Image Server.
 //
 // This is a wrapper around map[string]interface{} and provides utility methods.
+// It should only contains basic Go types values (string, int float64, ...) or nested Params.
 //
 // Getter methods return a *ParamError if the key does not exist or the type does not match.
 type Params map[string]interface{}

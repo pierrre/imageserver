@@ -2,7 +2,6 @@ package http
 
 import (
 	"net/http"
-	"net/url"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -135,59 +134,52 @@ func TestSourcePathParserParse(t *testing.T) {
 func TestSourcePathParserResolve(t *testing.T) {
 	parser := &SourcePathParser{}
 	httpParam := parser.Resolve(imageserver.SourceParam)
+	if httpParam != "path" {
+		t.Fatal("not equals")
+	}
+	httpParam = parser.Resolve("foobar")
 	if httpParam != "" {
 		t.Fatal("not equals")
 	}
 }
 
-var _ Parser = &SourceURLParser{}
+var _ Parser = &SourceTransformParser{}
 
-func TestSourceURLParserParse(t *testing.T) {
-	storeURL, err := url.Parse("http://store/image")
+func TestSourceTransformParser(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost?source=foo", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	parser := &SourceURLParser{
-		Parser: &SourcePathParser{},
-		Base:   storeURL,
-	}
-	req, err := http.NewRequest("GET", "http://localhost/foobar", nil)
-	if err != nil {
-		t.Fatal(err)
+	ps := &SourceTransformParser{
+		Parser: &SourceParser{},
+		Transform: func(source string) string {
+			return "bar"
+		},
 	}
 	params := imageserver.Params{}
-	err = parser.Parse(req, params)
+	err = ps.Parse(req, params)
 	if err != nil {
 		t.Fatal(err)
 	}
-	source, err := params.Get(imageserver.SourceParam)
+	source, err := params.GetString(imageserver.SourceParam)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if source, ok := source.(*url.URL); !ok {
-		t.Fatal("source is not an URL")
-	} else {
-		if source.String() != "http://store/image/foobar" {
-			t.Fatal("not equals")
-		}
+	if source != "bar" {
+		t.Fatal("not equals")
 	}
 }
 
-func TestSourceURLParserParseUndefined(t *testing.T) {
-	storeURL, err := url.Parse("http://store/image")
-	if err != nil {
-		t.Fatal(err)
-	}
-	parser := &SourceURLParser{
-		Parser: &SourceParser{},
-		Base:   storeURL,
-	}
+func TestSourceTransformParserUndefined(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://localhost", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	ps := &SourceTransformParser{
+		Parser: &SourceParser{},
+	}
 	params := imageserver.Params{}
-	err = parser.Parse(req, params)
+	err = ps.Parse(req, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -196,23 +188,60 @@ func TestSourceURLParserParseUndefined(t *testing.T) {
 	}
 }
 
-func TestSourceURLParserParseError(t *testing.T) {
-	storeURL, err := url.Parse("http://store/image")
-	if err != nil {
-		t.Fatal(err)
-	}
-	parser := &SourceURLParser{
-		Parser: &QualityParser{},
-		Base:   storeURL,
-	}
+func TestSourceTransformParserErrorParse(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://localhost?quality=invalid", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	ps := &SourceTransformParser{
+		Parser: &QualityParser{},
+	}
 	params := imageserver.Params{}
-	err = parser.Parse(req, params)
+	err = ps.Parse(req, params)
 	if err == nil {
 		t.Fatal("no error")
+	}
+}
+
+func TestSourceTransformParserErrorParams(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ps := &SourceTransformParser{
+		Parser: &SourceParser{},
+	}
+	params := imageserver.Params{
+		imageserver.SourceParam: 666,
+	}
+	err = ps.Parse(req, params)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
+var _ Parser = &SourcePrefixParser{}
+
+func TestSourcePrefixParser(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost?source=bar", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ps := &SourcePrefixParser{
+		Parser: &SourceParser{},
+		Prefix: "foo",
+	}
+	params := imageserver.Params{}
+	err = ps.Parse(req, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	source, err := params.GetString(imageserver.SourceParam)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if source != "foobar" {
+		t.Fatal("not equals")
 	}
 }
 
