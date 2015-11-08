@@ -3,8 +3,8 @@ package httpsource
 import (
 	"errors"
 	"fmt"
-	"net"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -14,11 +14,13 @@ import (
 var _ imageserver.Server = &Server{}
 
 func TestGet(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-	params := imageserver.Params{imageserver.SourceParam: createTestSource(listener, testdata.MediumFileName)}
-	server := &Server{}
-	im, err := server.Get(params)
+	httpSrv := createTestHTTPServer(t)
+	defer httpSrv.Close()
+	params := imageserver.Params{
+		imageserver.SourceParam: createTestSource(httpSrv, testdata.MediumFileName),
+	}
+	srv := &Server{}
+	im, err := srv.Get(params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,11 +36,11 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetErrorNoSource(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
+	httpSrv := createTestHTTPServer(t)
+	defer httpSrv.Close()
 	params := imageserver.Params{}
-	server := &Server{}
-	_, err := server.Get(params)
+	srv := &Server{}
+	_, err := srv.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -48,13 +50,13 @@ func TestGetErrorNoSource(t *testing.T) {
 }
 
 func TestGetErrorNotFound(t *testing.T) {
-	listener := createTestHTTPServer(t)
-	defer listener.Close()
-	source := createTestSource(listener, testdata.MediumFileName)
+	httpSrv := createTestHTTPServer(t)
+	defer httpSrv.Close()
+	source := createTestSource(httpSrv, testdata.MediumFileName)
 	source += "foobar"
 	params := imageserver.Params{imageserver.SourceParam: source}
-	server := &Server{}
-	_, err := server.Get(params)
+	srv := &Server{}
+	_, err := srv.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -65,8 +67,8 @@ func TestGetErrorNotFound(t *testing.T) {
 
 func TestGetErrorInvalidUrl(t *testing.T) {
 	params := imageserver.Params{imageserver.SourceParam: "foobar"}
-	server := &Server{}
-	_, err := server.Get(params)
+	srv := &Server{}
+	_, err := srv.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -77,8 +79,8 @@ func TestGetErrorInvalidUrl(t *testing.T) {
 
 func TestGetErrorInvalidUrlScheme(t *testing.T) {
 	params := imageserver.Params{imageserver.SourceParam: "custom://foobar"}
-	server := &Server{}
-	_, err := server.Get(params)
+	srv := &Server{}
+	_, err := srv.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -89,8 +91,8 @@ func TestGetErrorInvalidUrlScheme(t *testing.T) {
 
 func TestGetErrorRequest(t *testing.T) {
 	params := imageserver.Params{imageserver.SourceParam: "http://localhost:123456"}
-	server := &Server{}
-	_, err := server.Get(params)
+	srv := &Server{}
+	_, err := srv.Get(params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -123,22 +125,10 @@ func TestParseResponseErrorData(t *testing.T) {
 	}
 }
 
-func createTestHTTPServer(t *testing.T) *net.TCPListener {
-	addr, err := net.ResolveTCPAddr("tcp", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	listener, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		t.Fatal(err)
-	}
-	server := &http.Server{
-		Handler: http.FileServer(http.Dir(testdata.Dir)),
-	}
-	go server.Serve(listener)
-	return listener
+func createTestHTTPServer(t *testing.T) *httptest.Server {
+	return httptest.NewServer(http.FileServer(http.Dir(testdata.Dir)))
 }
 
-func createTestSource(listener *net.TCPListener, filename string) string {
-	return fmt.Sprintf("http://%s/%s", listener.Addr(), filename)
+func createTestSource(srv *httptest.Server, filename string) string {
+	return fmt.Sprintf("http://%s/%s", srv.Listener.Addr(), filename)
 }
