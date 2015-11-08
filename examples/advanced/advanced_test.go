@@ -7,13 +7,13 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
 )
 
 func TestServer(t *testing.T) {
 	h := newImageHTTPHandler()
 	type TC struct {
+		path               string
 		query              url.Values
 		expectedStatusCode int
 		expectedFormat     string
@@ -25,111 +25,99 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.SmallFileName},
-			},
+			path: testdata.SmallFileName,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-			},
+			path: testdata.MediumFileName,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.LargeFileName},
-			},
+			path: testdata.LargeFileName,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.HugeFileName},
-			},
+			path: testdata.HugeFileName,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.AnimatedFileName},
-			},
+			path: testdata.AnimatedFileName,
 		},
 		{
-			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-			},
+			path: testdata.MediumFileName,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"format":                {"foobar"},
+				"format": {"foobar"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"format":                {"png"},
+				"format": {"png"},
 			},
 			expectedFormat: "png",
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"format":                {"gif"},
+				"format": {"gif"},
 			},
 			expectedFormat: "gif",
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"format":                {"jpeg"},
-				"quality":               {"-10"},
+				"format":  {"jpeg"},
+				"quality": {"-10"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"format":                {"jpeg"},
-				"quality":               {"50"},
+				"format":  {"jpeg"},
+				"quality": {"50"},
 			},
 			expectedFormat: "jpeg",
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"width":                 {"-100"},
+				"width": {"-100"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"width":                 {"9001"},
+				"width": {"9001"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"width":                 {"100"},
+				"width": {"100"},
 			},
 			expectedWidth: 100,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"height":                {"-100"},
+				"height": {"-100"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"height":                {"9001"},
+				"height": {"9001"},
 			},
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			path: testdata.MediumFileName,
 			query: url.Values{
-				imageserver.SourceParam: {testdata.MediumFileName},
-				"height":                {"100"},
+				"height": {"100"},
 			},
 			expectedHeight: 100,
 		},
@@ -143,6 +131,7 @@ func TestServer(t *testing.T) {
 			u := &url.URL{
 				Scheme:   "http",
 				Host:     "localhost",
+				Path:     "/" + tc.path,
 				RawQuery: tc.query.Encode(),
 			}
 			req, err := http.NewRequest("GET", u.String(), nil)

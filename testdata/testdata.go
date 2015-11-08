@@ -2,7 +2,7 @@
 package testdata
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
@@ -76,7 +76,7 @@ var (
 func Get(name string) (*imageserver.Image, error) {
 	im, ok := Images[name]
 	if !ok {
-		return nil, errors.New("unknown image")
+		return nil, fmt.Errorf("unknown image \"%s\"", name)
 	}
 	return im, nil
 }

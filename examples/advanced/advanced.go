@@ -160,7 +160,12 @@ func newImageHTTPHandler() http.Handler {
 	var handler http.Handler
 	handler = &imageserver_http.Handler{
 		Parser: &imageserver_http.ListParser{
-			&imageserver_http.SourceParser{},
+			&imageserver_http.SourceTransformParser{
+				Parser: &imageserver_http.SourcePathParser{},
+				Transform: func(source string) string {
+					return strings.TrimPrefix(source, "/")
+				},
+			},
 			&imageserver_http_nfntresize.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
