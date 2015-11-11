@@ -50,6 +50,16 @@ func (prc ListProcessor) Change(params imageserver.Params) bool {
 	return false
 }
 
+// ChangeProcessor is a Processor that alway return true for the Change method.
+type ChangeProcessor struct {
+	Processor
+}
+
+// Change implements Processor.
+func (prc *ChangeProcessor) Change(params imageserver.Params) bool {
+	return true
+}
+
 // IdentityProcessor is a Processor that returns the same Image.
 type IdentityProcessor struct{}
 

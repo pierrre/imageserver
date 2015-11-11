@@ -99,6 +99,16 @@ func (prc testChangeProcessor) Change(params imageserver.Params) bool {
 	return bool(prc)
 }
 
+var _ Processor = &ChangeProcessor{}
+
+func TestChangeProcessor(t *testing.T) {
+	prc := &ChangeProcessor{}
+	change := prc.Change(imageserver.Params{})
+	if change != true {
+		t.Fatal("not false")
+	}
+}
+
 var _ Processor = &IdentityProcessor{}
 
 func TestIdentityProcessor(t *testing.T) {

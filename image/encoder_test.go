@@ -186,3 +186,17 @@ func TestDecodeCheckServerErrorPostDecode(t *testing.T) {
 		t.Fatal("no error")
 	}
 }
+
+func init() {
+	RegisterEncoder("test", &testEncoder{})
+}
+
+type testEncoder struct{}
+
+func (enc *testEncoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
+	return nil
+}
+
+func (enc *testEncoder) Change(params imageserver.Params) bool {
+	return false
+}

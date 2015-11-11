@@ -7,12 +7,7 @@ import (
 // Server is an Image Server that uses Go Image.
 type Server struct {
 	imageserver.Server
-
-	// Force to handle the Image
-	Force bool
-
-	// Optional Processor
-	Processor Processor
+	Processor Processor // Optional Processor
 }
 
 // Get implements Server.
@@ -49,9 +44,6 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 }
 
 func (srv *Server) change(im *imageserver.Image, format string, enc Encoder, params imageserver.Params) bool {
-	if srv.Force {
-		return true
-	}
 	if format != im.Format {
 		return true
 	}

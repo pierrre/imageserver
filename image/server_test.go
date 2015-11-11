@@ -35,19 +35,6 @@ func TestServerNoChange(t *testing.T) {
 	}
 }
 
-func TestServerForce(t *testing.T) {
-	srv := &Server{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
-		Force: true,
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func TestServerFormat(t *testing.T) {
 	srv := &Server{
 		Server: &imageserver.StaticServer{
@@ -122,9 +109,8 @@ func TestServerErrorDecode(t *testing.T) {
 		Server: &imageserver.StaticServer{
 			Image: testdata.Invalid,
 		},
-		Force: true,
 	}
-	_, err := srv.Get(imageserver.Params{})
+	_, err := srv.Get(imageserver.Params{"format": "test"})
 	if err == nil {
 		t.Fatal("no error")
 	}
