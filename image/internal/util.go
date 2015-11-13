@@ -11,19 +11,16 @@ import (
 // If p has no size, 1x1 is used.
 // See NewDrawableSize.
 func NewDrawable(p image.Image) draw.Image {
-	width := p.Bounds().Dx()
-	height := p.Bounds().Dy()
+	r := p.Bounds()
 	if _, ok := p.(*image.Uniform); ok {
-		width = 1
-		height = 1
+		r = image.Rect(0, 0, 1, 1)
 	}
-	return NewDrawableSize(p, width, height)
+	return NewDrawableSize(p, r)
 }
 
-// NewDrawableSize returns a new draw.Image with the same type as p and the given size .
+// NewDrawableSize returns a new draw.Image with the same type as p and the given bounds.
 // If p is not a draw.Image, another type is used.
-func NewDrawableSize(p image.Image, width, height int) draw.Image {
-	r := image.Rect(0, 0, width, height)
+func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
 	switch p.(type) {
 	case *image.RGBA:
 		return image.NewRGBA(r)
@@ -50,24 +47,27 @@ func NewDrawableSize(p image.Image, width, height int) draw.Image {
 
 // Copy copies src to dst.
 func Copy(dst draw.Image, src image.Image) {
-	width := src.Bounds().Dx()
-	if dstWidth := dst.Bounds().Dx(); dstWidth < width {
-		width = dstWidth
-	}
-	height := src.Bounds().Dy()
-	if dstHeight := dst.Bounds().Dy(); dstHeight < height {
-		height = dstHeight
-	}
+	width := min(src.Bounds().Dx(), dst.Bounds().Dx())
+	height := min(src.Bounds().Dy(), dst.Bounds().Dy())
+	srcMin := src.Bounds().Min
+	dstMin := dst.Bounds().Min
 	at := NewAtFunc(src)
 	set := NewSetFunc(dst)
 	Parallel(height, func(yStart, yEnd int) {
 		for y := yStart; y < yEnd; y++ {
 			for x := 0; x < width; x++ {
-				r, g, b, a := at(x, y)
-				set(x, y, r, g, b, a)
+				r, g, b, a := at(x+srcMin.X, y+srcMin.Y)
+				set(x+dstMin.X, y+dstMin.Y, r, g, b, a)
 			}
 		}
 	})
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // Parallel helps to dispatch tasks concurrently.

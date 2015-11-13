@@ -33,12 +33,24 @@ func TestCopy(t *testing.T) {
 			dstSize: image.Rect(0, 0, 10, 10),
 		},
 		{
+			srcSize: image.Rect(0, 0, 5, 5),
+			dstSize: image.Rect(0, 0, 10, 10),
+		},
+		{
 			srcSize: image.Rect(0, 0, 10, 10),
 			dstSize: image.Rect(0, 0, 5, 5),
 		},
 		{
+			srcSize: image.Rect(0, 0, 5, 5),
+			dstSize: image.Rect(5, 5, 10, 10),
+		},
+		{
 			srcSize: image.Rect(0, 0, 10, 10),
-			dstSize: image.Rect(0, 0, 20, 20),
+			dstSize: image.Rect(5, 5, 15, 15),
+		},
+		{
+			srcSize: image.Rect(5, 5, 15, 15),
+			dstSize: image.Rect(0, 0, 10, 10),
 		},
 	} {
 		func() {
@@ -51,11 +63,14 @@ func TestCopy(t *testing.T) {
 			testDrawRandom(src)
 			dst := image.NewRGBA(tc.dstSize)
 			Copy(dst, src)
-			bds := src.Bounds().Intersect(dst.Bounds())
-			for y := 0; y < bds.Dy(); y++ {
-				for x := 0; x < bds.Dx(); x++ {
-					cSrc := src.At(x, y)
-					cDst := dst.At(x, y)
+			width := min(src.Bounds().Dx(), dst.Bounds().Dx())
+			height := min(src.Bounds().Dy(), dst.Bounds().Dy())
+			srcMin := src.Bounds().Min
+			dstMin := dst.Bounds().Min
+			for y := 0; y < height; y++ {
+				for x := 0; x < width; x++ {
+					cSrc := src.At(x+srcMin.X, y+srcMin.Y)
+					cDst := dst.At(x+dstMin.X, y+dstMin.Y)
 					if cSrc != cDst {
 						t.Errorf("different colors at %d,%d: src=%#v, dst=%#v", x, y, cSrc, cDst)
 					}
@@ -63,7 +78,36 @@ func TestCopy(t *testing.T) {
 			}
 		}()
 	}
+}
 
+func TestMin(t *testing.T) {
+	type TC struct {
+		val1     int
+		val2     int
+		expected int
+	}
+	for _, tc := range []TC{
+		{
+			val1:     1,
+			val2:     2,
+			expected: 1,
+		},
+		{
+			val1:     5,
+			val2:     4,
+			expected: 4,
+		},
+		{
+			val1:     6,
+			val2:     6,
+			expected: 6,
+		},
+	} {
+		m := min(tc.val1, tc.val2)
+		if m != tc.expected {
+			t.Fatalf("val1=%d, val2=%d: got %d, want %d", tc.val1, tc.val2, m, tc.expected)
+		}
+	}
 }
 
 func TestParallel(t *testing.T) {

@@ -113,7 +113,7 @@ func (prc *CorrectionProcessor) process(nim image.Image, params imageserver.Para
 	}
 	nim, _ = prc.after.Process(nim, params)
 	if isHighQuality(nim) && !isHighQuality(original) {
-		newNim := imageserver_image_internal.NewDrawableSize(original, nim.Bounds().Dx(), nim.Bounds().Dy())
+		newNim := imageserver_image_internal.NewDrawableSize(original, nim.Bounds())
 		imageserver_image_internal.Copy(newNim, nim)
 		nim = newNim
 	}
