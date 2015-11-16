@@ -159,7 +159,7 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 func newImageHTTPHandler() http.Handler {
 	var handler http.Handler
 	handler = &imageserver_http.Handler{
-		Parser: &imageserver_http.ListParser{
+		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourceTransformParser{
 				Parser: &imageserver_http.SourcePathParser{},
 				Transform: func(source string) string {
@@ -170,7 +170,7 @@ func newImageHTTPHandler() http.Handler {
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
 			&imageserver_http.GammaCorrectionParser{},
-		},
+		}),
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
 		ErrorFunc: func(err error, req *http.Request) {

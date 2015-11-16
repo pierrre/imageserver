@@ -1,4 +1,4 @@
-// Package _test provides utilities for cache testing.
+// Package _test provides utilities for Cache testing.
 package _test
 
 import (
@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	// KeyValid is a valid cache key (with content)
+	// KeyValid is a valid Cache key (with content)
 	KeyValid = "test"
-	// KeyMiss is an invalid cache key (without content)
+	// KeyMiss is an invalid Cache key (without content)
 	KeyMiss = "unknown"
 )
 
-// TestGetSet is a helper to test cache Get()/Set().
+// TestGetSet is a helper to test Cache.Get()/Set().
 func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 	err := cache.Set(KeyValid, testdata.Medium, imageserver.Params{})
 	if err != nil {
@@ -35,7 +35,7 @@ func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 	}
 }
 
-// CacheTestGetMiss is a helper to test cache Get() with a "cache miss" error.
+// TestGetMiss is a helper to test Cache.Get() with a "cache miss".
 func TestGetMiss(t *testing.T, cache imageserver_cache.Cache) {
 	im, err := cache.Get(KeyMiss, imageserver.Params{})
 	if err != nil {

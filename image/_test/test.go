@@ -10,10 +10,12 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 )
 
+// TestEncoder is a helper to test Encoder.
 func TestEncoder(t *testing.T, enc imageserver_image.Encoder, expectedFormat string) {
 	TestEncoderParams(t, enc, imageserver.Params{}, expectedFormat)
 }
 
+// TestEncoderParams is a helper to test Encoder with Params.
 func TestEncoderParams(t *testing.T, enc imageserver_image.Encoder, params imageserver.Params, expectedFormat string) {
 	buf := new(bytes.Buffer)
 	nim := NewImage()
@@ -30,6 +32,7 @@ func TestEncoderParams(t *testing.T, enc imageserver_image.Encoder, params image
 	}
 }
 
+// NewImage creates a new test Image.
 func NewImage() image.Image {
 	return image.NewRGBA(image.Rect(0, 0, 64, 64))
 }

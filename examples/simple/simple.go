@@ -20,12 +20,12 @@ func main() {
 		Processor: &imageserver_image_nfntresize.Processor{},
 	}
 	handler := &imageserver_http.Handler{
-		Parser: &imageserver_http.ListParser{
+		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourceParser{},
 			&imageserver_http_nfntresize.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
-		},
+		}),
 		Server: server,
 	}
 	http.Handle("/", handler)

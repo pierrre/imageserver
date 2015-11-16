@@ -44,7 +44,7 @@ func TestImageMarshallErrorFormatMaxLen(t *testing.T) {
 }
 
 func TestImageMarshallErrorDataMaxLen(t *testing.T) {
-	data := make([]byte, 0)
+	var data []byte
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
 	dataHeader.Len = ImageDataMaxLen + 1
 	im := &Image{

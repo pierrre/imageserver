@@ -59,7 +59,7 @@ var (
 	Invalid = loadImage(InvalidFileName, "jpeg")
 
 	// Server is an Image Server that uses filename as source.
-	Server imageserver.Server = imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+	Server = imageserver.Server(imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 		source, err := params.GetString(imageserver.SourceParam)
 		if err != nil {
 			return nil, err
@@ -69,7 +69,7 @@ var (
 			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}
 		}
 		return im, nil
-	})
+	}))
 )
 
 // Get returns an Image for a name.
