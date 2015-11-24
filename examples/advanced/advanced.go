@@ -13,21 +13,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disintegration/gift"
 	"github.com/golang/groupcache"
-	"github.com/nfnt/resize"
 	"github.com/pierrre/githubhook"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_groupcache "github.com/pierrre/imageserver/cache/groupcache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_http_nfntresize "github.com/pierrre/imageserver/http/nfntresize"
+	imageserver_http_gift "github.com/pierrre/imageserver/http/gift"
 	imageserver_image "github.com/pierrre/imageserver/image"
 	_ "github.com/pierrre/imageserver/image/bmp"
 	imageserver_image_gamma "github.com/pierrre/imageserver/image/gamma"
 	_ "github.com/pierrre/imageserver/image/gif"
+	imageserver_image_gift "github.com/pierrre/imageserver/image/gift"
 	_ "github.com/pierrre/imageserver/image/jpeg"
-	imageserver_image_nfntresize "github.com/pierrre/imageserver/image/nfntresize"
 	_ "github.com/pierrre/imageserver/image/png"
 	_ "github.com/pierrre/imageserver/image/tiff"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
@@ -167,7 +167,7 @@ func newImageHTTPHandler() http.Handler {
 					return strings.TrimPrefix(source, "/")
 				},
 			},
-			&imageserver_http_nfntresize.Parser{},
+			&imageserver_http_gift.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
 			&imageserver_http.GammaCorrectionParser{},
@@ -200,10 +200,10 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 	return &imageserver_image.Server{
 		Server: srv,
 		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			&imageserver_image_nfntresize.Processor{
-				DefaultInterpolation: resize.Lanczos3,
-				MaxWidth:             2048,
-				MaxHeight:            2048,
+			&imageserver_image_gift.Processor{
+				DefaultResampling: gift.LanczosResampling,
+				MaxWidth:          2048,
+				MaxHeight:         2048,
 			},
 			true,
 		),
