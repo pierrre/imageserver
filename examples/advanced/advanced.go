@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/golang/groupcache"
+	"github.com/nfnt/resize"
 	"github.com/pierrre/githubhook"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
@@ -190,7 +191,6 @@ func newServer() imageserver.Server {
 	srv := imageserver_testdata.Server
 	srv = newServerImage(srv)
 	srv = newServerLimit(srv)
-	srv = newServerValidate(srv)
 	srv = newServerGroupcache(srv)
 	srv = newServerCacheMemory(srv)
 	return srv
@@ -200,7 +200,11 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 	return &imageserver_image.Server{
 		Server: srv,
 		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			&imageserver_image_nfntresize.Processor{},
+			&imageserver_image_nfntresize.Processor{
+				DefaultInterpolation: resize.Lanczos3,
+				MaxWidth:             2048,
+				MaxHeight:            2048,
+			},
 			true,
 		),
 	}
@@ -208,14 +212,6 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 
 func newServerLimit(srv imageserver.Server) imageserver.Server {
 	return imageserver.NewLimitServer(srv, runtime.GOMAXPROCS(0)*2)
-}
-
-func newServerValidate(srv imageserver.Server) imageserver.Server {
-	return &imageserver_image_nfntresize.ValidateParamsServer{
-		Server:    srv,
-		WidthMax:  2048,
-		HeightMax: 2048,
-	}
 }
 
 func newServerGroupcache(srv imageserver.Server) imageserver.Server {

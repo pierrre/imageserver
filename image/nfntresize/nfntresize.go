@@ -16,10 +16,13 @@ const (
 
 // Processor processes an Image with nfnt resize.
 type Processor struct {
+	DefaultInterpolation resize.InterpolationFunction
+	MaxWidth             int
+	MaxHeight            int
 }
 
 // Process implements Processor.
-func (proc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(Param) {
 		return nim, nil
 	}
@@ -27,29 +30,28 @@ func (proc *Processor) Process(nim image.Image, params imageserver.Params) (imag
 	if err != nil {
 		return nil, err
 	}
-	nim, err = process(nim, params)
+	if params.Empty() {
+		return nim, nil
+	}
+	nim, err = prc.process(nim, params)
 	if err != nil {
-		return nil, wrapParamError(err)
+		if err, ok := err.(*imageserver.ParamError); ok {
+			err.Param = fmt.Sprintf("%s.%s", Param, err.Param)
+		}
+		return nil, err
 	}
 	return nim, nil
 }
 
-func process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	if params.Empty() {
-		return nim, nil
-	}
-	width, err := getDimension("width", params)
-	if err != nil {
-		return nil, err
-	}
-	height, err := getDimension("height", params)
+func (prc *Processor) process(nim image.Image, params imageserver.Params) (image.Image, error) {
+	width, height, err := prc.getSize(params)
 	if err != nil {
 		return nil, err
 	}
 	if width == 0 && height == 0 {
 		return nim, nil
 	}
-	interp, err := getInterpolation(params)
+	interp, err := prc.getInterpolation(params)
 	if err != nil {
 		return nil, err
 	}
@@ -61,23 +63,38 @@ func process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	return nim, nil
 }
 
-func getDimension(name string, params imageserver.Params) (uint, error) {
+func (prc *Processor) getSize(params imageserver.Params) (uint, uint, error) {
+	w, err := getDimension("width", prc.MaxWidth, params)
+	if err != nil {
+		return 0, 0, err
+	}
+	h, err := getDimension("height", prc.MaxHeight, params)
+	if err != nil {
+		return 0, 0, err
+	}
+	return w, h, nil
+}
+
+func getDimension(name string, max int, params imageserver.Params) (uint, error) {
 	if !params.Has(name) {
 		return 0, nil
 	}
-	dimension, err := params.GetInt(name)
+	d, err := params.GetInt(name)
 	if err != nil {
 		return 0, err
 	}
-	if dimension < 0 {
+	if d < 0 {
 		return 0, &imageserver.ParamError{Param: name, Message: "must be greater than or equal to 0"}
 	}
-	return uint(dimension), nil
+	if max > 0 && d > max {
+		return 0, &imageserver.ParamError{Param: name, Message: fmt.Sprintf("must be less than or equal to %d", max)}
+	}
+	return uint(d), nil
 }
 
-func getInterpolation(params imageserver.Params) (resize.InterpolationFunction, error) {
+func (prc *Processor) getInterpolation(params imageserver.Params) (resize.InterpolationFunction, error) {
 	if !params.Has("interpolation") {
-		return resize.Lanczos3, nil
+		return prc.DefaultInterpolation, nil
 	}
 	interpolation, err := params.GetString("interpolation")
 	if err != nil {
@@ -122,7 +139,7 @@ func getModeFunc(params imageserver.Params) (modeFunc, error) {
 }
 
 // Change implements Processor.
-func (proc *Processor) Change(params imageserver.Params) bool {
+func (prc *Processor) Change(params imageserver.Params) bool {
 	if !params.Has(Param) {
 		return false
 	}
@@ -139,18 +156,5 @@ func (proc *Processor) Change(params imageserver.Params) bool {
 	if params.Has("height") {
 		return true
 	}
-	if params.Has("interpolation") {
-		return true
-	}
-	if params.Has("mode") {
-		return true
-	}
 	return false
-}
-
-func wrapParamError(err error) error {
-	if err, ok := err.(*imageserver.ParamError); ok {
-		err.Param = fmt.Sprintf("%s.%s", Param, err.Param)
-	}
-	return err
 }

@@ -12,8 +12,12 @@ import (
 var _ imageserver_image.Processor = &Processor{}
 
 func TestProcessor(t *testing.T) {
-	prc := &Processor{}
+	nim, err := imageserver_image.Decode(imageserver_testdata.Medium)
+	if err != nil {
+		t.Fatal(err)
+	}
 	type TC struct {
+		processor          *Processor
 		params             imageserver.Params
 		expectedWidth      int
 		expectedHeight     int
@@ -60,6 +64,25 @@ func TestProcessor(t *testing.T) {
 			expectedWidth:  100,
 			expectedHeight: 100,
 		},
+		// mode
+		{
+			params: imageserver.Params{Param: imageserver.Params{
+				"width":  100,
+				"height": 100,
+				"mode":   "resize",
+			}},
+			expectedWidth:  100,
+			expectedHeight: 100,
+		},
+		{
+			params: imageserver.Params{Param: imageserver.Params{
+				"width":  100,
+				"height": 100,
+				"mode":   "thumbnail",
+			}},
+			expectedWidth:  100,
+			expectedHeight: 79,
+		},
 		// interpolation
 		{
 			params: imageserver.Params{Param: imageserver.Params{
@@ -103,25 +126,6 @@ func TestProcessor(t *testing.T) {
 			}},
 			expectedWidth: 100,
 		},
-		// mode
-		{
-			params: imageserver.Params{Param: imageserver.Params{
-				"width":  100,
-				"height": 100,
-				"mode":   "resize",
-			}},
-			expectedWidth:  100,
-			expectedHeight: 100,
-		},
-		{
-			params: imageserver.Params{Param: imageserver.Params{
-				"width":  100,
-				"height": 100,
-				"mode":   "thumbnail",
-			}},
-			expectedWidth:  100,
-			expectedHeight: 79, // 819 * 100 / 1024
-		},
 		// error
 		{
 			params:             imageserver.Params{Param: "invalid"},
@@ -148,6 +152,20 @@ func TestProcessor(t *testing.T) {
 		{
 			params: imageserver.Params{Param: imageserver.Params{
 				"height": -1,
+			}},
+			expectedParamError: Param + ".height",
+		},
+		{
+			processor: &Processor{MaxWidth: 500},
+			params: imageserver.Params{Param: imageserver.Params{
+				"width": 1000,
+			}},
+			expectedParamError: Param + ".width",
+		},
+		{
+			processor: &Processor{MaxHeight: 500},
+			params: imageserver.Params{Param: imageserver.Params{
+				"height": 1000,
 			}},
 			expectedParamError: Param + ".height",
 		},
@@ -186,22 +204,25 @@ func TestProcessor(t *testing.T) {
 					t.Logf("%#v", tc)
 				}
 			}()
-			im, err := imageserver_image.Decode(imageserver_testdata.Medium)
-			if err != nil {
-				t.Fatal(err)
+			prc := tc.processor
+			if prc == nil {
+				prc = &Processor{}
 			}
-			im, err = prc.Process(im, tc.params)
+			nim, err := prc.Process(nim, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
 					return
 				}
 				t.Fatal(err)
 			}
-			if tc.expectedWidth != 0 && im.Bounds().Dx() != tc.expectedWidth {
-				t.Fatalf("unexpected width: got %d, want %d", im.Bounds().Dx(), tc.expectedWidth)
+			if tc.expectedParamError != "" {
+				t.Fatal("no error")
 			}
-			if tc.expectedHeight != 0 && im.Bounds().Dy() != tc.expectedHeight {
-				t.Fatalf("unexpected height: got %d, want %d", im.Bounds().Dy(), tc.expectedHeight)
+			if tc.expectedWidth != 0 && nim.Bounds().Dx() != tc.expectedWidth {
+				t.Fatalf("unexpected width: got %d, want %d", nim.Bounds().Dx(), tc.expectedWidth)
+			}
+			if tc.expectedHeight != 0 && nim.Bounds().Dy() != tc.expectedHeight {
+				t.Fatalf("unexpected height: got %d, want %d", nim.Bounds().Dy(), tc.expectedHeight)
 			}
 		}()
 	}
@@ -235,18 +256,6 @@ func TestProcessorChange(t *testing.T) {
 		{
 			params: imageserver.Params{Param: imageserver.Params{
 				"height": 100,
-			}},
-			expected: true,
-		},
-		{
-			params: imageserver.Params{Param: imageserver.Params{
-				"interpolation": "lanczos3",
-			}},
-			expected: true,
-		},
-		{
-			params: imageserver.Params{Param: imageserver.Params{
-				"mode": "resize",
 			}},
 			expected: true,
 		},

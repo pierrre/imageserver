@@ -12,6 +12,7 @@ import (
 var _ imageserver_http.Parser = &Parser{}
 
 func TestParse(t *testing.T) {
+	p := &Parser{}
 	type TC struct {
 		query              url.Values
 		expectedParams     imageserver.Params
@@ -21,35 +22,35 @@ func TestParse(t *testing.T) {
 		{},
 		{
 			query: url.Values{"width": {"100"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{Param: imageserver.Params{
 				"width": 100,
 			}},
 		},
 		{
 			query: url.Values{"height": {"100"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{Param: imageserver.Params{
 				"height": 100,
 			}},
 		},
 		{
 			query: url.Values{"interpolation": {"lanczos3"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{Param: imageserver.Params{
 				"interpolation": "lanczos3",
 			}},
 		},
 		{
 			query: url.Values{"mode": {"resize"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{Param: imageserver.Params{
 				"mode": "resize",
 			}},
 		},
 		{
 			query:              url.Values{"width": {"invalid"}},
-			expectedParamError: globalParam + ".width",
+			expectedParamError: Param + ".width",
 		},
 		{
 			query:              url.Values{"height": {"invalid"}},
-			expectedParamError: globalParam + ".height",
+			expectedParamError: Param + ".height",
 		},
 	} {
 		func() {
@@ -67,7 +68,7 @@ func TestParse(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			p := &Parser{}
+
 			params := imageserver.Params{}
 			err = p.Parse(req, params)
 			if err != nil {
@@ -85,7 +86,7 @@ func TestParse(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	p := &Parser{}
-	httpParam := p.Resolve(globalParam + ".width")
+	httpParam := p.Resolve(Param + ".width")
 	if httpParam != "width" {
 		t.Fatal("not equal")
 	}

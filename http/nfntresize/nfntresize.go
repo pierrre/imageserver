@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	globalParam = "nfntresize"
+	// Param is the sub-param used by this package.
+	Param = "nfntresize"
 )
 
 // Parser is a nfnt resize HTTP Parser.
@@ -21,20 +22,20 @@ type Parser struct{}
 // Parse implements Parser.
 func (parser *Parser) Parse(req *http.Request, params imageserver.Params) error {
 	p := imageserver.Params{}
-	err := parser.parse(req, p)
+	err := parse(req, p)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = globalParam + "." + err.Param
+			err.Param = Param + "." + err.Param
 		}
 		return err
 	}
 	if !p.Empty() {
-		params.Set(globalParam, p)
+		params.Set(Param, p)
 	}
 	return nil
 }
 
-func (parser *Parser) parse(req *http.Request, params imageserver.Params) error {
+func parse(req *http.Request, params imageserver.Params) error {
 	if err := imageserver_http.ParseQueryInt("width", req, params); err != nil {
 		return err
 	}
@@ -48,8 +49,8 @@ func (parser *Parser) parse(req *http.Request, params imageserver.Params) error 
 
 // Resolve implements Parser.
 func (parser *Parser) Resolve(param string) string {
-	if !strings.HasPrefix(param, globalParam+".") {
+	if !strings.HasPrefix(param, Param+".") {
 		return ""
 	}
-	return strings.TrimPrefix(param, globalParam+".")
+	return strings.TrimPrefix(param, Param+".")
 }
