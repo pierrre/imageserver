@@ -41,10 +41,10 @@ var (
 	flagHTTPAddr            = ":8080"
 	flagGitHubWebhookSecret string
 	flagHTTPExpires         = time.Duration(7 * 24 * time.Hour)
-	flagGroupcache          = int64(512 * (1 << 20))
+	flagGroupcache          = int64(0)
 	flagGroupcacheSelf      string
 	flagGroupcachePeers     string
-	flagCacheMemory         = int64(64 * (1 << 20))
+	flagCacheMemory         = int64(128 * (1 << 20))
 )
 
 func main() {
