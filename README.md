@@ -54,7 +54,8 @@ An image server toolkit in Go (Golang)
     </tbody>
 </table>
 
-### Gamma correction
+### Gamma correction ([more info](http://www.4p8.com/eric.brasseur/gamma.html))
+
 <table>
     <thead>
         <tr>
