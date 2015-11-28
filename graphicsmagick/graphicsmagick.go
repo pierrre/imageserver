@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pierrre/imageserver"
@@ -29,23 +30,44 @@ const (
 //
 // Params:
 //
-// - width / height: sizes for "-resize" argument (both optionals)
+// - ignore_ratio: "!" for "-resize" argument
 //
 // - fill: "^" for "-resize" argument
-//
-// - ignore_ratio: "!" for "-resize" argument
 //
 // - only_shrink_larger: ">" for "-resize" argument
 //
 // - only_enlarge_smaller: "<" for "-resize" argument
 //
-// - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
+// - extent: "-extent" param, uses width/height params
 //
-// - extent: "-extent" param, uses width/height params and add "-gravity center" argument
+// - width / height: sizes for "-resize" argument (both optionals)
+//
+// - quality: "-quality" param
+//
+// - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
 //
 // - format: "-format" param
 //
-// - quality: "-quality" param
+// - gravity: "-gravity" param, default is Center
+//
+// - crop: "-crop" param with "+repage"
+//
+// - rotate: "-rotate" param
+//
+// - monochrome: "-monochrome" param
+//
+// - grey: "-colorspace" param with "GRAY"
+//
+// - no_strip: "-strip" param
+//
+// - trim: "-trim" param
+//
+// - no_interlace: "-interlace" param with "Line"
+//
+// - flip: "-flip" param
+//
+// - flop: "-flop" param
+
 type Server struct {
 	Server         imageserver.Server
 	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
@@ -93,7 +115,57 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 		return nil, err
 	}
 
+	err = server.buildArgumentsGravity(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
 	err = server.buildArgumentsExtent(arguments, params, width, height)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsCrop(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsRotate(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsMonochrome(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsGrey(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsStrip(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsTrim(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsInterlace(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsFlip(arguments, params)
+	if err != nil {
+		return nil, err
+	}
+
+	err = server.buildArgumentsFlop(arguments, params)
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +194,7 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 
 	file := filepath.Join(tempDir, "image")
 	arguments.PushBack(file)
+
 	err = ioutil.WriteFile(file, im.Data, os.FileMode(0600))
 	if err != nil {
 		return nil, err
@@ -260,8 +333,6 @@ func (server *Server) buildArgumentsExtent(arguments *list.List, params imageser
 		return err
 	}
 	if extent {
-		arguments.PushBack("-gravity")
-		arguments.PushBack("center")
 		arguments.PushBack("-extent")
 		arguments.PushBack(fmt.Sprintf("%dx%d", width, height))
 	}
@@ -311,6 +382,142 @@ func (server *Server) buildArgumentsQuality(arguments *list.List, params imagese
 	}
 	arguments.PushBack("-quality")
 	arguments.PushBack(strconv.Itoa(quality))
+	return nil
+}
+
+func (server *Server) buildArgumentsGravity(arguments *list.List, params imageserver.Params) error {
+	gravity, _ := params.GetString("gravity")
+	var translatedGravity string
+	if gravity != "" {
+		switch {
+		case gravity == "n":
+			translatedGravity = "North"
+		case gravity == "s":
+			translatedGravity = "South"
+		case gravity == "e":
+			translatedGravity = "East"
+		case gravity == "w":
+			translatedGravity = "West"
+		case gravity == "ne":
+			translatedGravity = "NorthEast"
+		case gravity == "se":
+			translatedGravity = "SouthEast"
+		case gravity == "nw":
+			translatedGravity = "NorthWest"
+		case gravity == "sw":
+			translatedGravity = "SouthWest"
+		}
+		if translatedGravity == "" {
+			return &imageserver.ParamError{Param: "gravity", Message: "gravity should n, s, e, w, ne, se, nw or sw"}
+		}
+	} else {
+		// Default gravity is center.
+		translatedGravity = "Center"
+	}
+
+	arguments.PushBack("-gravity")
+	arguments.PushBack(fmt.Sprintf("%s", translatedGravity))
+	return nil
+}
+
+func (server *Server) buildArgumentsCrop(arguments *list.List, params imageserver.Params) error {
+	if !params.Has("crop") {
+		return nil
+	}
+	crop, _ := params.GetString("crop")
+	cropArgs := strings.Split(crop, ",")
+	cropArgsLen := len(cropArgs)
+	if cropArgsLen != 2 && cropArgsLen != 4 {
+		return &imageserver.ParamError{Param: "crop", Message: "Invalid crop request, parameters number mismatch"}
+	}
+	if cropArgsLen == 2 {
+		width, _ := strconv.Atoi(cropArgs[0])
+		height, _ := strconv.Atoi(cropArgs[1])
+		arguments.PushBack("-crop")
+		arguments.PushBack(fmt.Sprintf("%dx%d", width, height))
+		arguments.PushBack("+repage")
+	}
+	if cropArgsLen == 4 {
+		width, _ := strconv.Atoi(cropArgs[0])
+		height, _ := strconv.Atoi(cropArgs[1])
+		x, _ := strconv.Atoi(cropArgs[2])
+		y, _ := strconv.Atoi(cropArgs[3])
+		arguments.PushBack("-crop")
+		arguments.PushBack(fmt.Sprintf("%dx%d+%d+%d", width, height, x, y))
+		arguments.PushBack("+repage")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsRotate(arguments *list.List, params imageserver.Params) error {
+	rotate, _ := params.GetInt("rotate")
+	if rotate != 0 {
+		if rotate < 0 || rotate > 359 {
+			return &imageserver.ParamError{Param: "rotate", Message: "Invalid rotate parameter"}
+		}
+
+		arguments.PushBack("-rotate")
+		arguments.PushBack(strconv.Itoa(rotate))
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsMonochrome(arguments *list.List, params imageserver.Params) error {
+	monochrome, _ := params.GetBool("monochrome")
+	if monochrome {
+		arguments.PushBack("-monochrome")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsGrey(arguments *list.List, params imageserver.Params) error {
+	grey, _ := params.GetBool("grey")
+	if grey {
+		arguments.PushBack("-colorspace")
+		arguments.PushBack("GRAY")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsStrip(arguments *list.List, params imageserver.Params) error {
+	strip, _ := params.GetBool("no_strip")
+	if !strip {
+		arguments.PushBack("-strip")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsTrim(arguments *list.List, params imageserver.Params) error {
+	trim, _ := params.GetBool("trim")
+	if trim {
+		// We must execute trim first. (order of operations)
+		arguments.PushFront("-trim")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsInterlace(arguments *list.List, params imageserver.Params) error {
+	interlace, _ := params.GetBool("no_interlace")
+	if !interlace {
+		arguments.PushBack("-interlace")
+		arguments.PushBack("Line")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsFlip(arguments *list.List, params imageserver.Params) error {
+	flip, _ := params.GetBool("flip")
+	if flip {
+		arguments.PushBack("-flip")
+	}
+	return nil
+}
+
+func (server *Server) buildArgumentsFlop(arguments *list.List, params imageserver.Params) error {
+	flop, _ := params.GetBool("flop")
+	if flop {
+		arguments.PushBack("-flop")
+	}
 	return nil
 }
 
