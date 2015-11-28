@@ -67,7 +67,6 @@ const (
 // - flip: "-flip" param
 //
 // - flop: "-flop" param
-
 type Server struct {
 	Server         imageserver.Server
 	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
