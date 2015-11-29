@@ -58,8 +58,6 @@ const (
 //
 // - grey: "-colorspace" param with "GRAY"
 //
-// - no_strip: "-strip" param
-//
 // - trim: "-trim" param
 //
 // - no_interlace: "-interlace" param with "Line"
@@ -140,11 +138,6 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 	}
 
 	err = server.buildArgumentsGrey(arguments, params)
-	if err != nil {
-		return nil, err
-	}
-
-	err = server.buildArgumentsStrip(arguments, params)
 	if err != nil {
 		return nil, err
 	}
@@ -474,14 +467,6 @@ func (server *Server) buildArgumentsGrey(arguments *list.List, params imageserve
 	if grey {
 		arguments.PushBack("-colorspace")
 		arguments.PushBack("GRAY")
-	}
-	return nil
-}
-
-func (server *Server) buildArgumentsStrip(arguments *list.List, params imageserver.Params) error {
-	strip, _ := params.GetBool("no_strip")
-	if !strip {
-		arguments.PushBack("-strip")
 	}
 	return nil
 }

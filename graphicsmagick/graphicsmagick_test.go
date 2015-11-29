@@ -408,38 +408,6 @@ func TestBuildArgumentsGrey(t *testing.T) {
 	}
 }
 
-func TestBuildArgumentsStrip(t *testing.T) {
-	testSamples := []testSample{
-		testSample{
-			Params: imageserver.Params{
-				"no_strip": true,
-			},
-			ExpectedArguments: "",
-		},
-		testSample{
-			Params: imageserver.Params{
-				"no_strip": false,
-			},
-			ExpectedArguments: "-strip ",
-		},
-	}
-	server := &Server{
-		Server:     &imageserver.StaticServer{Image: testdata.Medium},
-		Executable: "gm",
-	}
-	for _, ts := range testSamples {
-		arguments := list.New()
-		err := server.buildArgumentsStrip(arguments, ts.Params)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		args := convertArgumentsToString(arguments)
-		if args != ts.ExpectedArguments {
-			t.Errorf("Failed to build arguments for gm.\nGot:  " + args + "\nWant: " + ts.ExpectedArguments)
-		}
-	}
-}
-
 func TestBuildArgumentsTrim(t *testing.T) {
 	testSamples := []testSample{
 		testSample{
