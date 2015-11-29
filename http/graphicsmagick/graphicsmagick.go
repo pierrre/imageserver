@@ -35,31 +35,51 @@ func (parser *Parser) Parse(req *http.Request, params imageserver.Params) error 
 }
 
 func (parser *Parser) parse(req *http.Request, params imageserver.Params) error {
-	if err := imageserver_http.ParseQueryInt("width", req, params); err != nil {
-		return err
+	// parse bool params
+	boolParams := []string{
+		"ignore_ratio",
+		"fill",
+		"only_shrink_larger",
+		"only_enlarge_smaller",
+		"extent",
+		"monochrome",
+		"grey",
+		"no_strip",
+		"trim",
+		"no_interlace",
+		"flip",
+		"flop",
 	}
-	if err := imageserver_http.ParseQueryInt("height", req, params); err != nil {
-		return err
+	for _, bp := range boolParams {
+		err := imageserver_http.ParseQueryBool(bp, req, params)
+		if err != nil {
+			return err
+		}
 	}
-	if err := imageserver_http.ParseQueryBool("fill", req, params); err != nil {
-		return err
+
+	// parse integer params
+	intParams := []string{
+		"w",
+		"h",
+		"rotate",
+		"q",
 	}
-	if err := imageserver_http.ParseQueryBool("ignore_ratio", req, params); err != nil {
-		return err
+	for _, ip := range intParams {
+		err := imageserver_http.ParseQueryInt(ip, req, params)
+		if err != nil {
+			return err
+		}
 	}
-	if err := imageserver_http.ParseQueryBool("only_shrink_larger", req, params); err != nil {
-		return err
+
+	// parse string params
+	stringParams := []string{
+		"bg",
+		"gravity",
+		"crop",
+		"format",
 	}
-	if err := imageserver_http.ParseQueryBool("only_enlarge_smaller", req, params); err != nil {
-		return err
-	}
-	imageserver_http.ParseQueryString("background", req, params)
-	if err := imageserver_http.ParseQueryBool("extent", req, params); err != nil {
-		return err
-	}
-	imageserver_http.ParseQueryString("format", req, params)
-	if err := imageserver_http.ParseQueryInt("quality", req, params); err != nil {
-		return err
+	for _, sp := range stringParams {
+		imageserver_http.ParseQueryString(sp, req, params)
 	}
 	return nil
 }
