@@ -19,9 +19,6 @@ An image server toolkit in Go (Golang)
 ## Demo
 *Click the images to see the URL parameters.*
 
-### Normal
-<a href="http://fuckingfrogs.fr:8080/small.jpg"><img src="http://fuckingfrogs.fr:8080/small.jpg" /></a>
-
 ### Resize
 <table>
     <thead>
@@ -81,7 +78,7 @@ An image server toolkit in Go (Golang)
             <td><a href="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=true" /></a></td>
         </tr>
         <tr>
-            <td><a href="http://fuckingfrogs.fr:8080/random.png">Rings</a></td>
+            <td><a href="http://fuckingfrogs.fr:8080/rings.png">Rings</a></td>
             <td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=false"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=false" /></a></td>
             <td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=true" /></a></td>
         </tr>
