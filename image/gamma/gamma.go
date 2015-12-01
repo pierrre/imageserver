@@ -84,9 +84,6 @@ func NewCorrectionProcessor(prc imageserver_image.Processor, enabled bool) *Corr
 
 // Process implements Processor.
 func (prc *CorrectionProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	if !prc.Processor.Change(params) {
-		return nim, nil
-	}
 	enabled, err := prc.isEnabled(params)
 	if err != nil {
 		return nil, err
