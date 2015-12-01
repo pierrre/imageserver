@@ -105,7 +105,7 @@ func TestChangeProcessor(t *testing.T) {
 	prc := &ChangeProcessor{}
 	change := prc.Change(imageserver.Params{})
 	if change != true {
-		t.Fatal("not false")
+		t.Fatal("not true")
 	}
 }
 
