@@ -125,11 +125,6 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode:    http.StatusInternalServerError,
 			expectErrorFuncCalled: true,
 		},
-		{
-			url:                   "http://localhost?source=medium.jpg",
-			responseWriter:        &errorResponseWriter{},
-			expectErrorFuncCalled: true,
-		},
 	} {
 		func() {
 			defer func() {
@@ -199,18 +194,4 @@ func TestNewParamsHashETagFunc(t *testing.T) {
 	NewParamsHashETagFunc(sha256.New)(imageserver.Params{
 		"foo": "bar",
 	})
-}
-
-type errorResponseWriter struct {
-}
-
-func (rw *errorResponseWriter) Header() http.Header {
-	return make(http.Header)
-}
-
-func (rw *errorResponseWriter) Write(b []byte) (int, error) {
-	return 0, fmt.Errorf("error")
-}
-
-func (rw *errorResponseWriter) WriteHeader(code int) {
 }

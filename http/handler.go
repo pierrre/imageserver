@@ -82,10 +82,7 @@ func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, ima
 	}
 	rw.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 	if req.Method == "GET" {
-		_, err := rw.Write(image.Data)
-		if err != nil {
-			handler.callErrorFunc(err, req)
-		}
+		rw.Write(image.Data)
 	}
 }
 
@@ -117,14 +114,10 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, req *http.Request) 
 		text := fmt.Sprintf("image error: %s", err.Message)
 		return &Error{Code: http.StatusBadRequest, Text: text}
 	default:
-		handler.callErrorFunc(err, req)
+		if handler.ErrorFunc != nil {
+			handler.ErrorFunc(err, req)
+		}
 		return NewErrorDefaultText(http.StatusInternalServerError)
-	}
-}
-
-func (handler *Handler) callErrorFunc(err error, req *http.Request) {
-	if handler.ErrorFunc != nil {
-		handler.ErrorFunc(err, req)
 	}
 }
 
