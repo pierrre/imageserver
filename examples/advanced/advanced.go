@@ -87,7 +87,7 @@ func startHTTPServer() {
 
 func newHTTPHandler() http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/", newImageHTTPHandler())
+	mux.Handle("/", http.StripPrefix("/", newImageHTTPHandler()))
 	mux.Handle("/favicon.ico", http.NotFoundHandler())
 	if h := newGitHubWebhookHTTPHandler(); h != nil {
 		mux.Handle("/github_webhook", h)
@@ -161,12 +161,7 @@ func newImageHTTPHandler() http.Handler {
 	var handler http.Handler
 	handler = &imageserver_http.Handler{
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
-			&imageserver_http.SourceTransformParser{
-				Parser: &imageserver_http.SourcePathParser{},
-				Transform: func(source string) string {
-					return strings.TrimPrefix(source, "/")
-				},
-			},
+			&imageserver_http.SourcePathParser{},
 			&imageserver_http_gift.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},

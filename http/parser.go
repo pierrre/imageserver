@@ -66,7 +66,9 @@ type SourcePathParser struct {
 
 // Parse implements Parser.
 func (parser *SourcePathParser) Parse(req *http.Request, params imageserver.Params) error {
-	params.Set(imageserver.SourceParam, req.URL.Path)
+	if len(req.URL.Path) > 0 {
+		params.Set(imageserver.SourceParam, req.URL.Path)
+	}
 	return nil
 }
 

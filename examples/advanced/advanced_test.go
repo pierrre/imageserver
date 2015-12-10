@@ -11,7 +11,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	h := newImageHTTPHandler()
+	h := newHTTPHandler()
 	type TC struct {
 		path               string
 		query              url.Values
