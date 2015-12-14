@@ -56,7 +56,7 @@ var (
 	// InvalidFileName is the file name of Invalid.
 	InvalidFileName = "invalid.jpg"
 	// Invalid is an invalid Image.
-	Invalid = loadImage(InvalidFileName, "jpeg")
+	Invalid = loadImage(InvalidFileName, "invalid")
 
 	// Server is an Image Server that uses filename as source.
 	Server = imageserver.Server(imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {

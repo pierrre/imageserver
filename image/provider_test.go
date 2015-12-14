@@ -26,7 +26,7 @@ var _ Provider = &StaticProvider{}
 
 func TestStaticProvider(t *testing.T) {
 	srv := &StaticProvider{
-		Image: NewTestImage(),
+		Image: image.NewRGBA(image.Rect(0, 0, 1, 1)),
 		Error: nil,
 	}
 	_, err := srv.Get(imageserver.Params{})
@@ -43,7 +43,7 @@ func TestProcessorProvider(t *testing.T) {
 	prv := &ProcessorProvider{
 		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
 			providerCalled = true
-			return NewTestImage(), nil
+			return image.NewRGBA(image.Rect(0, 0, 1, 1)), nil
 		}),
 		Processor: ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
 			processorCalled = true
@@ -77,7 +77,7 @@ func TestProcessorProviderErrorProvider(t *testing.T) {
 func TestProcessorProviderErrorProcessor(t *testing.T) {
 	prv := &ProcessorProvider{
 		Provider: &StaticProvider{
-			Image: NewTestImage(),
+			Image: image.NewRGBA(image.Rect(0, 0, 1, 1)),
 		},
 		Processor: ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
 			return nil, fmt.Errorf("error")
@@ -94,7 +94,7 @@ var _ imageserver.Server = &ProviderServer{}
 func TestProviderServer(t *testing.T) {
 	srv := &ProviderServer{
 		Provider: &StaticProvider{
-			Image: NewTestImage(),
+			Image: image.NewRGBA(image.Rect(0, 0, 1, 1)),
 		},
 	}
 	im, err := srv.Get(imageserver.Params{"format": "jpeg"})
@@ -153,7 +153,7 @@ func TestProviderServerErrorProvider(t *testing.T) {
 func TestProviderServerErrorEncode(t *testing.T) {
 	srv := &ProviderServer{
 		Provider: &StaticProvider{
-			Image: NewTestImage(),
+			Image: image.NewRGBA(image.Rect(0, 0, 1, 1)),
 		},
 	}
 	_, err := srv.Get(imageserver.Params{"format": "jpeg", "quality": 9001})

@@ -29,9 +29,12 @@ func TestServerNoChange(t *testing.T) {
 			Image: testdata.Medium,
 		},
 	}
-	_, err := srv.Get(imageserver.Params{})
+	im, err := srv.Get(imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
+	}
+	if im != testdata.Medium {
+		t.Fatal("not equal")
 	}
 }
 
@@ -41,7 +44,7 @@ func TestServerFormat(t *testing.T) {
 			Image: testdata.Medium,
 		},
 	}
-	_, err := srv.Get(imageserver.Params{"format": "test"})
+	_, err := srv.Get(imageserver.Params{"format": "jpeg"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +113,7 @@ func TestServerErrorDecode(t *testing.T) {
 			Image: testdata.Invalid,
 		},
 	}
-	_, err := srv.Get(imageserver.Params{"format": "test"})
+	_, err := srv.Get(imageserver.Params{"format": "jpeg"})
 	if err == nil {
 		t.Fatal("no error")
 	}

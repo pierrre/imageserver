@@ -20,7 +20,7 @@ func TestEncoderFunc(t *testing.T) {
 		called = true
 		return nil
 	})
-	nim := NewTestImage()
+	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	err := f.Encode(ioutil.Discard, nim, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
@@ -62,51 +62,4 @@ func TestDecodeErrorFormat(t *testing.T) {
 	if _, ok := err.(*imageserver.ImageError); !ok {
 		t.Fatalf("unexpected error type: %T", err)
 	}
-}
-
-func TestEncode(t *testing.T) {
-	nim := NewTestImage()
-	im, err := Encode(nim, "jpeg", imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if im == nil {
-		t.Fatal("image nil")
-	}
-	if im.Format != "jpeg" {
-		t.Fatalf("unexpected format: got %s, want %s", im.Format, "jpeg")
-	}
-}
-
-func TestEncodeErrorFormat(t *testing.T) {
-	nim := NewTestImage()
-	_, err := Encode(nim, "foo", imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
-	}
-}
-
-func TestEncodeErrorEncoderParams(t *testing.T) {
-	nim := NewTestImage()
-	_, err := Encode(nim, "jpeg", imageserver.Params{"quality": 9001})
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ParamError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func init() {
-	RegisterEncoder("test", &testEncoder{})
-}
-
-type testEncoder struct{}
-
-func (enc *testEncoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
-	return nil
-}
-
-func (enc *testEncoder) Change(params imageserver.Params) bool {
-	return false
 }

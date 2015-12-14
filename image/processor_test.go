@@ -16,7 +16,7 @@ func TestProcessorFunc(t *testing.T) {
 		called = true
 		return nim, nil
 	})
-	nim := NewTestImage()
+	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	f.Process(nim, imageserver.Params{})
 	if !called {
 		t.Fatal("not called")
@@ -29,8 +29,8 @@ func TestProcessorFunc(t *testing.T) {
 var _ Processor = ListProcessor{}
 
 func TestListProcessorProcess(t *testing.T) {
-	nim1 := NewTestImage()
-	nim2 := NewTestImage()
+	nim1 := image.NewRGBA(image.Rect(0, 0, 1, 1))
+	nim2 := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	params := imageserver.Params{}
 	prc := ListProcessor{}
 
@@ -112,7 +112,7 @@ func TestChangeProcessor(t *testing.T) {
 var _ Processor = &IdentityProcessor{}
 
 func TestIdentityProcessor(t *testing.T) {
-	nim := NewTestImage()
+	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	prc := &IdentityProcessor{}
 	nimNew, err := prc.Process(nim, imageserver.Params{})
 	if err != nil {

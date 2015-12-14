@@ -66,6 +66,19 @@ func getEncoderFormat(defaultFormat string, params imageserver.Params) (Encoder,
 	return enc, format, nil
 }
 
+func encode(nim image.Image, format string, enc Encoder, params imageserver.Params) (*imageserver.Image, error) {
+	buf := new(bytes.Buffer)
+	err := enc.Encode(buf, nim, params)
+	if err != nil {
+		return nil, err
+	}
+	im := &imageserver.Image{
+		Format: format,
+		Data:   buf.Bytes(),
+	}
+	return im, nil
+}
+
 // Decode decodes a raw Image to a Go Image.
 //
 // It returns an error if the decoded Image format does not match the raw Image format.
@@ -78,26 +91,4 @@ func Decode(im *imageserver.Image) (image.Image, error) {
 		return nil, &imageserver.ImageError{Message: fmt.Sprintf("decoded format \"%s\" does not match image format \"%s\"", format, im.Format)}
 	}
 	return nim, nil
-}
-
-// Encode encodes a Go Image to a raw Image.
-func Encode(nim image.Image, format string, params imageserver.Params) (*imageserver.Image, error) {
-	enc, err := getEncoder(format)
-	if err != nil {
-		return nil, err
-	}
-	return encode(nim, format, enc, params)
-}
-
-func encode(nim image.Image, format string, enc Encoder, params imageserver.Params) (*imageserver.Image, error) {
-	buf := new(bytes.Buffer)
-	err := enc.Encode(buf, nim, params)
-	if err != nil {
-		return nil, err
-	}
-	im := &imageserver.Image{
-		Format: format,
-		Data:   buf.Bytes(),
-	}
-	return im, nil
 }
