@@ -14,21 +14,24 @@ import (
 var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
 // Server is a HTTP source Image Server.
-type Server struct{}
-
-// Get returns an Image for a HTTP source.
 //
-// If the source is not an url, the string representation of the source will be used to create one.
-//
-// Returns an error if the HTTP status code is not 200 (OK).
+// It parses the "source" param as URL, then do a GET request.
+// It returns an error if the HTTP status code is not 200 (OK).
 //
 // The image type is determined by the "Content-Type" header.
-func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+type Server struct {
+	// Client is an optional HTTP client.
+	// http.DefaultClient is used by default.
+	Client *http.Client
+}
+
+// Get implements Server.
+func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	sourceURL, err := getSourceURL(params)
 	if err != nil {
 		return nil, err
 	}
-	response, err := doRequest(sourceURL)
+	response, err := srv.doRequest(sourceURL)
 	if err != nil {
 		return nil, err
 	}
@@ -61,9 +64,12 @@ func getSourceURL(params imageserver.Params) (*url.URL, error) {
 	return sourceURL, nil
 }
 
-func doRequest(sourceURL *url.URL) (*http.Response, error) {
-	//TODO optional http client
-	response, err := http.Get(sourceURL.String())
+func (srv *Server) doRequest(sourceURL *url.URL) (*http.Response, error) {
+	c := srv.Client
+	if c == nil {
+		c = http.DefaultClient
+	}
+	response, err := c.Get(sourceURL.String())
 	if err != nil {
 		return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}
 	}
