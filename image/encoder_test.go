@@ -1,7 +1,6 @@
 package image_test
 
 import (
-	"fmt"
 	"image"
 	"io"
 	"io/ioutil"
@@ -95,95 +94,6 @@ func TestEncodeErrorEncoderParams(t *testing.T) {
 	}
 	if _, ok := err.(*imageserver.ParamError); !ok {
 		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-var _ imageserver.Server = &DecodeCheckServer{}
-
-func TestDecodeCheckServer(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestDecodeCheckServerErrorServer(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Error: fmt.Errorf("error"),
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
-	}
-}
-
-func TestDecodeCheckServerErrorPreDecode(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
-		PreDecode: func(im *imageserver.Image, params imageserver.Params) error {
-			return fmt.Errorf("error")
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
-	}
-}
-
-func TestDecodeCheckServerErrorDecodeConfig(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Invalid,
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ImageError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func TestDecodeCheckServerErrorFormat(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Image: &imageserver.Image{
-				Format: "error",
-				Data:   testdata.Medium.Data,
-			},
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ImageError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func TestDecodeCheckServerErrorPostDecode(t *testing.T) {
-	srv := &DecodeCheckServer{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
-		PostDecode: func(cfg image.Config, format string, params imageserver.Params) error {
-			return fmt.Errorf("error")
-		},
-	}
-	_, err := srv.Get(imageserver.Params{})
-	if err == nil {
-		t.Fatal("no error")
 	}
 }
 

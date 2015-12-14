@@ -101,38 +101,3 @@ func encode(nim image.Image, format string, enc Encoder, params imageserver.Para
 	}
 	return im, nil
 }
-
-// DecodeCheckServer is an Image Server that checks the Image with image.DecodeConfig().
-type DecodeCheckServer struct {
-	imageserver.Server
-	PreDecode  func(im *imageserver.Image, params imageserver.Params) error
-	PostDecode func(cfg image.Config, format string, params imageserver.Params) error
-}
-
-// Get implements Server
-func (srv *DecodeCheckServer) Get(params imageserver.Params) (*imageserver.Image, error) {
-	im, err := srv.Server.Get(params)
-	if err != nil {
-		return nil, err
-	}
-	if srv.PreDecode != nil {
-		err = srv.PreDecode(im, params)
-		if err != nil {
-			return nil, err
-		}
-	}
-	cfg, format, err := image.DecodeConfig(bytes.NewReader(im.Data))
-	if err != nil {
-		return nil, &imageserver.ImageError{Message: err.Error()}
-	}
-	if format != im.Format {
-		return nil, &imageserver.ImageError{Message: fmt.Sprintf("decoded format \"%s\" does not match image format \"%s\"", format, im.Format)}
-	}
-	if srv.PostDecode != nil {
-		err = srv.PostDecode(cfg, format, params)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return im, err
-}
