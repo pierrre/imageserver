@@ -8,11 +8,10 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-var _ imageserver.Server = &Server{}
+var _ imageserver.Handler = &Handler{}
 
-func TestGet(t *testing.T) {
-	server := &Server{
-		Server:     &imageserver.StaticServer{Image: testdata.Medium},
+func TestHandle(t *testing.T) {
+	hdr := &Handler{
 		Executable: "gm",
 	}
 	params := imageserver.Params{
@@ -21,15 +20,14 @@ func TestGet(t *testing.T) {
 			"height": 100,
 		},
 	}
-	_, err := server.Get(params)
+	_, err := hdr.Handle(testdata.Medium, params)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestGetErrorTimeout(t *testing.T) {
-	server := &Server{
-		Server:     &imageserver.StaticServer{Image: testdata.Medium},
+func TestHandleErrorTimeout(t *testing.T) {
+	hdr := &Handler{
 		Executable: "gm",
 		Timeout:    1 * time.Nanosecond,
 	}
@@ -39,7 +37,7 @@ func TestGetErrorTimeout(t *testing.T) {
 			"height": 100,
 		},
 	}
-	_, err := server.Get(params)
+	_, err := hdr.Handle(testdata.Medium, params)
 	if err == nil {
 		t.Fatal("no error")
 	}

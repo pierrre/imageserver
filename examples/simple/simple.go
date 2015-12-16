@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/pierrre/imageserver"
 	imageserver_http "github.com/pierrre/imageserver/http"
 	imageserver_http_gift "github.com/pierrre/imageserver/http/gift"
 	imageserver_image "github.com/pierrre/imageserver/image"
@@ -14,21 +15,20 @@ import (
 )
 
 func main() {
-	server := imageserver_testdata.Server
-	server = &imageserver_image.Server{
-		Server:    server,
-		Processor: &imageserver_image_gift.Processor{},
-	}
-	handler := &imageserver_http.Handler{
+	http.Handle("/", &imageserver_http.Handler{
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourceParser{},
 			&imageserver_http_gift.Parser{},
 			&imageserver_http.FormatParser{},
 			&imageserver_http.QualityParser{},
 		}),
-		Server: server,
-	}
-	http.Handle("/", handler)
+		Server: &imageserver.HandlerServer{
+			Server: imageserver_testdata.Server,
+			Handler: &imageserver_image.Handler{
+				Processor: &imageserver_image_gift.Processor{},
+			},
+		},
+	})
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)

@@ -24,8 +24,7 @@ func BenchmarkResizeHuge(b *testing.B) {
 }
 
 func benchmarkResize(b *testing.B, im *imageserver.Image) {
-	server := &Server{
-		Server:     &imageserver.StaticServer{Image: im},
+	hdr := &Handler{
 		Executable: "gm",
 	}
 	params := imageserver.Params{
@@ -35,7 +34,7 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 	}
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := server.Get(params)
+			_, err := hdr.Handle(im, params)
 			if err != nil {
 				b.Fatal(err)
 			}

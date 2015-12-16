@@ -19,9 +19,9 @@ const (
 	tempDirPrefix = "imageserver_"
 )
 
-// Server is a GraphicsMagick Image Server.
+// Handler is a GraphicsMagick Image Handler.
 //
-// It gets the Image from the underlying Server then processes it with the GraphicsMagick command line (mogrify command).
+// It processes the Image with the GraphicsMagick command line (mogrify command).
 //
 // All params are extracted from the "graphicsmagick" node param and are optionals.
 //
@@ -46,31 +46,26 @@ const (
 // - format: "-format" param
 //
 // - quality: "-quality" param
-type Server struct {
-	Server         imageserver.Server
+type Handler struct {
 	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
 	Timeout        time.Duration // timeout for process, optional
 	TempDir        string        // temp directory for image files, optional
 	AllowedFormats []string      // allowed format list, optional
 }
 
-// Get implements Server.
-func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	im, err := server.Server.Get(params)
-	if err != nil {
-		return nil, err
-	}
+// Handle implements Handler.
+func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	if !params.Has(globalParam) {
 		return im, nil
 	}
-	params, err = params.GetParams(globalParam)
+	params, err := params.GetParams(globalParam)
 	if err != nil {
 		return nil, err
 	}
 	if params.Empty() {
 		return im, nil
 	}
-	im, err = server.process(im, params)
+	im, err = hdr.handle(im, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
 			err.Param = globalParam + "." + err.Param
@@ -80,30 +75,30 @@ func (server *Server) Get(params imageserver.Params) (*imageserver.Image, error)
 	return im, nil
 }
 
-func (server *Server) process(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	arguments := list.New()
 
-	width, height, err := server.buildArgumentsResize(arguments, params)
+	width, height, err := hdr.buildArgumentsResize(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = server.buildArgumentsBackground(arguments, params)
+	err = hdr.buildArgumentsBackground(arguments, params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = server.buildArgumentsExtent(arguments, params, width, height)
+	err = hdr.buildArgumentsExtent(arguments, params, width, height)
 	if err != nil {
 		return nil, err
 	}
 
-	format, formatSpecified, err := server.buildArgumentsFormat(arguments, params, im)
+	format, formatSpecified, err := hdr.buildArgumentsFormat(arguments, params, im)
 	if err != nil {
 		return nil, err
 	}
 
-	err = server.buildArgumentsQuality(arguments, params, format)
+	err = hdr.buildArgumentsQuality(arguments, params, format)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +109,7 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 
 	arguments.PushFront("mogrify")
 
-	tempDir, err := ioutil.TempDir(server.TempDir, tempDirPrefix)
+	tempDir, err := ioutil.TempDir(hdr.TempDir, tempDirPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -128,8 +123,8 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 	}
 
 	argumentSlice := convertArgumentsToSlice(arguments)
-	cmd := exec.Command(server.Executable, argumentSlice...)
-	err = server.runCommand(cmd)
+	cmd := exec.Command(hdr.Executable, argumentSlice...)
+	err = hdr.runCommand(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +144,7 @@ func (server *Server) process(im *imageserver.Image, params imageserver.Params) 
 	return im, nil
 }
 
-func (server *Server) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
+func (hdr *Handler) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
 	width, err = getDimension("width", params)
 	if err != nil {
 		return 0, 0, err
@@ -225,7 +220,7 @@ func getDimension(name string, params imageserver.Params) (int, error) {
 	return dimension, nil
 }
 
-func (server *Server) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
+func (hdr *Handler) buildArgumentsBackground(arguments *list.List, params imageserver.Params) error {
 	if !params.Has("background") {
 		return nil
 	}
@@ -248,7 +243,7 @@ func (server *Server) buildArgumentsBackground(arguments *list.List, params imag
 	return nil
 }
 
-func (server *Server) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
+func (hdr *Handler) buildArgumentsExtent(arguments *list.List, params imageserver.Params, width int, height int) error {
 	if width == 0 || height == 0 {
 		return nil
 	}
@@ -268,7 +263,7 @@ func (server *Server) buildArgumentsExtent(arguments *list.List, params imageser
 	return nil
 }
 
-func (server *Server) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
+func (hdr *Handler) buildArgumentsFormat(arguments *list.List, params imageserver.Params, sourceImage *imageserver.Image) (format string, formatSpecified bool, err error) {
 	if !params.Has("format") {
 		return sourceImage.Format, false, nil
 	}
@@ -276,9 +271,9 @@ func (server *Server) buildArgumentsFormat(arguments *list.List, params imageser
 	if err != nil {
 		return "", false, err
 	}
-	if server.AllowedFormats != nil {
+	if hdr.AllowedFormats != nil {
 		ok := false
-		for _, f := range server.AllowedFormats {
+		for _, f := range hdr.AllowedFormats {
 			if f == format {
 				ok = true
 				break
@@ -293,7 +288,7 @@ func (server *Server) buildArgumentsFormat(arguments *list.List, params imageser
 	return format, true, nil
 }
 
-func (server *Server) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
+func (hdr *Handler) buildArgumentsQuality(arguments *list.List, params imageserver.Params, format string) error {
 	if !params.Has("quality") {
 		return nil
 	}
@@ -322,7 +317,7 @@ func convertArgumentsToSlice(arguments *list.List) []string {
 	return argumentSlice
 }
 
-func (server *Server) runCommand(cmd *exec.Cmd) error {
+func (hdr *Handler) runCommand(cmd *exec.Cmd) error {
 	err := cmd.Start()
 	if err != nil {
 		return err
@@ -332,14 +327,14 @@ func (server *Server) runCommand(cmd *exec.Cmd) error {
 		cmdChan <- cmd.Wait()
 	}()
 	var timeoutChan <-chan time.Time
-	if server.Timeout != 0 {
-		timeoutChan = time.After(server.Timeout)
+	if hdr.Timeout != 0 {
+		timeoutChan = time.After(hdr.Timeout)
 	}
 	select {
 	case err = <-cmdChan:
 	case <-timeoutChan:
 		cmd.Process.Kill()
-		err = fmt.Errorf("timeout after %s", server.Timeout)
+		err = fmt.Errorf("timeout after %s", hdr.Timeout)
 	}
 	if err != nil {
 		return &imageserver.ImageError{Message: fmt.Sprintf("GraphicsMagick command: %s", err)}

@@ -4,18 +4,13 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Server is an Image Server that uses Go Image.
-type Server struct {
-	imageserver.Server
+// Handler is an Image Handler that uses Go Image.
+type Handler struct {
 	Processor Processor // Optional Processor
 }
 
-// Get implements Server.
-func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	im, err := srv.Server.Get(params)
-	if err != nil {
-		return nil, err
-	}
+// Handle implements Handler.
+func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	enc, format, err := getEncoderFormat(im.Format, params)
 	if err != nil {
 		if _, ok := err.(*imageserver.ParamError); !ok {
@@ -23,15 +18,15 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 		}
 		return nil, err
 	}
-	if !srv.change(im, format, enc, params) {
+	if !hdr.change(im, format, enc, params) {
 		return im, nil
 	}
 	nim, err := Decode(im)
 	if err != nil {
 		return nil, err
 	}
-	if srv.Processor != nil {
-		nim, err = srv.Processor.Process(nim, params)
+	if hdr.Processor != nil {
+		nim, err = hdr.Processor.Process(nim, params)
 		if err != nil {
 			return nil, err
 		}
@@ -43,11 +38,11 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	return im, nil
 }
 
-func (srv *Server) change(im *imageserver.Image, format string, enc Encoder, params imageserver.Params) bool {
+func (hdr *Handler) change(im *imageserver.Image, format string, enc Encoder, params imageserver.Params) bool {
 	if format != im.Format {
 		return true
 	}
-	if srv.Processor != nil && srv.Processor.Change(params) {
+	if hdr.Processor != nil && hdr.Processor.Change(params) {
 		return true
 	}
 	if enc.Change(params) {

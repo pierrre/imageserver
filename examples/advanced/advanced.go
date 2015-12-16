@@ -192,16 +192,18 @@ func newServer() imageserver.Server {
 }
 
 func newServerImage(srv imageserver.Server) imageserver.Server {
-	return &imageserver_image.Server{
+	return &imageserver.HandlerServer{
 		Server: srv,
-		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			&imageserver_image_gift.Processor{
-				DefaultResampling: gift.LanczosResampling,
-				MaxWidth:          2048,
-				MaxHeight:         2048,
-			},
-			true,
-		),
+		Handler: &imageserver_image.Handler{
+			Processor: imageserver_image_gamma.NewCorrectionProcessor(
+				&imageserver_image_gift.Processor{
+					DefaultResampling: gift.LanczosResampling,
+					MaxWidth:          2048,
+					MaxHeight:         2048,
+				},
+				true,
+			),
+		},
 	}
 }
 

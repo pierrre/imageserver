@@ -1,7 +1,7 @@
 // Package imageserver provides an Image server toolkit.
 package imageserver
 
-// Server represents an Image server
+// Server serves an Image.
 type Server interface {
 	Get(Params) (*Image, error)
 }
