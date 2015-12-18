@@ -1,43 +1,45 @@
-package imageserver_test
+package imageserver
 
 import (
+	"fmt"
 	"testing"
-
-	. "github.com/pierrre/imageserver"
-	"github.com/pierrre/imageserver/testdata"
 )
 
 var _ Server = ServerFunc(nil)
 
 func TestServerFunc(t *testing.T) {
 	called := false
-	server := ServerFunc(func(params Params) (*Image, error) {
+	srv := ServerFunc(func(params Params) (*Image, error) {
 		called = true
-		return testdata.Medium, nil
+		return &Image{}, nil
 	})
-	server.Get(Params{})
+	srv.Get(Params{})
 	if !called {
 		t.Fatal("not called")
+	}
+}
+
+var _ Server = &StaticServer{}
+
+func TestStaticServer(t *testing.T) {
+	im := &Image{}
+	srv := &StaticServer{
+		Image: im,
+		Error: nil,
+	}
+	out, err := srv.Get(Params{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out != im {
+		t.Fatal("not equal")
 	}
 }
 
 var _ Server = &SourceServer{}
 
 func TestSourceServer(t *testing.T) {
-	server := &SourceServer{
-		Server: testdata.Server,
-	}
-	im, err := server.Get(Params{SourceParam: testdata.MediumFileName})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if im != testdata.Medium {
-		t.Fatal("not equal")
-	}
-}
-
-func TestSourceServerParam(t *testing.T) {
-	server := &SourceServer{
+	srv := &SourceServer{
 		Server: ServerFunc(func(params Params) (*Image, error) {
 			if !params.Has(SourceParam) {
 				t.Fatal("no source param")
@@ -45,30 +47,33 @@ func TestSourceServerParam(t *testing.T) {
 			if params.Has("foo") {
 				t.Fatal("unexpected param")
 			}
-			return testdata.Medium, nil
+			return &Image{}, nil
 		}),
 	}
-	server.Get(Params{
-		SourceParam: testdata.MediumFileName,
+	_, err := srv.Get(Params{
+		SourceParam: "source",
 		"foo":       "bar",
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
-func TestSourceServerError(t *testing.T) {
-	server := &SourceServer{
-		Server: testdata.Server,
+func TestSourceServerErrorServer(t *testing.T) {
+	srv := &SourceServer{
+		Server: &StaticServer{
+			Error: fmt.Errorf("error"),
+		},
 	}
-	_, err := server.Get(Params{SourceParam: "foobar"})
+	_, err := srv.Get(Params{SourceParam: "source"})
 	if err == nil {
 		t.Fatal("no error")
 	}
 }
 
 func TestSourceServerErrorNoSource(t *testing.T) {
-	server := &SourceServer{
-		Server: testdata.Server,
-	}
-	_, err := server.Get(Params{})
+	srv := &SourceServer{}
+	_, err := srv.Get(Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -79,33 +84,14 @@ func TestSourceServerErrorNoSource(t *testing.T) {
 
 func TestNewLimitServer(t *testing.T) {
 	// TODO test limit
-	server := NewLimitServer(&StaticServer{Image: testdata.Medium}, 1)
-	im, err := server.Get(Params{})
+	srv := NewLimitServer(&StaticServer{Image: &Image{}}, 1)
+	_, err := srv.Get(Params{})
 	if err != nil {
 		t.Fatal(err)
-	}
-	if im != testdata.Medium {
-		t.Fatal("not equal")
 	}
 }
 
 func TestNewLimitServerZero(t *testing.T) {
 	// TODO ?
-	NewLimitServer(&StaticServer{Image: testdata.Medium}, 0)
-}
-
-var _ Server = &StaticServer{}
-
-func TestStaticServer(t *testing.T) {
-	s := &StaticServer{
-		Image: testdata.Medium,
-		Error: nil,
-	}
-	im, err := s.Get(Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !ImageEqual(im, testdata.Medium) {
-		t.Fatal("not equal")
-	}
+	NewLimitServer(&StaticServer{Image: &Image{}}, 0)
 }
