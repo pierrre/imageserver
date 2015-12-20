@@ -78,6 +78,10 @@ func BenchmarkNewAtFuncYCbCr(b *testing.B) {
 	benchmarkNewAtFunc(b, image.NewYCbCr(image.Rect(0, 0, 1, 1), image.YCbCrSubsampleRatio444))
 }
 
+func BenchmarkNewAtFuncNYCbCrA(b *testing.B) {
+	benchmarkNewAtFunc(b, image.NewNYCbCrA(image.Rect(0, 0, 1, 1), image.YCbCrSubsampleRatio444))
+}
+
 func BenchmarkNewAtFuncCMYK(b *testing.B) {
 	benchmarkNewAtFunc(b, image.NewCMYK(image.Rect(0, 0, 1, 1)))
 }

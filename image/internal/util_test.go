@@ -188,6 +188,24 @@ var testNewImageFuncs = []func(image.Rectangle) image.Image{
 		return image.NewYCbCr(r, image.YCbCrSubsampleRatio410)
 	},
 	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio444)
+	},
+	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio422)
+	},
+	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio420)
+	},
+	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio440)
+	},
+	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio411)
+	},
+	func(r image.Rectangle) image.Image {
+		return image.NewNYCbCrA(r, image.YCbCrSubsampleRatio410)
+	},
+	func(r image.Rectangle) image.Image {
 		return image.NewUniform(color.RGBA{})
 	},
 	func(r image.Rectangle) image.Image {

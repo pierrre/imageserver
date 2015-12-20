@@ -41,6 +41,17 @@ func newSimpleSetFunc(p image.Image) func(x, y int, c color.Color) {
 			p.Cb[ci] = c1.Cb
 			p.Cr[ci] = c1.Cr
 		}
+	case *image.NYCbCrA:
+		return func(x, y int, c color.Color) {
+			c1 := color.NYCbCrAModel.Convert(c).(color.NYCbCrA)
+			yi := p.YOffset(x, y)
+			ci := p.COffset(x, y)
+			ai := p.AOffset(x, y)
+			p.Y[yi] = c1.Y
+			p.Cb[ci] = c1.Cb
+			p.Cr[ci] = c1.Cr
+			p.A[ai] = c1.A
+		}
 	case *image.Uniform:
 		return func(x, y int, c color.Color) {
 			p.C = c
