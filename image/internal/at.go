@@ -157,7 +157,21 @@ func newAtFuncUniform(p *image.Uniform) AtFunc {
 func newAtFuncYCbCr(p *image.YCbCr) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		yi := p.YOffset(x, y)
-		ci := p.COffset(x, y)
+		var ci int
+		switch p.SubsampleRatio {
+		case image.YCbCrSubsampleRatio422:
+			ci = (y-p.Rect.Min.Y)*p.CStride + (x/2 - p.Rect.Min.X/2)
+		case image.YCbCrSubsampleRatio420:
+			ci = (y/2-p.Rect.Min.Y/2)*p.CStride + (x/2 - p.Rect.Min.X/2)
+		case image.YCbCrSubsampleRatio440:
+			ci = (y/2-p.Rect.Min.Y/2)*p.CStride + (x - p.Rect.Min.X)
+		case image.YCbCrSubsampleRatio411:
+			ci = (y-p.Rect.Min.Y)*p.CStride + (x/4 - p.Rect.Min.X/4)
+		case image.YCbCrSubsampleRatio410:
+			ci = (y/2-p.Rect.Min.Y/2)*p.CStride + (x/4 - p.Rect.Min.X/4)
+		default:
+			ci = (y-p.Rect.Min.Y)*p.CStride + (x - p.Rect.Min.X)
+		}
 		y1 := int32(p.Y[yi]) * 0x10100
 		cb1 := int32(p.Cb[ci]) - 128
 		cr1 := int32(p.Cr[ci]) - 128

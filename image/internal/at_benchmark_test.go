@@ -74,7 +74,7 @@ func BenchmarkNewAtFuncUniform(b *testing.B) {
 	benchmarkNewAtFunc(b, image.NewUniform(color.RGBA{}))
 }
 
-func BenchmarkNewAtFuncYCbCR(b *testing.B) {
+func BenchmarkNewAtFuncYCbCr(b *testing.B) {
 	benchmarkNewAtFunc(b, image.NewYCbCr(image.Rect(0, 0, 1, 1), image.YCbCrSubsampleRatio444))
 }
 
