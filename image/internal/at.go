@@ -39,7 +39,7 @@ func NewAtFunc(p image.Image) AtFunc {
 
 func newAtFuncRGBA(p *image.RGBA) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
 		r = uint32(p.Pix[i+0])
 		r |= r << 8
 		g = uint32(p.Pix[i+1])
@@ -54,7 +54,7 @@ func newAtFuncRGBA(p *image.RGBA) AtFunc {
 
 func newAtFuncRGBA64(p *image.RGBA64) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
 		r = uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
 		g = uint32(p.Pix[i+2])<<8 | uint32(p.Pix[i+3])
 		b = uint32(p.Pix[i+4])<<8 | uint32(p.Pix[i+5])
@@ -65,7 +65,7 @@ func newAtFuncRGBA64(p *image.RGBA64) AtFunc {
 
 func newAtFuncNRGBA(p *image.NRGBA) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
 		a = uint32(p.Pix[i+3])
 		a |= a << 8
 		if a == 0 {
@@ -89,7 +89,7 @@ func newAtFuncNRGBA(p *image.NRGBA) AtFunc {
 
 func newAtFuncNRGBA64(p *image.NRGBA64) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
 		a = uint32(p.Pix[i+6])<<8 | uint32(p.Pix[i+7])
 		if a == 0 {
 			return
@@ -109,7 +109,7 @@ func newAtFuncNRGBA64(p *image.NRGBA64) AtFunc {
 
 func newAtFuncAlpha(p *image.Alpha) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*1
 		a = uint32(p.Pix[i])
 		a |= a << 8
 		return a, a, a, a
@@ -118,7 +118,7 @@ func newAtFuncAlpha(p *image.Alpha) AtFunc {
 
 func newAtFuncAlpha16(p *image.Alpha16) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
 		a = uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
 		return a, a, a, a
 	}
@@ -126,7 +126,7 @@ func newAtFuncAlpha16(p *image.Alpha16) AtFunc {
 
 func newAtFuncGray(p *image.Gray) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*1
 		yy := uint32(p.Pix[i])
 		yy |= yy << 8
 		return yy, yy, yy, 0xffff
@@ -135,7 +135,7 @@ func newAtFuncGray(p *image.Gray) AtFunc {
 
 func newAtFuncGray16(p *image.Gray16) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
 		yy := uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
 		return yy, yy, yy, 0xffff
 	}
@@ -143,7 +143,7 @@ func newAtFuncGray16(p *image.Gray16) AtFunc {
 
 func newAtFuncPaletted(p *image.Paletted) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*1
 		return p.Palette[p.Pix[i]].RGBA()
 	}
 }
@@ -156,7 +156,7 @@ func newAtFuncUniform(p *image.Uniform) AtFunc {
 
 func newAtFuncYCbCr(p *image.YCbCr) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		yi := p.YOffset(x, y)
+		yi := (y-p.Rect.Min.Y)*p.YStride + (x - p.Rect.Min.X)
 		var ci int
 		switch p.SubsampleRatio {
 		case image.YCbCrSubsampleRatio422:
@@ -199,7 +199,7 @@ func newAtFuncYCbCr(p *image.YCbCr) AtFunc {
 
 func newAtFuncCMYK(p *image.CMYK) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
-		i := p.PixOffset(x, y)
+		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
 		w := uint32(0xffff - uint32(p.Pix[i+3])*0x101)
 		r = uint32(0xffff-uint32(p.Pix[i+0])*0x101) * w / 0xffff
 		g = uint32(0xffff-uint32(p.Pix[i+1])*0x101) * w / 0xffff
