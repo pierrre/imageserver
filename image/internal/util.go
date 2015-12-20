@@ -2,6 +2,7 @@ package internal
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 	"runtime"
 	"sync"
@@ -21,7 +22,7 @@ func NewDrawable(p image.Image) draw.Image {
 // NewDrawableSize returns a new draw.Image with the same type as p and the given bounds.
 // If p is not a draw.Image, another type is used.
 func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
-	switch p.(type) {
+	switch p := p.(type) {
 	case *image.RGBA:
 		return image.NewRGBA(r)
 	case *image.RGBA64:
@@ -38,6 +39,10 @@ func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
 		return image.NewGray(r)
 	case *image.Gray16:
 		return image.NewGray16(r)
+	case *image.Paletted:
+		pl := make(color.Palette, len(p.Palette))
+		copy(pl, p.Palette)
+		return image.NewPaletted(r, pl)
 	case *image.CMYK:
 		return image.NewCMYK(r)
 	default:
