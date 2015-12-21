@@ -2,7 +2,6 @@ package internal
 
 import (
 	"image"
-	"image/color"
 	"image/draw"
 	"testing"
 )
@@ -56,7 +55,7 @@ func BenchmarkNewSetFuncGray16(b *testing.B) {
 }
 
 func BenchmarkNewSetFuncPaletted(b *testing.B) {
-	benchmarkNewSetFunc(b, image.NewPaletted(image.Rect(0, 0, 1, 1), color.Palette{color.RGBA{}}))
+	benchmarkNewSetFunc(b, image.NewPaletted(image.Rect(0, 0, 1, 1), testPalette))
 }
 
 func BenchmarkNewSetFuncCMYK(b *testing.B) {

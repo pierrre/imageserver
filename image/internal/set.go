@@ -121,14 +121,10 @@ func newSetFuncGray16(p *image.Gray16) SetFunc {
 }
 
 func newSetFuncPaletted(p *image.Paletted) SetFunc {
+	pa := newPaletteRGBA(p.Palette)
 	return func(x, y int, r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*1
-		p.Pix[i] = uint8(p.Palette.Index(color.RGBA64{
-			R: uint16(r),
-			G: uint16(g),
-			B: uint16(b),
-			A: uint16(a),
-		}))
+		p.Pix[i] = uint8(pa.index(colorRGBA{r, g, b, a}))
 	}
 }
 

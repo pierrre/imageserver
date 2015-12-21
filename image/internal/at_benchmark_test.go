@@ -67,7 +67,7 @@ func BenchmarkNewAtFuncGray16(b *testing.B) {
 }
 
 func BenchmarkNewAtFuncPaletted(b *testing.B) {
-	benchmarkNewAtFunc(b, image.NewPaletted(image.Rect(0, 0, 1, 1), color.Palette{color.RGBA{}}))
+	benchmarkNewAtFunc(b, image.NewPaletted(image.Rect(0, 0, 1, 1), testPalette))
 }
 
 func BenchmarkNewAtFuncUniform(b *testing.B) {

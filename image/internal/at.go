@@ -142,17 +142,10 @@ func newAtFuncGray16(p *image.Gray16) AtFunc {
 }
 
 func newAtFuncPaletted(p *image.Paletted) AtFunc {
-	type colorRGBA struct {
-		r, g, b, a uint32
-	}
-	colors := make([]colorRGBA, len(p.Palette))
-	for i, c := range p.Palette {
-		r, g, b, a := c.RGBA()
-		colors[i] = colorRGBA{r, g, b, a}
-	}
+	pa := newPaletteRGBA(p.Palette)
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*1
-		c := colors[p.Pix[i]]
+		c := pa[p.Pix[i]]
 		return c.r, c.g, c.b, c.a
 	}
 }

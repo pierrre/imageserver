@@ -208,7 +208,7 @@ var testNewImageFuncs = []func(image.Rectangle) image.Image{
 		return image.NewCMYK(r)
 	},
 	func(r image.Rectangle) image.Image {
-		return image.NewPaletted(r, color.Palette{color.RGBA{255, 255, 255, 255}})
+		return image.NewPaletted(r, testPalette)
 	},
 	func(r image.Rectangle) image.Image {
 		return image.NewYCbCr(r, image.YCbCrSubsampleRatio444)
@@ -265,7 +265,7 @@ var testNewImageDrawFuncs = []func(image.Rectangle) draw.Image{
 		return image.NewCMYK(r)
 	},
 	func(r image.Rectangle) draw.Image {
-		return image.NewPaletted(r, color.Palette{color.RGBA{255, 255, 255, 255}})
+		return image.NewPaletted(r, testPalette)
 	},
 	func(r image.Rectangle) draw.Image {
 		return &testImageDefault{image.NewRGBA(r)}
@@ -305,4 +305,12 @@ func testDrawRandom(p draw.Image) {
 			p.Set(x, y, testRandomColor())
 		}
 	}
+}
+
+var testPalette = color.Palette{
+	color.RGBA{0, 0, 0, 255},
+	color.RGBA{255, 0, 0, 255},
+	color.RGBA{0, 255, 0, 255},
+	color.RGBA{0, 0, 255, 255},
+	color.RGBA{255, 255, 255, 255},
 }

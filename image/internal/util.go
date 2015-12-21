@@ -75,6 +75,16 @@ func min(a, b int) int {
 	return b
 }
 
+func sqDiff(x, y uint32) uint32 {
+	var d uint32
+	if x > y {
+		d = x - y
+	} else {
+		d = y - x
+	}
+	return (d * d) >> 2
+}
+
 // Parallel helps to dispatch tasks concurrently.
 // It calls f with arguments (0,a) (a,b) ... (x,n).
 // Currently, it starts GOMAXPROCS goroutines.
