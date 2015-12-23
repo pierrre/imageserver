@@ -51,8 +51,27 @@ An image server toolkit in Go (Golang)
     </tbody>
 </table>
 
-### Gamma correction ([more info](http://www.4p8.com/eric.brasseur/gamma.html))
+### Animated GIF
+<table>
+    <thead>
+        <tr>
+            <th>Original</th>
+            <th>Resized</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th><a href="http://fuckingfrogs.fr:8080/animated.gif">Animated</a></th>
+            <th><a href="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill"><img src="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill" /></a></th>
+        </tr>
+        <tr>
+            <th><a href="http://fuckingfrogs.fr:8080/spaceship.gif">Spaceship</a></th>
+            <th><a href="http://fuckingfrogs.fr:8080/spaceship.gif?width=300"><img src="http://fuckingfrogs.fr:8080/spaceship.gif?width=300" /></a></th>
+        </tr>
+    </tbody>
+</table>
 
+### Gamma correction ([more info](http://www.4p8.com/eric.brasseur/gamma.html))
 <table>
     <thead>
         <tr>

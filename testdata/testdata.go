@@ -37,6 +37,10 @@ var (
 	AnimatedFileName = "animated.gif"
 	// Animated is an animated GIF Image.
 	Animated = loadImage(AnimatedFileName, "gif")
+	// SpaceshipFileName is the file name of Spaceship.
+	SpaceshipFileName = "spaceship.gif"
+	// Spaceship is an animated spaceship GIF Image.
+	Spaceship = loadImage(SpaceshipFileName, "gif")
 	// DalaiGammaFileName is the file name of DalaiGamma.
 	DalaiGammaFileName = "dalai_gamma.jpg"
 	// DalaiGamma is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html).

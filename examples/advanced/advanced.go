@@ -26,7 +26,7 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 	_ "github.com/pierrre/imageserver/image/bmp"
 	imageserver_image_gamma "github.com/pierrre/imageserver/image/gamma"
-	_ "github.com/pierrre/imageserver/image/gif"
+	imageserver_image_gif "github.com/pierrre/imageserver/image/gif"
 	imageserver_image_gift "github.com/pierrre/imageserver/image/gift"
 	_ "github.com/pierrre/imageserver/image/jpeg"
 	_ "github.com/pierrre/imageserver/image/png"
@@ -193,18 +193,32 @@ func newServer() imageserver.Server {
 }
 
 func newServerImage(srv imageserver.Server) imageserver.Server {
-	return &imageserver.HandlerServer{
-		Server: srv,
-		Handler: &imageserver_image.Handler{
-			Processor: imageserver_image_gamma.NewCorrectionProcessor(
-				&imageserver_image_gift.Processor{
-					DefaultResampling: gift.LanczosResampling,
-					MaxWidth:          2048,
-					MaxHeight:         2048,
+	var hdr imageserver.Handler
+	hdr = &imageserver_image.Handler{
+		Processor: imageserver_image_gamma.NewCorrectionProcessor(
+			&imageserver_image_gift.Processor{
+				DefaultResampling: gift.LanczosResampling,
+				MaxWidth:          2048,
+				MaxHeight:         2048,
+			},
+			true,
+		),
+	}
+	hdr = &imageserver_image_gif.FallbackHandler{
+		Handler: &imageserver_image_gif.Handler{
+			Processor: &imageserver_image_gif.SimpleProcessor{
+				Processor: &imageserver_image_gift.Processor{
+					DefaultResampling: gift.NearestNeighborResampling,
+					MaxWidth:          1024,
+					MaxHeight:         1024,
 				},
-				true,
-			),
+			},
 		},
+		Fallback: hdr,
+	}
+	return &imageserver.HandlerServer{
+		Server:  srv,
+		Handler: hdr,
 	}
 }
 
