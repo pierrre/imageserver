@@ -1,3 +1,4 @@
+// Package gift provides a GIFT HTTP Parser
 package gift
 
 import (

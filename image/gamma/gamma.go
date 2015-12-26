@@ -1,3 +1,4 @@
+// Package gamma provides gamma Processor and CorrectionProcessor.
 package gamma
 
 import (

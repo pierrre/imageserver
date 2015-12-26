@@ -1,4 +1,4 @@
-// Package nfntresize provides an Encoder that uses nfnt resize library.
+// Package nfntresize provides a nfnt resize Processor.
 package nfntresize
 
 import (

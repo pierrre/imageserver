@@ -1,3 +1,4 @@
+// Package advanced provides an advanced example.
 package main
 
 import (

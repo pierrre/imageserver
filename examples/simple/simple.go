@@ -1,3 +1,4 @@
+// Package simple provides a simple example.
 package main
 
 import (

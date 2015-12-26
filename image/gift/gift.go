@@ -1,3 +1,4 @@
+// Package gift provides a GIFT Processor.
 package gift
 
 import (
