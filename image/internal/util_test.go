@@ -53,30 +53,23 @@ func TestCopy(t *testing.T) {
 			dstSize: image.Rect(0, 0, 10, 10),
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
-			src := image.NewRGBA(tc.srcSize)
-			testDrawRandom(src)
-			dst := image.NewRGBA(tc.dstSize)
-			Copy(dst, src)
-			width := min(src.Bounds().Dx(), dst.Bounds().Dx())
-			height := min(src.Bounds().Dy(), dst.Bounds().Dy())
-			srcMin := src.Bounds().Min
-			dstMin := dst.Bounds().Min
-			for y := 0; y < height; y++ {
-				for x := 0; x < width; x++ {
-					cSrc := src.At(x+srcMin.X, y+srcMin.Y)
-					cDst := dst.At(x+dstMin.X, y+dstMin.Y)
-					if cSrc != cDst {
-						t.Errorf("different colors at %d,%d: src=%#v, dst=%#v", x, y, cSrc, cDst)
-					}
+		src := image.NewRGBA(tc.srcSize)
+		testDrawRandom(src)
+		dst := image.NewRGBA(tc.dstSize)
+		Copy(dst, src)
+		width := min(src.Bounds().Dx(), dst.Bounds().Dx())
+		height := min(src.Bounds().Dy(), dst.Bounds().Dy())
+		srcMin := src.Bounds().Min
+		dstMin := dst.Bounds().Min
+		for y := 0; y < height; y++ {
+			for x := 0; x < width; x++ {
+				cSrc := src.At(x+srcMin.X, y+srcMin.Y)
+				cDst := dst.At(x+dstMin.X, y+dstMin.Y)
+				if cSrc != cDst {
+					t.Fatalf("different color: %#v, pixel %dx%d: src=%#v, dst=%#v", tc, x, y, cSrc, cDst)
 				}
 			}
-		}()
+		}
 	}
 }
 

@@ -137,16 +137,9 @@ func TestIsHighQuality(t *testing.T) {
 			expected: false,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
-			res := isHighQuality(tc.p)
-			if res != tc.expected {
-				t.Errorf("unexpected result: got %t, want %t", res, tc.expected)
-			}
-		}()
+		res := isHighQuality(tc.p)
+		if res != tc.expected {
+			t.Fatalf("unexpected result for %T: got %t, want %t", tc.p, res, tc.expected)
+		}
 	}
 }

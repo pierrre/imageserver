@@ -12,7 +12,7 @@ func TestRGBAToNRGBA(t *testing.T) {
 		c := color.NRGBA64Model.Convert(color.RGBA64{r, g, b, a}).(color.NRGBA64)
 		r2, g2, b2, a2 := uint32(c.R), uint32(c.G), uint32(c.B), uint32(c.A)
 		if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2 {
-			t.Errorf("different color: {%d %d %d %d}: got {%d %d %d %d}, want {%d %d %d %d}", r, g, b, a, r1, g1, b1, a1, r2, g2, b2, a2)
+			t.Fatalf("different color: {%d %d %d %d}: got {%d %d %d %d}, want {%d %d %d %d}", r, g, b, a, r1, g1, b1, a1, r2, g2, b2, a2)
 		}
 	}
 	vals := []uint16{0, 0x4000, 0x8000, 0xc000, 0xffff}
@@ -40,7 +40,7 @@ func TestNRGBAToRGBA(t *testing.T) {
 		c := color.RGBA64Model.Convert(color.NRGBA64{r, g, b, a}).(color.RGBA64)
 		r2, g2, b2, a2 := uint32(c.R), uint32(c.G), uint32(c.B), uint32(c.A)
 		if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2 {
-			t.Errorf("different color: {%d %d %d %d}: got {%d %d %d %d}, want {%d %d %d %d}", r, g, b, a, r1, g1, b1, a1, r2, g2, b2, a2)
+			t.Fatalf("different color: {%d %d %d %d}: got {%d %d %d %d}, want {%d %d %d %d}", r, g, b, a, r1, g1, b1, a1, r2, g2, b2, a2)
 		}
 	}
 	vals := []uint16{0, 0x4000, 0x8000, 0xc000, 0xffff}

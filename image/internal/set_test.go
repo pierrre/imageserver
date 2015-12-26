@@ -22,7 +22,7 @@ func TestNewSetFunc(t *testing.T) {
 					p.Set(x, y, c)
 					r2, g2, b2, a2 := p.At(x, y).RGBA()
 					if r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2 {
-						t.Errorf("different color: image %T, pixel %dx%d, color %#v: got {%d %d %d %d}, want {%d %d %d %d}", p, x, y, c, r1, g1, b1, a1, r2, g2, b2, a2)
+						t.Fatalf("different color: image %T, pixel %dx%d, color %#v: got {%d %d %d %d}, want {%d %d %d %d}", p, x, y, c, r1, g1, b1, a1, r2, g2, b2, a2)
 					}
 				}
 			}
