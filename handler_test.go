@@ -19,20 +19,6 @@ func TestHandlerFunc(t *testing.T) {
 	}
 }
 
-var _ Handler = &IdentityHandler{}
-
-func TestIdentityHandler(t *testing.T) {
-	im := &Image{}
-	hdr := &IdentityHandler{}
-	out, err := hdr.Handle(im, Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if out != im {
-		t.Fatal("not equal")
-	}
-}
-
 var _ Server = &HandlerServer{}
 
 func TestHandlerServer(t *testing.T) {
@@ -40,7 +26,9 @@ func TestHandlerServer(t *testing.T) {
 		Server: &StaticServer{
 			Image: &Image{},
 		},
-		Handler: &IdentityHandler{},
+		Handler: HandlerFunc(func(im *Image, params Params) (*Image, error) {
+			return im, nil
+		}),
 	}
 	_, err := srv.Get(Params{})
 	if err != nil {

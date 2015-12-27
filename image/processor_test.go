@@ -108,20 +108,3 @@ func TestChangeProcessor(t *testing.T) {
 		t.Fatal("not true")
 	}
 }
-
-var _ Processor = &IdentityProcessor{}
-
-func TestIdentityProcessor(t *testing.T) {
-	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	prc := &IdentityProcessor{}
-	nimNew, err := prc.Process(nim, imageserver.Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if nimNew != nim {
-		t.Fatal("not equal")
-	}
-	if prc.Change(imageserver.Params{}) != false {
-		t.Fatal("not false")
-	}
-}

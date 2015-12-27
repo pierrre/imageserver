@@ -59,16 +59,3 @@ type ChangeProcessor struct {
 func (prc *ChangeProcessor) Change(params imageserver.Params) bool {
 	return true
 }
-
-// IdentityProcessor is a Processor that returns the same Image.
-type IdentityProcessor struct{}
-
-// Process implements Processor.
-func (prc *IdentityProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	return nim, nil
-}
-
-// Change implements Processor.
-func (prc *IdentityProcessor) Change(params imageserver.Params) bool {
-	return false
-}

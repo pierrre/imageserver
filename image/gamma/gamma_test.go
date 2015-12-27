@@ -78,10 +78,6 @@ func TestCorrectionProcessor(t *testing.T) {
 			},
 		},
 		{
-			processor: &imageserver_image.IdentityProcessor{},
-			enabled:   true,
-		},
-		{
 			processor:     errPrc,
 			enabled:       true,
 			errorExpected: true,

@@ -13,14 +13,6 @@ func (f HandlerFunc) Handle(im *Image, params Params) (*Image, error) {
 	return f(im, params)
 }
 
-// IdentityHandler is a Handler that returns the same Image.
-type IdentityHandler struct{}
-
-// Handle implements Handler.
-func (hdr IdentityHandler) Handle(im *Image, params Params) (*Image, error) {
-	return im, nil
-}
-
 // HandlerServer is a Handler Server.
 type HandlerServer struct {
 	Server
