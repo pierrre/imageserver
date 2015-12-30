@@ -26,7 +26,7 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 	}
 	if highQuality {
 		prc.newDrawable = func(p image.Image) draw.Image {
-			return image.NewNRGBA64(image.Rect(0, 0, p.Bounds().Dx(), p.Bounds().Dy()))
+			return image.NewNRGBA64(p.Bounds())
 		}
 	} else {
 		prc.newDrawable = imageserver_image_internal.NewDrawable
@@ -37,14 +37,13 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 // Process implements Processor.
 // It doesn't return error.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	width := nim.Bounds().Dx()
-	height := nim.Bounds().Dy()
 	dst := prc.newDrawable(nim)
+	bd := nim.Bounds().Intersect(dst.Bounds())
 	at := imageserver_image_internal.NewAtFunc(nim)
 	set := imageserver_image_internal.NewSetFunc(dst)
-	imageserver_image_internal.Parallel(height, func(yStart, yEnd int) {
-		for y := yStart; y < yEnd; y++ {
-			for x := 0; x < width; x++ {
+	imageserver_image_internal.Parallel(bd.Dy(), func(yOffStart, yOffEnd int) {
+		for y, yEnd := bd.Min.Y+yOffStart, bd.Min.Y+yOffEnd; y < yEnd; y++ {
+			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
 				r, g, b, a := at(x, y)
 				r, g, b, a = imageserver_image_internal.RGBAToNRGBA(r, g, b, a)
 				r = uint32(prc.vals[uint16(r)])

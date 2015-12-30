@@ -52,17 +52,14 @@ func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
 
 // Copy copies src to dst.
 func Copy(dst draw.Image, src image.Image) {
-	width := min(src.Bounds().Dx(), dst.Bounds().Dx())
-	height := min(src.Bounds().Dy(), dst.Bounds().Dy())
-	srcMin := src.Bounds().Min
-	dstMin := dst.Bounds().Min
+	bd := src.Bounds().Intersect(dst.Bounds())
 	at := NewAtFunc(src)
 	set := NewSetFunc(dst)
-	Parallel(height, func(yStart, yEnd int) {
-		for y := yStart; y < yEnd; y++ {
-			for x := 0; x < width; x++ {
-				r, g, b, a := at(x+srcMin.X, y+srcMin.Y)
-				set(x+dstMin.X, y+dstMin.Y, r, g, b, a)
+	Parallel(bd.Dy(), func(yOffStart, yOffEnd int) {
+		for y, yEnd := bd.Min.Y+yOffStart, bd.Min.Y+yOffEnd; y < yEnd; y++ {
+			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
+				r, g, b, a := at(x, y)
+				set(x, y, r, g, b, a)
 			}
 		}
 	})

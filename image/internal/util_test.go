@@ -57,14 +57,11 @@ func TestCopy(t *testing.T) {
 		testDrawRandom(src)
 		dst := image.NewRGBA(tc.dstSize)
 		Copy(dst, src)
-		width := min(src.Bounds().Dx(), dst.Bounds().Dx())
-		height := min(src.Bounds().Dy(), dst.Bounds().Dy())
-		srcMin := src.Bounds().Min
-		dstMin := dst.Bounds().Min
-		for y := 0; y < height; y++ {
-			for x := 0; x < width; x++ {
-				cSrc := src.At(x+srcMin.X, y+srcMin.Y)
-				cDst := dst.At(x+dstMin.X, y+dstMin.Y)
+		bd := src.Bounds().Intersect(dst.Bounds())
+		for y, yEnd := bd.Min.Y, bd.Max.Y; y < yEnd; y++ {
+			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
+				cSrc := src.At(x, y)
+				cDst := dst.At(x, y)
 				if cSrc != cDst {
 					t.Fatalf("different color: %#v, pixel %dx%d: src=%#v, dst=%#v", tc, x, y, cSrc, cDst)
 				}
@@ -293,8 +290,9 @@ func testRandomColor() color.Color {
 }
 
 func testDrawRandom(p draw.Image) {
-	for y := 0; y < p.Bounds().Dy(); y++ {
-		for x := 0; x < p.Bounds().Dx(); x++ {
+	bd := p.Bounds()
+	for y, yEnd := bd.Min.Y, bd.Max.Y; y < yEnd; y++ {
+		for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
 			p.Set(x, y, testRandomColor())
 		}
 	}

@@ -8,16 +8,14 @@ import (
 )
 
 func TestNewAtFunc(t *testing.T) {
-	width := 3
-	height := 3
-	r := image.Rect(0, 0, width, height)
+	bd := image.Rect(0, 0, 3, 3)
 	for _, newImageFunc := range testNewImageFuncs {
-		p := newImageFunc(r)
+		p := newImageFunc(bd)
 		set := newSimpleSetFunc(p)
 		at := NewAtFunc(p)
 		for _, c := range testColors {
-			for y := 0; y < height; y++ {
-				for x := 0; x < width; x++ {
+			for y := bd.Min.Y; y < bd.Max.Y; y++ {
+				for x := bd.Min.X; x < bd.Max.X; x++ {
 					set(x, y, c)
 					r1, g1, b1, a1 := at(x, y)
 					r2, g2, b2, a2 := p.At(x, y).RGBA()

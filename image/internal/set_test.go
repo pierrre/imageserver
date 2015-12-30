@@ -7,16 +7,14 @@ import (
 )
 
 func TestNewSetFunc(t *testing.T) {
-	width := 3
-	height := 3
-	r := image.Rect(0, 0, width, height)
+	bd := image.Rect(0, 0, 3, 3)
 	for _, newImageDrawFunc := range testNewImageDrawFuncs {
-		p := newImageDrawFunc(r)
+		p := newImageDrawFunc(bd)
 		set := NewSetFunc(p)
 		for _, c := range testColors {
 			c := color.RGBA64Model.Convert(c).(color.RGBA64)
-			for y := 0; y < height; y++ {
-				for x := 0; x < width; x++ {
+			for y := bd.Min.Y; y < bd.Max.Y; y++ {
+				for x := bd.Min.X; x < bd.Max.X; x++ {
 					set(x, y, uint32(c.R), uint32(c.G), uint32(c.B), uint32(c.A))
 					r1, g1, b1, a1 := p.At(x, y).RGBA()
 					p.Set(x, y, c)
