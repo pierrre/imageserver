@@ -61,8 +61,7 @@ func (parser *SourceParser) Resolve(param string) string {
 }
 
 // SourcePathParser is a HTTP Parser that takes the "source" param from the path.
-type SourcePathParser struct {
-}
+type SourcePathParser struct{}
 
 // Parse implements Parser.
 func (parser *SourcePathParser) Parse(req *http.Request, params imageserver.Params) error {
@@ -122,8 +121,7 @@ func (ps *SourcePrefixParser) Parse(req *http.Request, params imageserver.Params
 }
 
 // FormatParser is an http Parser that takes the "format" param from query.
-type FormatParser struct {
-}
+type FormatParser struct{}
 
 // Parse implements Parser.
 func (parser *FormatParser) Parse(req *http.Request, params imageserver.Params) error {
@@ -151,8 +149,7 @@ func (parser *FormatParser) Resolve(param string) string {
 }
 
 // QualityParser is an http Parser that takes the "quality" param from query.
-type QualityParser struct {
-}
+type QualityParser struct{}
 
 // Parse implements Parser.
 func (parser *QualityParser) Parse(req *http.Request, params imageserver.Params) error {

@@ -11,8 +11,7 @@ import (
 )
 
 // Encoder encodes an Image to TIFF.
-type Encoder struct {
-}
+type Encoder struct{}
 
 var opts = &tiff.Options{
 	Compression: tiff.Deflate,

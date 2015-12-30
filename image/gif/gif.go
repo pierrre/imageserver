@@ -11,8 +11,7 @@ import (
 )
 
 // Encoder encodes an Image to GIF.
-type Encoder struct {
-}
+type Encoder struct{}
 
 // Encode implements Encoder.
 func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {

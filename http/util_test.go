@@ -78,8 +78,7 @@ func TestCopyURL(t *testing.T) {
 	}
 }
 
-type nopResponseWriter struct {
-}
+type nopResponseWriter struct{}
 
 func (nrw *nopResponseWriter) Header() http.Header {
 	return make(http.Header)

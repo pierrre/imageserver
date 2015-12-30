@@ -16,7 +16,7 @@ func (f HandlerFunc) Handle(im *Image, params Params) (*Image, error) {
 // HandlerServer is a Handler Server.
 type HandlerServer struct {
 	Server
-	Handler
+	Handler Handler
 }
 
 // Get implements Server
@@ -25,7 +25,7 @@ func (srv *HandlerServer) Get(params Params) (*Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	im, err = srv.Handle(im, params)
+	im, err = srv.Handler.Handle(im, params)
 	if err != nil {
 		return nil, err
 	}
