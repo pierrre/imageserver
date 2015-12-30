@@ -57,9 +57,9 @@ func (prc *Processor) process(nim image.Image, params imageserver.Params) (image
 		return nil, err
 	}
 	g := gift.New(f)
-	dst := imageserver_image_internal.NewDrawableSize(nim, g.Bounds(nim.Bounds()))
-	g.Draw(dst, nim)
-	return dst, nil
+	out := imageserver_image_internal.NewDrawableSize(nim, g.Bounds(nim.Bounds()))
+	g.Draw(out, nim)
+	return out, nil
 }
 
 func (prc *Processor) getSize(params imageserver.Params) (int, int, error) {

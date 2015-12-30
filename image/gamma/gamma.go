@@ -37,10 +37,10 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 // Process implements Processor.
 // It doesn't return error.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	dst := prc.newDrawable(nim)
-	bd := nim.Bounds().Intersect(dst.Bounds())
+	out := prc.newDrawable(nim)
+	bd := nim.Bounds().Intersect(out.Bounds())
 	at := imageserver_image_internal.NewAtFunc(nim)
-	set := imageserver_image_internal.NewSetFunc(dst)
+	set := imageserver_image_internal.NewSetFunc(out)
 	imageserver_image_internal.Parallel(bd.Dy(), func(yOffStart, yOffEnd int) {
 		for y, yEnd := bd.Min.Y+yOffStart, bd.Min.Y+yOffEnd; y < yEnd; y++ {
 			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
@@ -54,7 +54,7 @@ func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image
 			}
 		}
 	})
-	return dst, nil
+	return out, nil
 }
 
 // Change implements Processor.
