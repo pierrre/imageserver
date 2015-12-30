@@ -19,23 +19,6 @@ func TestServerFunc(t *testing.T) {
 	}
 }
 
-var _ Server = &StaticServer{}
-
-func TestStaticServer(t *testing.T) {
-	im := &Image{}
-	srv := &StaticServer{
-		Image: im,
-		Error: nil,
-	}
-	out, err := srv.Get(Params{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if out != im {
-		t.Fatal("not equal")
-	}
-}
-
 var _ Server = &SourceServer{}
 
 func TestSourceServer(t *testing.T) {
@@ -61,9 +44,9 @@ func TestSourceServer(t *testing.T) {
 
 func TestSourceServerErrorServer(t *testing.T) {
 	srv := &SourceServer{
-		Server: &StaticServer{
-			Error: fmt.Errorf("error"),
-		},
+		Server: ServerFunc(func(params Params) (*Image, error) {
+			return nil, fmt.Errorf("error")
+		}),
 	}
 	_, err := srv.Get(Params{SourceParam: "source"})
 	if err == nil {
@@ -84,7 +67,9 @@ func TestSourceServerErrorNoSource(t *testing.T) {
 
 func TestNewLimitServer(t *testing.T) {
 	// TODO test limit
-	srv := NewLimitServer(&StaticServer{Image: &Image{}}, 1)
+	srv := NewLimitServer(ServerFunc(func(params Params) (*Image, error) {
+		return &Image{}, nil
+	}), 1)
 	_, err := srv.Get(Params{})
 	if err != nil {
 		t.Fatal(err)
@@ -93,5 +78,7 @@ func TestNewLimitServer(t *testing.T) {
 
 func TestNewLimitServerZero(t *testing.T) {
 	// TODO ?
-	NewLimitServer(&StaticServer{Image: &Image{}}, 0)
+	NewLimitServer(ServerFunc(func(params Params) (*Image, error) {
+		return &Image{}, nil
+	}), 0)
 }

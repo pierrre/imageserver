@@ -19,17 +19,6 @@ func (f ProviderFunc) Get(params imageserver.Params) (image.Image, error) {
 	return f(params)
 }
 
-// StaticProvider is a Go Image Provider that always return the same result.
-type StaticProvider struct {
-	Image image.Image
-	Error error
-}
-
-// Get implements Provider
-func (prv *StaticProvider) Get(params imageserver.Params) (image.Image, error) {
-	return prv.Image, prv.Error
-}
-
 // ProcessorProvider is a Go Image provider that processes the Image.
 type ProcessorProvider struct {
 	Provider

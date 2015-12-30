@@ -20,9 +20,9 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	srv := newTestServer(
-		&imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 		imageserver_cache.StringKeyGenerator("test"),
 	)
 	im, err := srv.Get(imageserver.Params{
@@ -38,9 +38,9 @@ func TestServer(t *testing.T) {
 
 func TestServerErrorGroup(t *testing.T) {
 	srv := newTestServer(
-		&imageserver.StaticServer{
-			Error: fmt.Errorf("error"),
-		},
+		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return nil, fmt.Errorf("error")
+		}),
 		imageserver_cache.StringKeyGenerator("test"),
 	)
 	_, err := srv.Get(imageserver.Params{})
@@ -84,9 +84,9 @@ func TestGetter(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err != nil {
@@ -106,9 +106,9 @@ func TestGetterErrorContextType(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 	}
 	err := gt.Get("invalid", "foo", dest)
 	if err == nil {
@@ -121,9 +121,9 @@ func TestGetterErrorContextNil(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err == nil {
@@ -138,9 +138,9 @@ func TestGetterErrorParamsNil(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err == nil {
@@ -155,9 +155,9 @@ func TestGetterErrorServer(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Error: fmt.Errorf("error"),
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return nil, fmt.Errorf("error")
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err == nil {
@@ -172,11 +172,11 @@ func TestGetterErrorImageMarshal(t *testing.T) {
 	var data []byte
 	dest := groupcache.AllocatingByteSliceSink(&data)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: &imageserver.Image{
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return &imageserver.Image{
 				Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
-			},
-		},
+			}, nil
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err == nil {
@@ -190,9 +190,9 @@ func TestGetterErrorSink(t *testing.T) {
 	}
 	dest := groupcache.AllocatingByteSliceSink(nil)
 	gt := &Getter{
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 	}
 	err := gt.Get(ctx, "foo", dest)
 	if err == nil {

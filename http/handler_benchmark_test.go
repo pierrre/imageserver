@@ -12,9 +12,9 @@ import (
 func BenchmarkHandler(b *testing.B) {
 	h := &Handler{
 		Parser: &nopParser{},
-		Server: &imageserver.StaticServer{
-			Image: testdata.Medium,
-		},
+		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return testdata.Medium, nil
+		}),
 		ETagFunc: func(params imageserver.Params) string {
 			return "foo"
 		},

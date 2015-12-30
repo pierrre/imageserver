@@ -26,9 +26,9 @@ func BenchmarkServerHuge(b *testing.B) {
 
 func benchmarkServer(b *testing.B, im *imageserver.Image) {
 	srv := newTestServer(
-		&imageserver.StaticServer{
-			Image: im,
-		},
+		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			return im, nil
+		}),
 		imageserver_cache.StringKeyGenerator("test"),
 	)
 	params := imageserver.Params{}

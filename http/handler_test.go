@@ -90,38 +90,38 @@ func TestHandler(t *testing.T) {
 		},
 		{
 			url: "http://localhost",
-			server: &imageserver.StaticServer{
-				Error: &imageserver.ParamError{
+			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+				return nil, &imageserver.ParamError{
 					Param:   imageserver.SourceParam,
 					Message: "error",
-				},
-			},
+				}
+			}),
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			url: "http://localhost",
-			server: &imageserver.StaticServer{
-				Error: &imageserver.ParamError{
+			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+				return nil, &imageserver.ParamError{
 					Param:   "foobar",
 					Message: "error",
-				},
-			},
+				}
+			}),
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			url: "http://localhost",
-			server: &imageserver.StaticServer{
-				Error: &imageserver.ImageError{
+			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+				return nil, &imageserver.ImageError{
 					Message: "error",
-				},
-			},
+				}
+			}),
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
 			url: "http://localhost",
-			server: &imageserver.StaticServer{
-				Error: fmt.Errorf("error"),
-			},
+			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+				return nil, fmt.Errorf("error")
+			}),
 			expectedStatusCode:    http.StatusInternalServerError,
 			expectErrorFuncCalled: true,
 		},

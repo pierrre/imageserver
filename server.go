@@ -14,17 +14,6 @@ func (f ServerFunc) Get(params Params) (*Image, error) {
 	return f(params)
 }
 
-// StaticServer is an Image Server that always returns the same Image and error.
-type StaticServer struct {
-	Image *Image
-	Error error
-}
-
-// Get implements Server.
-func (s *StaticServer) Get(params Params) (*Image, error) {
-	return s.Image, s.Error
-}
-
 // SourceParam is the source Param name.
 const SourceParam = "source"
 

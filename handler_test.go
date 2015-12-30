@@ -23,9 +23,9 @@ var _ Server = &HandlerServer{}
 
 func TestHandlerServer(t *testing.T) {
 	srv := &HandlerServer{
-		Server: &StaticServer{
-			Image: &Image{},
-		},
+		Server: ServerFunc(func(params Params) (*Image, error) {
+			return &Image{}, nil
+		}),
 		Handler: HandlerFunc(func(im *Image, params Params) (*Image, error) {
 			return im, nil
 		}),
@@ -38,9 +38,9 @@ func TestHandlerServer(t *testing.T) {
 
 func TestHandlerServerErrorServer(t *testing.T) {
 	srv := &HandlerServer{
-		Server: &StaticServer{
-			Error: fmt.Errorf("error"),
-		},
+		Server: ServerFunc(func(params Params) (*Image, error) {
+			return nil, fmt.Errorf("error")
+		}),
 	}
 	_, err := srv.Get(Params{})
 	if err == nil {
@@ -50,9 +50,9 @@ func TestHandlerServerErrorServer(t *testing.T) {
 
 func TestHandlerServerErrorHandler(t *testing.T) {
 	srv := &HandlerServer{
-		Server: &StaticServer{
-			Image: &Image{},
-		},
+		Server: ServerFunc(func(params Params) (*Image, error) {
+			return &Image{}, nil
+		}),
 		Handler: HandlerFunc(func(im *Image, params Params) (*Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
