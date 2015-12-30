@@ -1,7 +1,7 @@
 package cache_test
 
 import (
-	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -23,10 +23,10 @@ func TestIgnoreErrorGetSetError(t *testing.T) {
 	c := &IgnoreError{
 		Cache: &Func{
 			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
-				return nil, errors.New("error")
+				return nil, fmt.Errorf("error")
 			},
 			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
-				return errors.New("error")
+				return fmt.Errorf("error")
 			},
 		},
 	}

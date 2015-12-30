@@ -1,7 +1,6 @@
 package httpsource
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -104,11 +103,11 @@ func TestGetErrorRequest(t *testing.T) {
 type errorReadCloser struct{}
 
 func (erc *errorReadCloser) Read(p []byte) (n int, err error) {
-	return 0, errors.New("error")
+	return 0, fmt.Errorf("error")
 }
 
 func (erc *errorReadCloser) Close() error {
-	return errors.New("error")
+	return fmt.Errorf("error")
 }
 
 func TestParseResponseErrorData(t *testing.T) {

@@ -2,7 +2,6 @@ package cache_test
 
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -39,7 +38,7 @@ func TestServerErrorCacheGet(t *testing.T) {
 	s := &Server{
 		Cache: &Func{
 			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
-				return nil, errors.New("error")
+				return nil, fmt.Errorf("error")
 			},
 		},
 		KeyGenerator: StringKeyGenerator("test"),
@@ -74,7 +73,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 				return nil, nil
 			},
 			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
-				return errors.New("error")
+				return fmt.Errorf("error")
 			},
 		},
 		KeyGenerator: StringKeyGenerator("test"),
