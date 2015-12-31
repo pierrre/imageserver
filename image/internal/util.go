@@ -65,13 +65,6 @@ func Copy(dst draw.Image, src image.Image) {
 	})
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func sqDiff(x, y uint32) uint32 {
 	var d uint32
 	if x > y {

@@ -70,36 +70,6 @@ func TestCopy(t *testing.T) {
 	}
 }
 
-func TestMin(t *testing.T) {
-	type TC struct {
-		val1     int
-		val2     int
-		expected int
-	}
-	for _, tc := range []TC{
-		{
-			val1:     1,
-			val2:     2,
-			expected: 1,
-		},
-		{
-			val1:     5,
-			val2:     4,
-			expected: 4,
-		},
-		{
-			val1:     6,
-			val2:     6,
-			expected: 6,
-		},
-	} {
-		m := min(tc.val1, tc.val2)
-		if m != tc.expected {
-			t.Fatalf("val1=%d, val2=%d: got %d, want %d", tc.val1, tc.val2, m, tc.expected)
-		}
-	}
-}
-
 func TestParallel(t *testing.T) {
 	type TC struct {
 		n        int
