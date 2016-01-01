@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"image/draw"
 	"math/rand"
-	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -127,68 +126,12 @@ func TestCopy(t *testing.T) {
 }
 
 func TestParallel(t *testing.T) {
-	type TC struct {
-		n        int
-		p        int
-		expected map[int]int
-	}
-	for _, tc := range []TC{
-		{
-			n: 0,
-			p: 0,
-		},
-		{
-			n: -1,
-			p: 0,
-		},
-		{
-			n: 1,
-			p: 4,
-			expected: map[int]int{
-				0: 1,
-			},
-		},
-		{
-			n: 1,
-			p: 0,
-			expected: map[int]int{
-				0: 1,
-			},
-		},
-		{
-			n: 8,
-			p: 4,
-			expected: map[int]int{
-				0: 2,
-				2: 4,
-				4: 6,
-				6: 8,
-			},
-		},
-	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
-			var called int32
-			parallel(tc.n, tc.p, func(start, end int) {
-				expectedEnd, ok := tc.expected[start]
-				if !ok {
-					t.Fatalf("unexpected start: %d", start)
-				}
-				if end != expectedEnd {
-					t.Fatalf("unexpected end for start %d: got %d want %d", start, end, expectedEnd)
-				}
-				atomic.AddInt32(&called, 1)
-			})
-			if int(called) != len(tc.expected) {
-				t.Fatalf("unexpected call count: got %d want %d", called, len(tc.expected))
-			}
-		}()
-	}
-	Parallel(1, func(start, end int) {})
+	r := image.Rect(100, 100, 200, 200)
+	Parallel(r, func(sub image.Rectangle) {
+		if !sub.In(r) {
+			t.Fatalf("%s is not in %s", sub, r)
+		}
+	})
 }
 
 type testImageDefault struct {

@@ -83,9 +83,9 @@ func Copy(dst draw.Image, src image.Image) {
 	bd := src.Bounds().Intersect(dst.Bounds())
 	at := NewAtFunc(src)
 	set := NewSetFunc(dst)
-	Parallel(bd.Dy(), func(yOffStart, yOffEnd int) {
-		for y, yEnd := bd.Min.Y+yOffStart, bd.Min.Y+yOffEnd; y < yEnd; y++ {
-			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
+	Parallel(bd, func(bd image.Rectangle) {
+		for y := bd.Min.Y; y < bd.Max.Y; y++ {
+			for x := bd.Min.X; x < bd.Max.X; x++ {
 				r, g, b, a := at(x, y)
 				set(x, y, r, g, b, a)
 			}
@@ -93,38 +93,25 @@ func Copy(dst draw.Image, src image.Image) {
 	})
 }
 
-// Parallel helps to dispatch tasks concurrently.
-// It calls f with arguments (0,a) (a,b) ... (x,n).
-// Currently, it starts GOMAXPROCS goroutines.
-func Parallel(n int, f func(start, end int)) {
-	parallel(n, runtime.GOMAXPROCS(0), f)
-}
-
-func parallel(n int, p int, f func(start, end int)) {
-	if n < 1 {
-		return
-	}
-	// n >= 1
-	if p > n {
-		p = n
-	} else if p < 1 {
-		p = 1
-	}
-	// n >= p >= 1
-	if p == 1 {
-		f(0, n)
-		return
-	}
-	// n >= p > 1
+// Parallel dispatches tasks concurrently for a Rectangle.
+func Parallel(r image.Rectangle, f func(r image.Rectangle)) {
+	p := runtime.GOMAXPROCS(0)
 	wg := new(sync.WaitGroup)
-	wg.Add(p)
-	for i := 0; i < p; i++ {
-		go func(i int) {
-			defer wg.Done()
-			start := n * i / p
-			end := n * (i + 1) / p
-			f(start, end)
-		}(i)
+	h := r.Dy()
+	for y := 0; y < p; y++ {
+		r := image.Rect(
+			r.Min.X,
+			r.Min.Y+(h*y/p),
+			r.Max.X,
+			r.Min.Y+(h*(y+1)/p),
+		)
+		if !r.Empty() {
+			wg.Add(1)
+			go func(r image.Rectangle) {
+				f(r)
+				wg.Done()
+			}(r)
+		}
 	}
 	wg.Wait()
 }

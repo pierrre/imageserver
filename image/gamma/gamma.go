@@ -41,9 +41,9 @@ func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image
 	bd := nim.Bounds().Intersect(out.Bounds())
 	at := imageserver_image_internal.NewAtFunc(nim)
 	set := imageserver_image_internal.NewSetFunc(out)
-	imageserver_image_internal.Parallel(bd.Dy(), func(yOffStart, yOffEnd int) {
-		for y, yEnd := bd.Min.Y+yOffStart, bd.Min.Y+yOffEnd; y < yEnd; y++ {
-			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
+	imageserver_image_internal.Parallel(bd, func(bd image.Rectangle) {
+		for y := bd.Min.Y; y < bd.Max.Y; y++ {
+			for x := bd.Min.X; x < bd.Max.X; x++ {
 				r, g, b, a := at(x, y)
 				r, g, b, a = imageserver_image_internal.RGBAToNRGBA(r, g, b, a)
 				r = uint32(prc.vals[uint16(r)])
