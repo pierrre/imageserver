@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	// ImageFormatMaxLen is the maximum length for the image's format.
+	// ImageFormatMaxLen is the maximum length for the Image's format.
 	ImageFormatMaxLen = 1 << 8 // 256 B
-	// ImageDataMaxLen is the maximum length for the image's data.
+	// ImageDataMaxLen is the maximum length for the Mmage's data.
 	ImageDataMaxLen = 1 << 30 // 1 GiB
 )
 
@@ -19,21 +19,20 @@ var (
 
 // Image is a raw image.
 //
-//
 // Binary encoding:
-//
-// - Format length (uint32)
-//
-// - Format (string)
-//
-// - Data length (uint32)
-//
-// - Data([]byte)
-//
+//  - Format length (uint32)
+//  - Format (string)
+//  - Data length (uint32)
+//  - Data([]byte)
 // Numbers are encoded using little-endian order.
 type Image struct {
-	Format string // png, jpeg, bmp, gif, ...
-	Data   []byte // raw image data
+	// Format is the format used to encode the image.
+	//
+	// e.g. png, jpeg, bmp, gif, ...
+	Format string
+
+	// Data contains the raw data of the encoded image.
+	Data []byte
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler.

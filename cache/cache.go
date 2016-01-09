@@ -1,18 +1,22 @@
-// Package cache provides an Image cache.
+// Package cache provides a base for an Image cache.
 package cache
 
-import "github.com/pierrre/imageserver"
+import (
+	"github.com/pierrre/imageserver"
+)
 
 // Cache represents an Image cache.
 //
 // The Params can be used for custom behavior (no-cache, expiration, ...).
 type Cache interface {
-	// Must return nil and no error if the image is not found.
+	// Get returns the Image associated to the key, or nil if not found.
 	Get(key string, params imageserver.Params) (*imageserver.Image, error)
+
+	// Set adds the Image and associate it to the key.
 	Set(key string, image *imageserver.Image, params imageserver.Params) error
 }
 
-// IgnoreError is a Cache that ignores error from the underlying Cache.
+// IgnoreError is a Cache implementation that ignores error from the underlying Cache.
 type IgnoreError struct {
 	Cache
 }
@@ -32,7 +36,7 @@ func (c *IgnoreError) Set(key string, image *imageserver.Image, params imageserv
 	return nil
 }
 
-// Async is an asynchronous Cache.
+// Async is an asynchronous Cache implementation.
 //
 // The Images are set from a new goroutine.
 type Async struct {
@@ -47,7 +51,7 @@ func (a *Async) Set(key string, image *imageserver.Image, params imageserver.Par
 	return nil
 }
 
-// Func is an Image Cache that forwards calls to user defined functions
+// Func is a Cache implementation that forwards calls to user defined functions
 type Func struct {
 	GetFunc func(key string, params imageserver.Params) (*imageserver.Image, error)
 	SetFunc func(key string, image *imageserver.Image, params imageserver.Params) error

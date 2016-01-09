@@ -6,12 +6,13 @@ import (
 )
 
 // CacheControlPublicHandler is a net/http.Handler implementation that sets the "Cache-Control" header to "public".
+//
 // It only sets the header if the status code is StatusOK/204 or StatusNotModified/304.
 type CacheControlPublicHandler struct {
 	http.Handler
 }
 
-// ServeHTTP implements http.Handler.
+// ServeHTTP implements net/http.Handler
 func (h *CacheControlPublicHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	hrw := &headerResponseWriter{
 		ResponseWriter: rw,
@@ -34,14 +35,15 @@ func getTimeLocation(name string) *time.Location {
 	return l
 }
 
-// ExpiresHandler is a HTTP Handler that sets "Expires" header.
+// ExpiresHandler is a net/http.Handler implementation that sets the "Expires" header.
+//
 // It only sets the header if the status code is StatusOK/204 or StatusNotModified/304.
 type ExpiresHandler struct {
 	http.Handler
 	Expires time.Duration
 }
 
-// ServeHTTP implements http.Handler.
+// ServeHTTP implements net/http.Handler.
 func (eh *ExpiresHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	hrw := &headerResponseWriter{
 		ResponseWriter: rw,

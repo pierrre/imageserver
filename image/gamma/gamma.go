@@ -1,4 +1,4 @@
-// Package gamma provides gamma Processor and CorrectionProcessor.
+// Package gamma provides gamma imageserver/image.Processor implementations.
 package gamma
 
 import (
@@ -11,13 +11,15 @@ import (
 	imageserver_image_internal "github.com/pierrre/imageserver/image/internal"
 )
 
-// Processor is a Processor that applies gamma transformation.
+// Processor is a imageserver/image.Processor implementation that applies gamma transformation.
 type Processor struct {
 	vals        [1 << 16]uint16
 	newDrawable func(image.Image) draw.Image
 }
 
 // NewProcessor creates a Processor.
+//
+// "highQuality" indicates if the Processor return a NRGBA64 Image or an Image with the same quality as the given Image.
 func NewProcessor(gamma float64, highQuality bool) *Processor {
 	prc := new(Processor)
 	gammaInv := 1 / gamma
@@ -34,8 +36,9 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 	return prc
 }
 
-// Process implements Processor.
-// It doesn't return error.
+// Process implements imageserver/image.Processor.
+//
+// It doesn't return an error.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	out := prc.newDrawable(nim)
 	bd := nim.Bounds().Intersect(out.Bounds())
@@ -57,14 +60,23 @@ func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image
 	return out, nil
 }
 
-// Change implements Processor.
+// Change implements imageserver/image.Processor.
 func (prc *Processor) Change(params imageserver.Params) bool {
 	return true
 }
 
 const correct = 2.2
 
-// CorrectionProcessor is a Processor that corrects gamma.
+// CorrectionProcessor is a imageserver/image.Processor implementation that corrects gamma for a sub Processor.
+//
+// Steps:
+//  - apply gamma of 1/2.2 (darken)
+//  - call the sub Processor
+//  - apply gamma of 2.2 (lighten)
+//
+// Internally, it uses NRGBA64 high quality Image, to avoid loss of information.
+//
+// The CorrectionProcessor can be enabled/disabled with the "gamma_correction" (bool) param.
 type CorrectionProcessor struct {
 	imageserver_image.Processor
 	enabled bool
@@ -73,6 +85,8 @@ type CorrectionProcessor struct {
 }
 
 // NewCorrectionProcessor creates a CorrectionProcessor.
+//
+// "enabled" indicated if the CorrectionProcessor is enabled by default.
 func NewCorrectionProcessor(prc imageserver_image.Processor, enabled bool) *CorrectionProcessor {
 	return &CorrectionProcessor{
 		Processor: prc,
@@ -82,7 +96,7 @@ func NewCorrectionProcessor(prc imageserver_image.Processor, enabled bool) *Corr
 	}
 }
 
-// Process implements Processor.
+// Process implements imageserver/image.Processor.
 func (prc *CorrectionProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	enabled, err := prc.isEnabled(params)
 	if err != nil {

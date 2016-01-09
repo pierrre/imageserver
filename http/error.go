@@ -6,12 +6,14 @@ import (
 )
 
 // Error is a HTTP error.
+//
+// It is supported by Handler.
 type Error struct {
 	Code int
 	Text string
 }
 
-// NewErrorDefaultText creates an Error with the message associated with the code.
+// NewErrorDefaultText creates an Error with the default message associated with the code.
 func NewErrorDefaultText(code int) *Error {
 	return &Error{Code: code, Text: http.StatusText(code)}
 }

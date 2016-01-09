@@ -1,4 +1,4 @@
-// Package tiff provides a TIFF Encoder.
+// Package tiff provides a TIFF imageserver/image.Encoder implementation.
 package tiff
 
 import (
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/image/tiff"
 )
 
-// Encoder encodes an Image to TIFF.
+// Encoder is a TIFF imageserver/image.Encoder implementation.
 type Encoder struct{}
 
 var opts = &tiff.Options{
@@ -18,12 +18,12 @@ var opts = &tiff.Options{
 	Predictor:   true,
 }
 
-// Encode implements Encoder.
+// Encode implements imageserver/image.Encoder.
 func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
 	return tiff.Encode(w, nim, opts)
 }
 
-// Change implements Encoder.
+// Change implements imageserver/image.Encoder.
 func (enc *Encoder) Change(params imageserver.Params) bool {
 	return false
 }

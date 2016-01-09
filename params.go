@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-// Params are params used in Image Server.
+// Params are params used in imageserver.
 //
 // This is a wrapper around map[string]interface{} and provides utility methods.
 // It should only contains basic Go types values (string, int float64, ...) or nested Params.

@@ -1,4 +1,4 @@
-// Package gift provides a GIFT HTTP Parser
+// Package gift provides a imageserver/http.Parser implementation for imageserver/image/gift.Processor.
 package gift
 
 import (
@@ -10,27 +10,29 @@ import (
 )
 
 const (
-	// Param is the sub-param used by this package.
-	Param = "gift"
+	globalParam = "gift"
 )
 
-// Parser is a GIFT HTTP Parser.
+// Parser is a imageserver/http.Parser implementation for imageserver/image/gift.Processor.
 //
-// See Processor for params list.
+// It takes the params from the HTTP URL query and stores them in a Params.
+// This Params is added to the given Params at the key "gift".
+//
+// See imageserver/image/gift.Processor for params list.
 type Parser struct{}
 
-// Parse implements Parser.
+// Parse implements imageserver/http.Parser.
 func (parser *Parser) Parse(req *http.Request, params imageserver.Params) error {
 	p := imageserver.Params{}
 	err := parse(req, p)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = Param + "." + err.Param
+			err.Param = globalParam + "." + err.Param
 		}
 		return err
 	}
 	if !p.Empty() {
-		params.Set(Param, p)
+		params.Set(globalParam, p)
 	}
 	return nil
 }
@@ -47,10 +49,10 @@ func parse(req *http.Request, params imageserver.Params) error {
 	return nil
 }
 
-// Resolve implements Parser.
+// Resolve implements imageserver/http.Parser.
 func (parser *Parser) Resolve(param string) string {
-	if !strings.HasPrefix(param, Param+".") {
+	if !strings.HasPrefix(param, globalParam+".") {
 		return ""
 	}
-	return strings.TrimPrefix(param, Param+".")
+	return strings.TrimPrefix(param, globalParam+".")
 }

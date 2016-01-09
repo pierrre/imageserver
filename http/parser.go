@@ -8,20 +8,24 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Parser represents a HTTP Request parser.
+// Parser represents a *net/http.Request parser.
 type Parser interface {
-	// Parse parses a Request and fill Params.
+	// Parse parses a *net/http.Request and fill Params.
 	Parse(*http.Request, imageserver.Params) error
 
-	// Resolve resolves a param to a HTTP param.
-	// It returns the resolved HTTP param, or an empty string.
+	// Resolve resolves an internal param to a HTTP param.
+	// It returns the resolved HTTP param, or an empty string if it can not be resolved.
+	// It is used by Handler to generate errors messages.
 	Resolve(param string) (httpParam string)
 }
 
-// ListParser is a list of HTTP Parser.
+// ListParser is a Parser implementation that wraps a list of Parser.
 type ListParser []Parser
 
 // Parse implements Parser.
+//
+// It iterates through all sub parsers.
+// An error interrupts the iteration.
 func (lp ListParser) Parse(req *http.Request, params imageserver.Params) error {
 	for _, subParser := range lp {
 		err := subParser.Parse(req, params)
@@ -33,6 +37,8 @@ func (lp ListParser) Parse(req *http.Request, params imageserver.Params) error {
 }
 
 // Resolve implements Parser.
+//
+// It iterates through sub parsers, and return the first non-empty string.
 func (lp ListParser) Resolve(param string) string {
 	for _, subParser := range lp {
 		httpParam := subParser.Resolve(param)
@@ -43,7 +49,7 @@ func (lp ListParser) Resolve(param string) string {
 	return ""
 }
 
-// SourceParser is a HTTP Parser that takes the "source" param from the query.
+// SourceParser is a Parser implementation that takes the "source" param from the HTTP URL query.
 type SourceParser struct{}
 
 // Parse implements Parser.
@@ -60,7 +66,7 @@ func (parser *SourceParser) Resolve(param string) string {
 	return ""
 }
 
-// SourcePathParser is a HTTP Parser that takes the "source" param from the path.
+// SourcePathParser is a Parser implementation that takes the "source" param from the HTTP URL path.
 type SourcePathParser struct{}
 
 // Parse implements Parser.
@@ -79,7 +85,7 @@ func (parser *SourcePathParser) Resolve(param string) string {
 	return ""
 }
 
-// SourceTransformParser is a HTTP Parser that transforms the "source" param.
+// SourceTransformParser is a Parser implementation that transforms the "source" param.
 type SourceTransformParser struct {
 	Parser
 	Transform func(source string) string
@@ -107,7 +113,7 @@ func parseSourceTransform(ps Parser, req *http.Request, params imageserver.Param
 	return nil
 }
 
-// SourcePrefixParser is a HTTP Parser that adds a prefix to the "source" param.
+// SourcePrefixParser is a Parser implementation that adds a prefix to the "source" param.
 type SourcePrefixParser struct {
 	Parser
 	Prefix string
@@ -120,7 +126,7 @@ func (ps *SourcePrefixParser) Parse(req *http.Request, params imageserver.Params
 	})
 }
 
-// ParseQueryString takes the param from the query string and add it to params.
+// ParseQueryString takes the param from the HTTP URL query and add it to the Params.
 func ParseQueryString(param string, req *http.Request, params imageserver.Params) {
 	s := req.URL.Query().Get(param)
 	if s != "" {
@@ -128,7 +134,7 @@ func ParseQueryString(param string, req *http.Request, params imageserver.Params
 	}
 }
 
-// ParseQueryInt takes the param from the query string, parse it as an int and add it to params.
+// ParseQueryInt takes the param from the HTTP URL query, parse it as an int and add it to the Params.
 func ParseQueryInt(param string, req *http.Request, params imageserver.Params) error {
 	s := req.URL.Query().Get(param)
 	if s == "" {
@@ -142,7 +148,7 @@ func ParseQueryInt(param string, req *http.Request, params imageserver.Params) e
 	return nil
 }
 
-// ParseQueryFloat takes the param from the query string, parse it as a float64 and add it to params.
+// ParseQueryFloat takes the param from the HTTP URL query, parse it as a float64 and add it to the Params.
 func ParseQueryFloat(param string, req *http.Request, params imageserver.Params) error {
 	s := req.URL.Query().Get(param)
 	if s == "" {
@@ -156,7 +162,7 @@ func ParseQueryFloat(param string, req *http.Request, params imageserver.Params)
 	return nil
 }
 
-// ParseQueryBool takes the param from the query string, parse it as an bool and add it to params.
+// ParseQueryBool takes the param from the HTTP URL query, parse it as an bool and add it to the Params.
 func ParseQueryBool(param string, req *http.Request, params imageserver.Params) error {
 	s := req.URL.Query().Get(param)
 	if s == "" {

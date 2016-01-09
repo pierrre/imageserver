@@ -8,12 +8,19 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Handler is a GIF image Handler.
+// Handler is a GIF imageserver.Handler implementation.
+//
+// Steps:
+//  - decode the GIF image
+//  - processes the GIF image with a Processor from this package
+//  - encode the image to GIF
+//
+// If there is nothing to do, Handler does not decode the GIF image or call the Processor.
 type Handler struct {
 	Processor Processor
 }
 
-// Handle implements Handler.
+// Handle implements imageserver.Handler.
 func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	if im.Format != "gif" {
 		return nil, &imageserver.ImageError{Message: fmt.Sprintf("image format is not gif: %s", im.Format)}
@@ -41,7 +48,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	return im, nil
 }
 
-// FallbackHandler is an Image Handler that allows to switch between a Handler of this package, or a fallback Handler.
+// FallbackHandler is a imageserver.Handler implementation that allows to switch between a Handler of this package, or a fallback Handler.
 //
 // If the Image format and the "format" param are equal to "gif", the Handler of this package is used.
 // Otherwise, the fallback Handler is used.
@@ -50,7 +57,7 @@ type FallbackHandler struct {
 	Fallback imageserver.Handler
 }
 
-// Handle implements Handler.
+// Handle implements imageserver.Handler.
 func (hdr *FallbackHandler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	h, err := hdr.getHandler(im, params)
 	if err != nil {

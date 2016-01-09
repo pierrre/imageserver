@@ -1,4 +1,4 @@
-// Package jpeg provides a JPEG Encoder.
+// Package jpeg provides a JPEG imageserver/image.Encoder implementation.
 package jpeg
 
 import (
@@ -10,12 +10,14 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 )
 
-// Encoder encodes an Image to JPEG.
+// Encoder is a JPEG imageserver/image.Encoder implementation.
+//
+// It supports the "quality" param (1 to 100).
 type Encoder struct {
 	DefaultQuality int
 }
 
-// Encode implements Encoder.
+// Encode implements imageserver/image.Encoder.
 func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
 	opts, err := enc.getOptions(params)
 	if err != nil {
@@ -54,7 +56,7 @@ func (enc *Encoder) getQuality(params imageserver.Params) (int, error) {
 	return quality, nil
 }
 
-// Change implements Encoder.
+// Change implements imageserver/image.Encoder.
 func (enc *Encoder) Change(params imageserver.Params) bool {
 	if params.Has("quality") {
 		return true

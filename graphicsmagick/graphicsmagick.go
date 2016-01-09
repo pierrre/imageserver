@@ -1,4 +1,4 @@
-// Package graphicsmagick provides a GraphicsMagick Image Server.
+// Package graphicsmagick provides a GraphicsMagick imageserver.Handler implementation.
 package graphicsmagick
 
 import (
@@ -19,41 +19,37 @@ const (
 	tempDirPrefix = "imageserver_"
 )
 
-// Handler is a GraphicsMagick Image Handler.
+// Handler is a GraphicsMagick imageserver.Handler implementation.
 //
 // It processes the Image with the GraphicsMagick command line (mogrify command).
 //
 // All params are extracted from the "graphicsmagick" node param and are optionals.
 //
-// See GraphicsMagick documentation for more information about arguments.
-//
-// Params:
-//
-// - width / height: sizes for "-resize" argument (both optionals)
-//
-// - fill: "^" for "-resize" argument
-//
-// - ignore_ratio: "!" for "-resize" argument
-//
-// - only_shrink_larger: ">" for "-resize" argument
-//
-// - only_enlarge_smaller: "<" for "-resize" argument
-//
-// - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
-//
-// - extent: "-extent" param, uses width/height params and add "-gravity center" argument
-//
-// - format: "-format" param
-//
-// - quality: "-quality" param
+// Params (see GraphicsMagick documentation for more information about arguments):
+//  - width / height: sizes for "-resize" argument (both optionals)
+//  - fill: "^" for "-resize" argument
+//  - ignore_ratio: "!" for "-resize" argument
+//  - only_shrink_larger: ">" for "-resize" argument
+//  - only_enlarge_smaller: "<" for "-resize" argument
+//  - background: color for "-background" argument, 3/4/6/8 lower case hexadecimal characters
+//  - extent: "-extent" param, uses width/height params and add "-gravity center" argument
+//  - format: "-format" param
+//  - quality: "-quality" param
 type Handler struct {
-	Executable     string        // path to "gm" executable, usually "/usr/bin/gm"
-	Timeout        time.Duration // timeout for process, optional
-	TempDir        string        // temp directory for image files, optional
-	AllowedFormats []string      // allowed format list, optional
+	// Executable is the path to "gm" executable, usually "/usr/bin/gm".
+	Executable string
+
+	// Timeoput is an optional timeout for process.
+	Timeout time.Duration
+
+	// TempDir is an optional temp directory for image files.
+	TempDir string
+
+	// AllowedFormats is an optional list of allowed formats.
+	AllowedFormats []string
 }
 
-// Handle implements Handler.
+// Handle implements imageserver.Handler.
 func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	if !params.Has(globalParam) {
 		return im, nil

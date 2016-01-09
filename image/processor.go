@@ -6,7 +6,9 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Processor represents a Go Image processor.
+// Processor processes a Go Image.
+//
+// It can return the given Image, but should not modify it.
 type Processor interface {
 	Process(image.Image, imageserver.Params) (image.Image, error)
 	Changer
@@ -25,7 +27,7 @@ func (f ProcessorFunc) Change(params imageserver.Params) bool {
 	return true
 }
 
-// ListProcessor is a list of Processor.
+// ListProcessor is a Processor implementation that wrap a list of Processor.
 type ListProcessor []Processor
 
 // Process implements Processor.
@@ -50,7 +52,7 @@ func (prc ListProcessor) Change(params imageserver.Params) bool {
 	return false
 }
 
-// ChangeProcessor is a Processor that alway return true for the Change method.
+// ChangeProcessor is a Processor implementation that alway return true for the Change method.
 type ChangeProcessor struct {
 	Processor
 }

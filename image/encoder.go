@@ -9,7 +9,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Encoder represents an Image encoder.
+// Encoder encodes an Image.
 //
 // An Encoder must encode to only one specific format.
 type Encoder interface {

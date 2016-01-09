@@ -1,2 +1,2 @@
-// Package gif provides a GIF Encoder, Handler, and Processor.
+// Package gif provides GIF imageserver/image.Encoder|Processor and imageserver.Handler implementations.
 package gif

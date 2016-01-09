@@ -1,4 +1,4 @@
-// Package groupcache provides a groupcache Image Server.
+// Package groupcache provides a groupcache imageserver.Server implementation.
 package groupcache
 
 import (
@@ -17,7 +17,7 @@ func NewServer(srv imageserver.Server, kg imageserver_cache.KeyGenerator, name s
 	}
 }
 
-// Server is a groupcache Image Server.
+// Server is a groupcache imageserver.Server implementation.
 //
 // Group MUST use a Getter from this package.
 type Server struct {
@@ -25,7 +25,7 @@ type Server struct {
 	KeyGenerator imageserver_cache.KeyGenerator
 }
 
-// Get implements Server.
+// Get implements imageserver.Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	ctx := &Context{
 		Params: params,
@@ -45,12 +45,12 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	return im, nil
 }
 
-// Getter is a groupcache Getter for an Image Server.
+// Getter is a groupcache.Getter implementation for Server.
 type Getter struct {
 	Server imageserver.Server
 }
 
-// Get implements Getter.
+// Get implements groupcache.Getter.
 func (gt *Getter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) error {
 	myctx, ok := ctx.(*Context)
 	if !ok {
@@ -77,7 +77,7 @@ func (gt *Getter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) 
 	return nil
 }
 
-// Context is a groupcache.Context used by this package.
+// Context is a groupcache.Context implementation used by Getter.
 type Context struct {
 	Params imageserver.Params
 }

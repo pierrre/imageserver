@@ -1,4 +1,4 @@
-// Package _test provides utilities for Cache testing.
+// Package _test provides utilities for imageserver/cache.Cache testing.
 package _test
 
 import (
@@ -17,7 +17,7 @@ const (
 	KeyMiss = "unknown"
 )
 
-// TestGetSet is a helper to test Cache.Get()/Set().
+// TestGetSet is a helper to test imageserver/cache.Cache.Get()/Set().
 func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 	err := cache.Set(KeyValid, testdata.Medium, imageserver.Params{})
 	if err != nil {
@@ -35,7 +35,7 @@ func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 	}
 }
 
-// TestGetMiss is a helper to test Cache.Get() with a "cache miss".
+// TestGetMiss is a helper to test imageserver/cache.Cache.Get() with a "cache miss".
 func TestGetMiss(t *testing.T, cache imageserver_cache.Cache) {
 	im, err := cache.Get(KeyMiss, imageserver.Params{})
 	if err != nil {
@@ -46,7 +46,7 @@ func TestGetMiss(t *testing.T, cache imageserver_cache.Cache) {
 	}
 }
 
-// MapCache is a simple Cache (it wraps a map) for tests.
+// MapCache is a simple imageserver/cache.Cache implementation (it wraps a map) for tests.
 type MapCache struct {
 	mutex sync.RWMutex
 	data  map[string]*imageserver.Image
@@ -59,14 +59,14 @@ func NewMapCache() *MapCache {
 	}
 }
 
-// Get implements Cache.
+// Get implements imageserver/cache.Cache.
 func (cache *MapCache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
 	return cache.data[key], nil
 }
 
-// Set implements Cache.
+// Set implements imageserver/cache.Cache.
 func (cache *MapCache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()

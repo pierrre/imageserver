@@ -6,7 +6,7 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Provider represents a Go Image provider.
+// Provider returns a Go Image.
 type Provider interface {
 	Get(params imageserver.Params) (image.Image, error)
 }
@@ -14,18 +14,18 @@ type Provider interface {
 // ProviderFunc is a Provider func.
 type ProviderFunc func(imageserver.Params) (image.Image, error)
 
-// Get implements Provider
+// Get implements Provider.
 func (f ProviderFunc) Get(params imageserver.Params) (image.Image, error) {
 	return f(params)
 }
 
-// ProcessorProvider is a Go Image provider that processes the Image.
+// ProcessorProvider is a Provider implementation that processes the Image.
 type ProcessorProvider struct {
 	Provider
 	Processor Processor
 }
 
-// Get implements Provider
+// Get implements Provider.
 func (prv *ProcessorProvider) Get(params imageserver.Params) (image.Image, error) {
 	nim, err := prv.Provider.Get(params)
 	if err != nil {

@@ -4,12 +4,17 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Handler is an Image Handler that uses Go Image.
+// Handler is a imageserver.Handler implementation that uses Go "image" package.
+//
+// It supports format conversion and processing.
+// It uses the "format" param to determine which Encoder is used.
+//
+// If there is nothing to do, Handler does not decode the Image or call the Processor.
 type Handler struct {
 	Processor Processor // Optional Processor
 }
 
-// Handle implements Handler.
+// Handle implements imageserver.Handler.
 func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	enc, format, err := getEncoderFormat(im.Format, params)
 	if err != nil {

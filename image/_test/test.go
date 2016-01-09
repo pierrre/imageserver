@@ -1,4 +1,4 @@
-// Package _test provides utilities for Encoder testing.
+// Package _test provides utilities for imageserver/image.Encoder testing.
 package _test
 
 import (
@@ -10,12 +10,12 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 )
 
-// TestEncoder is a helper to test Encoder.
+// TestEncoder is a helper to test imageserver/image.Encoder.
 func TestEncoder(t *testing.T, enc imageserver_image.Encoder, expectedFormat string) {
 	TestEncoderParams(t, enc, imageserver.Params{}, expectedFormat)
 }
 
-// TestEncoderParams is a helper to test Encoder with Params.
+// TestEncoderParams is a helper to test imageserver/image.Encoder with Params.
 func TestEncoderParams(t *testing.T, enc imageserver_image.Encoder, params imageserver.Params, expectedFormat string) {
 	buf := new(bytes.Buffer)
 	nim := NewImage()

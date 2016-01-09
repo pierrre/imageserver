@@ -1,4 +1,4 @@
-// Package nfntresize provides a nfnt resize Processor.
+// Package nfntresize provides a nfnt/resize imageserver/image.Processor implementation.
 package nfntresize
 
 import (
@@ -14,14 +14,30 @@ const (
 	Param = "nfntresize"
 )
 
-// Processor processes an Image with nfnt resize.
+// Processor is a nfnt/resize imageserver/image.Processor implementation.
+//
+// All params are extracted from the "graphicsmagick" node param and are optionals:
+//  - width
+//  - height
+//  - mode: resize mode
+//      possible values:
+//      - resize (default): see github.com/nfnt/resize.Resize
+//      - thumbnail: see github.com/nfnt/resize.Thumbnail
+//  - interpolation: interpolation method
+//      possible values:
+//      - nearest_neighbor (default)
+//      - bilinear
+//      - bicubic
+//      - mitchell_netravali
+//      - lanczos2
+//      - lanczos3
 type Processor struct {
 	DefaultInterpolation resize.InterpolationFunction
 	MaxWidth             int
 	MaxHeight            int
 }
 
-// Process implements Processor.
+// Process implements imageserver/image.Processor.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(Param) {
 		return nim, nil
@@ -138,7 +154,7 @@ func getModeFunc(params imageserver.Params) (modeFunc, error) {
 	}
 }
 
-// Change implements Processor.
+// Change implements imageserver/image.Processor.
 func (prc *Processor) Change(params imageserver.Params) bool {
 	if !params.Has(Param) {
 		return false

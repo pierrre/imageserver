@@ -1,4 +1,4 @@
-// Package png provides a PNG Encoder.
+// Package png provides a PNG imageserver/image.Encoder implementation.
 package png
 
 import (
@@ -10,18 +10,18 @@ import (
 	imageserver_image "github.com/pierrre/imageserver/image"
 )
 
-// Encoder encodes an Image to PNG.
+// Encoder is a PNG imageserver/image.Encoder implementation.
 type Encoder struct {
 	CompressionLevel png.CompressionLevel
 }
 
-// Encode implements Encoder.
+// Encode implements imageserver/image.Encoder.
 func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
 	e := &png.Encoder{CompressionLevel: enc.CompressionLevel}
 	return e.Encode(w, nim)
 }
 
-// Change implements Encoder.
+// Change implements imageserver/image.Encoder.
 func (enc *Encoder) Change(params imageserver.Params) bool {
 	return false
 }

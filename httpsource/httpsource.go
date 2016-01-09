@@ -1,4 +1,4 @@
-// Package httpsource provides a HTTP source Image Server.
+// Package httpsource provides a imageserver.Server implementation that gets the Image from an HTTP URL.
 package httpsource
 
 import (
@@ -13,12 +13,12 @@ import (
 
 var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
-// Server is a HTTP source Image Server.
+// Server is a imageserver.Server implementation that gets the Image from an HTTP URL.
 //
 // It parses the "source" param as URL, then do a GET request.
 // It returns an error if the HTTP status code is not 200 (OK).
 //
-// The image type is determined by the "Content-Type" header.
+// The Image type is determined by the "Content-Type" header.
 type Server struct {
 	// Client is an optional HTTP client.
 	// http.DefaultClient is used by default.

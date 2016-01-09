@@ -17,9 +17,9 @@ func (f ServerFunc) Get(params Params) (*Image, error) {
 // SourceParam is the source Param name.
 const SourceParam = "source"
 
-// SourceServer is a source Server.
+// SourceServer is a Server implementation that forwards calls to the underlying Server with only the "source" param.
 //
-// It forwards to the underlying Server with only the source param.
+// It should be used to cache the source Image.
 type SourceServer struct {
 	Server
 }

@@ -9,27 +9,21 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Server is a Server with Cache.
-//
+// Server is a imageserver.Server implementation that supports a Cache.
 //
 // Steps:
-//
-// - Generate the cache key.
-//
-// - Get the Image from the Cache, and return it if found.
-//
-// - Get the Image from the Server.
-//
-// - Set the Image to the Cache.
-//
-// - Return the Image.
+//  - Generate the cache key.
+//  - Get the Image from the Cache, and return it if found.
+//  - Get the Image from the Server.
+//  - Set the Image to the Cache.
+//  - Return the Image.
 type Server struct {
 	imageserver.Server
 	Cache        Cache
 	KeyGenerator KeyGenerator
 }
 
-// Get implements Server.
+// Get implements imageserver.Server.
 func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	key := s.KeyGenerator.GetKey(params)
 	im, err := s.Cache.Get(key, params)
@@ -80,7 +74,7 @@ func NewParamsHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 	})
 }
 
-// PrefixKeyGenerator is a KeyGenerator that adds a prefix to the key.
+// PrefixKeyGenerator is a KeyGenerator implementation that adds a prefix to the key.
 type PrefixKeyGenerator struct {
 	KeyGenerator
 	Prefix string

@@ -1,4 +1,4 @@
-// Package http provides a HTTP Handler for an Image Server.
+// Package http provides a net/http.Handler implementation that wraps a imageserver.Server.
 package http
 
 import (
@@ -13,20 +13,47 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
-// Handler is a HTTP Handler for imageserver.Server.
+// Handler is a net/http.Handler implementation that wraps a imageserver.Server.
 //
-// Only GET and HEAD methods are supported.
+// Supported methods are: GET and HEAD.
+// Other method will return a StatusMethodNotAllowed/405 response.
 //
-// Supports ETag/If-None-Match (status code 304).
-// It doesn't check if the image really exists.
+// It supports ETag/If-None-Match headers and returns a StatusNotModified/304 response accordingly.
+// But it doesn't check if the Image really exists (the Server is not called).
+//
+// Steps:
+//  - Parse the HTTP request, and fill the Params.
+//  - If the given If-None-Match header matches the ETag, return a StatusNotModified/304 response.
+//  - Call the Server and get the Image.
+//  - Return a StatusOK/200 response containing the Image.
+//
+// Errors (returned by Parser or Server):
+//  - *imageserver/http.Error will return a response with the given status code and message.
+//  - *imageserver.ParamError will return a StatusBadRequest/400 response, with a message including the resolved HTTP param.
+//  - *imageserver.ImageError will return a StatusBadRequest/400 response, with the given message.
+//  - Other error will return a StatusInternalServerError/500 response, and ErrorFunc will be called.
+//
+// Returned headers:
+//  - Content-Type is set for StatusOK/200 response, and contains "image/{Image.Format}".
+//  - Content-Length is set for StatusOK/200 response, and contains the Image size.
+//  - ETag is set for StatusOK/200 and StatusNotModified/304 response, and contains the ETag value.
 type Handler struct {
-	Parser    Parser                                 // parse request to Params
-	Server    imageserver.Server                     // handle image requests
-	ETagFunc  func(params imageserver.Params) string // optional
-	ErrorFunc func(err error, req *http.Request)     // allows to handle internal errors, optional
+	// Parser parses the HTTP request and fills the Params.
+	Parser Parser
+
+	// Server handles the image request.
+	Server imageserver.Server
+
+	// ETagFunc is an optional function that returns the ETag value for the given Params.
+	// See https://en.wikipedia.org/wiki/HTTP_ETag .
+	// The returned value must not be enclosed in quotes (they are added automatically).
+	ETagFunc func(params imageserver.Params) string
+
+	// ErrorFunc is an optional function that is called if there is an internal error.
+	ErrorFunc func(err error, req *http.Request)
 }
 
-// ServeHTTP implements http.Handler.
+// ServeHTTP implements net/http.Handler.
 func (handler *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	err := handler.serveHTTP(rw, req)
 	if err != nil {
@@ -120,6 +147,8 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, req *http.Request) 
 }
 
 // NewParamsHashETagFunc returns a function that hashes the params and returns an ETag value.
+//
+// It is intended to be used in Handler.ETagFunc.
 func NewParamsHashETagFunc(newHashFunc func() hash.Hash) func(params imageserver.Params) string {
 	pool := &sync.Pool{
 		New: func() interface{} {

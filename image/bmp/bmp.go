@@ -1,4 +1,4 @@
-// Package bmp provides a BMP Encoder.
+// Package bmp provides a BMP imageserver/image.Encoder implementation.
 package bmp
 
 import (
@@ -10,15 +10,15 @@ import (
 	"golang.org/x/image/bmp"
 )
 
-// Encoder encodes an Image to BMP.
+// Encoder is a BMP imageserver/image.Encoder implementation.
 type Encoder struct{}
 
-// Encode implements Encoder.
+// Encode implements imageserver/image.Encoder.
 func (enc *Encoder) Encode(w io.Writer, nim image.Image, params imageserver.Params) error {
 	return bmp.Encode(w, nim)
 }
 
-// Change implements Encoder.
+// Change implements imageserver/image.Encoder.
 func (enc *Encoder) Change(params imageserver.Params) bool {
 	return false
 }

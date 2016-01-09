@@ -9,13 +9,13 @@ import (
 	imageserver_image_internal "github.com/pierrre/imageserver/image/internal"
 )
 
-// Processor represents a GIF processor.
+// Processor processes a GIF image.
 type Processor interface {
 	Process(*gif.GIF, imageserver.Params) (*gif.GIF, error)
 	imageserver_image.Changer
 }
 
-// SimpleProcessor is a GIF Processor that processes each frames with the sub Processor.
+// SimpleProcessor is a Processor implementation that processes each frames with the sub imageserver/image.Processor.
 type SimpleProcessor struct {
 	imageserver_image.Processor
 }

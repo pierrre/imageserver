@@ -22,35 +22,35 @@ func TestParse(t *testing.T) {
 		{},
 		{
 			query: url.Values{"width": {"100"}},
-			expectedParams: imageserver.Params{Param: imageserver.Params{
+			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"width": 100,
 			}},
 		},
 		{
 			query: url.Values{"height": {"100"}},
-			expectedParams: imageserver.Params{Param: imageserver.Params{
+			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"height": 100,
 			}},
 		},
 		{
 			query: url.Values{"interpolation": {"lanczos3"}},
-			expectedParams: imageserver.Params{Param: imageserver.Params{
+			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"interpolation": "lanczos3",
 			}},
 		},
 		{
 			query: url.Values{"mode": {"resize"}},
-			expectedParams: imageserver.Params{Param: imageserver.Params{
+			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"mode": "resize",
 			}},
 		},
 		{
 			query:              url.Values{"width": {"invalid"}},
-			expectedParamError: Param + ".width",
+			expectedParamError: globalParam + ".width",
 		},
 		{
 			query:              url.Values{"height": {"invalid"}},
-			expectedParamError: Param + ".height",
+			expectedParamError: globalParam + ".height",
 		},
 	} {
 		func() {
@@ -86,7 +86,7 @@ func TestParse(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	p := &Parser{}
-	httpParam := p.Resolve(Param + ".width")
+	httpParam := p.Resolve(globalParam + ".width")
 	if httpParam != "width" {
 		t.Fatal("not equal")
 	}

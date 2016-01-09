@@ -1,4 +1,4 @@
-// Package gift provides a GIFT Processor.
+// Package gift provides a GIFT imageserver/image.Processor implementation.
 package gift
 
 import (
@@ -15,14 +15,30 @@ const (
 	Param = "gift"
 )
 
-// Processor is an Image Processor that uses GIFT.
+// Processor is a GIFT imageserver/image.Processor implementation.
+//
+// All params are extracted from the "gift" node param and are optionals:
+//  - width
+//  - height
+//  - mode: resize mode
+//      possible values:
+//      - <no value> (default): see github.com/disintegration/gift.Resize
+//      - fit: see github.com/disintegration/gift.ResizeToFit
+//      - fill: see github.com/disintegration/gift.ResizeToFill
+//  - resampling: resampling method
+//      possible values:
+//      - nearest_neighbor (default)
+//      - box
+//      - linear
+//      - cubic
+//      - lanczos
 type Processor struct {
 	DefaultResampling gift.Resampling
 	MaxWidth          int
 	MaxHeight         int
 }
 
-// Process implements Processor.
+// Process implements imageserver/image.Processor.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(Param) {
 		return nim, nil
@@ -138,7 +154,7 @@ func (prc *Processor) getResampling(params imageserver.Params) (gift.Resampling,
 	return nil, &imageserver.ParamError{Param: "resampling", Message: "invalid value"}
 }
 
-// Change implements Processor.
+// Change implements imageserver/image.Processor.
 func (prc *Processor) Change(params imageserver.Params) bool {
 	if !params.Has(Param) {
 		return false
