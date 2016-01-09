@@ -11,6 +11,46 @@ import (
 	"github.com/pierrre/imageserver"
 )
 
+var _ http.Handler = &CacheControlPublicHandler{}
+
+func TestCacheControlPublicHandler(t *testing.T) {
+	h := &CacheControlPublicHandler{
+		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Write([]byte("foobar"))
+		}),
+	}
+	rw := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "http://localhost", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	h.ServeHTTP(rw, req)
+	cc := rw.Header().Get("Cache-Control")
+	if cc != "public" {
+		t.Fatal("not equal")
+	}
+}
+
+func TestCacheControlPublicHandlerUndefined(t *testing.T) {
+	h := &CacheControlPublicHandler{
+		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.WriteHeader(http.StatusNotFound)
+		}),
+	}
+	rw := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "http://localhost", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	h.ServeHTTP(rw, req)
+	cc := rw.Header().Get("Cache-Control")
+	if cc != "" {
+		t.Fatal("should not be set")
+	}
+}
+
+var _ http.Handler = &ExpiresHandler{}
+
 func TestExpiresHandler(t *testing.T) {
 	h := &ExpiresHandler{
 		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {

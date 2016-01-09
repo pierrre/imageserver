@@ -22,7 +22,9 @@ import (
 	imageserver_cache_groupcache "github.com/pierrre/imageserver/cache/groupcache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_http "github.com/pierrre/imageserver/http"
+	imageserver_http_gamma "github.com/pierrre/imageserver/http/gamma"
 	imageserver_http_gift "github.com/pierrre/imageserver/http/gift"
+	imageserver_http_image "github.com/pierrre/imageserver/http/image"
 	imageserver_image "github.com/pierrre/imageserver/image"
 	_ "github.com/pierrre/imageserver/image/bmp"
 	imageserver_image_gamma "github.com/pierrre/imageserver/image/gamma"
@@ -41,7 +43,6 @@ const (
 var (
 	flagHTTPAddr            = ":8080"
 	flagGitHubWebhookSecret string
-	flagHTTPExpires         = time.Duration(7 * 24 * time.Hour)
 	flagGroupcache          = int64(0)
 	flagGroupcacheSelf      string
 	flagGroupcachePeers     string
@@ -58,7 +59,6 @@ func main() {
 
 func parseFlags() {
 	flag.StringVar(&flagHTTPAddr, "http", flagHTTPAddr, "HTTP addr")
-	flag.DurationVar(&flagHTTPExpires, "http-expires", flagHTTPExpires, "HTTP expires")
 	flag.StringVar(&flagGitHubWebhookSecret, "github-webhook-secret", flagGitHubWebhookSecret, "GitHub webhook secret")
 	flag.Int64Var(&flagGroupcache, "groupcache", flagGroupcache, "Groupcache")
 	flag.StringVar(&flagGroupcacheSelf, "groupcache-self", flagGroupcacheSelf, "Groupcache self")
@@ -164,9 +164,9 @@ func newImageHTTPHandler() http.Handler {
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourcePathParser{},
 			&imageserver_http_gift.Parser{},
-			&imageserver_http.FormatParser{},
-			&imageserver_http.QualityParser{},
-			&imageserver_http.GammaCorrectionParser{},
+			&imageserver_http_image.FormatParser{},
+			&imageserver_http_image.QualityParser{},
+			&imageserver_http_gamma.CorrectionParser{},
 		}),
 		Server:   newServer(),
 		ETagFunc: imageserver_http.NewParamsHashETagFunc(sha256.New),
@@ -174,11 +174,12 @@ func newImageHTTPHandler() http.Handler {
 			log.Printf("Internal error: %s", err)
 		},
 	}
-	if flagHTTPExpires != 0 {
-		handler = &imageserver_http.ExpiresHandler{
-			Handler: handler,
-			Expires: flagHTTPExpires,
-		}
+	handler = &imageserver_http.ExpiresHandler{
+		Handler: handler,
+		Expires: time.Duration(7 * 24 * time.Hour),
+	}
+	handler = &imageserver_http.CacheControlPublicHandler{
+		Handler: handler,
 	}
 	return handler
 }

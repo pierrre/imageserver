@@ -87,10 +87,8 @@ func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, ima
 }
 
 func (handler *Handler) setImageHeaderCommon(rw http.ResponseWriter, req *http.Request, etag string) {
-	header := rw.Header()
-	header.Set("Cache-Control", "public")
 	if etag != "" {
-		header.Set("ETag", etag)
+		rw.Header().Set("ETag", etag)
 	}
 }
 

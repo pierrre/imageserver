@@ -120,66 +120,6 @@ func (ps *SourcePrefixParser) Parse(req *http.Request, params imageserver.Params
 	})
 }
 
-// FormatParser is an http Parser that takes the "format" param from query.
-type FormatParser struct{}
-
-// Parse implements Parser.
-func (parser *FormatParser) Parse(req *http.Request, params imageserver.Params) error {
-	ParseQueryString("format", req, params)
-	if !params.Has("format") {
-		return nil
-	}
-	format, err := params.GetString("format")
-	if err != nil {
-		return err
-	}
-	if format == "jpg" {
-		format = "jpeg"
-	}
-	params.Set("format", format)
-	return nil
-}
-
-// Resolve implements Parser.
-func (parser *FormatParser) Resolve(param string) string {
-	if param == "format" {
-		return "format"
-	}
-	return ""
-}
-
-// QualityParser is an http Parser that takes the "quality" param from query.
-type QualityParser struct{}
-
-// Parse implements Parser.
-func (parser *QualityParser) Parse(req *http.Request, params imageserver.Params) error {
-	return ParseQueryInt("quality", req, params)
-}
-
-// Resolve implements Parser.
-func (parser *QualityParser) Resolve(param string) string {
-	if param == "quality" {
-		return "quality"
-	}
-	return ""
-}
-
-// GammaCorrectionParser is a HTTP Parser for gamma correct.
-type GammaCorrectionParser struct{}
-
-// Parse implements Parser.
-func (parser *GammaCorrectionParser) Parse(req *http.Request, params imageserver.Params) error {
-	return ParseQueryBool("gamma_correction", req, params)
-}
-
-// Resolve implements Parser.
-func (parser *GammaCorrectionParser) Resolve(param string) string {
-	if param == "gamma_correction" {
-		return "gamma_correction"
-	}
-	return ""
-}
-
 // ParseQueryString takes the param from the query string and add it to params.
 func ParseQueryString(param string, req *http.Request, params imageserver.Params) {
 	s := req.URL.Query().Get(param)

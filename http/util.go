@@ -6,11 +6,29 @@ import (
 	"time"
 )
 
+// CacheControlPublicHandler is a net/http.Handler implementation that sets the "Cache-Control" header to "public".
+// It only sets the header if the status code is StatusOK/204 or StatusNotModified/304.
+type CacheControlPublicHandler struct {
+	http.Handler
+}
+
+// ServeHTTP implements http.Handler.
+func (h *CacheControlPublicHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	hrw := &headerResponseWriter{
+		ResponseWriter: rw,
+		OnWriteHeaderFunc: func(code int) {
+			if code == http.StatusOK || code == http.StatusNotModified {
+				rw.Header().Set("Cache-Control", "public")
+			}
+		},
+	}
+	h.Handler.ServeHTTP(hrw, req)
+}
+
 var expiresHeaderLocation, _ = time.LoadLocation("GMT")
 
-// ExpiresHandler is a HTTP Handler that adds "Expires" header.
-//
-// It only adds the header if the status code is OK (200) or NotModified (304)
+// ExpiresHandler is a HTTP Handler that sets "Expires" header.
+// It only sets the header if the status code is StatusOK/204 or StatusNotModified/304.
 type ExpiresHandler struct {
 	http.Handler
 	Expires time.Duration
@@ -21,13 +39,12 @@ func (eh *ExpiresHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	hrw := &headerResponseWriter{
 		ResponseWriter: rw,
 		OnWriteHeaderFunc: func(code int) {
-			if code != http.StatusOK && code != http.StatusNotModified {
-				return
+			if code == http.StatusOK || code == http.StatusNotModified {
+				t := time.Now()
+				t = t.Add(eh.Expires)
+				t = t.In(expiresHeaderLocation)
+				rw.Header().Set("Expires", t.Format(time.RFC1123))
 			}
-			t := time.Now()
-			t = t.Add(eh.Expires)
-			t = t.In(expiresHeaderLocation)
-			rw.Header().Set("Expires", t.Format(time.RFC1123))
 		},
 	}
 	eh.Handler.ServeHTTP(hrw, req)

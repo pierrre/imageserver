@@ -31,7 +31,6 @@ func TestHandler(t *testing.T) {
 			url:                "http://localhost?source=medium.jpg",
 			expectedStatusCode: http.StatusOK,
 			expectedHeader: map[string]string{
-				"Cache-Control": "public",
 				"Etag": fmt.Sprintf("\"%s\"", NewParamsHashETagFunc(sha256.New)(imageserver.Params{
 					imageserver.SourceParam: testdata.MediumFileName,
 				})),
@@ -85,7 +84,7 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusMethodNotAllowed,
 		},
 		{
-			url:                "http://localhost?quality=invalid",
+			url:                "http://localhost?error=foo",
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -136,8 +135,7 @@ func TestHandler(t *testing.T) {
 			h := &Handler{
 				Parser: ListParser{
 					&SourceParser{},
-					&FormatParser{},
-					&QualityParser{},
+					&testErrorParser{},
 				},
 				ErrorFunc: func(err error, req *http.Request) {
 					errorFuncCalled = true
