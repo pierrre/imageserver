@@ -24,14 +24,12 @@ func BenchmarkImageMarshalBinaryHuge(b *testing.B) {
 }
 
 func benchmarkImageMarshalBinary(b *testing.B, im *Image) {
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_, err := im.MarshalBinary()
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		_, err := im.MarshalBinary()
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 	b.SetBytes(int64(len(im.Data)))
 }
 
@@ -58,14 +56,12 @@ func benchmarkImageUnmarshalBinary(b *testing.B, im *Image) {
 	}
 	imNew := new(Image)
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			err := imNew.UnmarshalBinary(data)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		err := imNew.UnmarshalBinary(data)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 	b.SetBytes(int64(len(im.Data)))
 }
 
@@ -92,13 +88,11 @@ func benchmarkImageUnmarshalBinaryNoCopy(b *testing.B, im *Image) {
 	}
 	imNew := new(Image)
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			err := imNew.UnmarshalBinaryNoCopy(data)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		err := imNew.UnmarshalBinaryNoCopy(data)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 	b.SetBytes(int64(len(im.Data)))
 }

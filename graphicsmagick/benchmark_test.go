@@ -32,12 +32,10 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 			"width": 100,
 		},
 	}
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_, err := hdr.Handle(im, params)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		_, err := hdr.Handle(im, params)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 }

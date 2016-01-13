@@ -15,12 +15,10 @@ func BenchmarkEncoder(b *testing.B, enc imageserver_image.Encoder, im *imageserv
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			err := enc.Encode(ioutil.Discard, nim, params)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		err := enc.Encode(ioutil.Discard, nim, params)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 }

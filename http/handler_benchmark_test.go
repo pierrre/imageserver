@@ -26,20 +26,16 @@ func BenchmarkHandler(b *testing.B) {
 	}
 	req.Header.Set("If-None-Match", "\"bar\"")
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			h.ServeHTTP(rw, req)
-		}
-	})
+	for i := 0; i < b.N; i++ {
+		h.ServeHTTP(rw, req)
+	}
 }
 
 func BenchmarkNewParamsHashETagFunc(b *testing.B) {
 	params := imageserver.Params{"foo": "bar"}
 	f := NewParamsHashETagFunc(sha256.New)
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			f(params)
-		}
-	})
+	for i := 0; i < b.N; i++ {
+		f(params)
+	}
 }

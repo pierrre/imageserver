@@ -73,9 +73,7 @@ func BenchmarkNewSetFuncDefault(b *testing.B) {
 func benchmarkNewSetFuncColor(b *testing.B, p draw.Image, rr, gg, bb, aa uint32) {
 	set := NewSetFunc(p)
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			set(0, 0, rr, gg, bb, aa)
-		}
-	})
+	for i := 0; i < b.N; i++ {
+		set(0, 0, rr, gg, bb, aa)
+	}
 }

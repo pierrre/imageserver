@@ -14,9 +14,7 @@ func BenchmarkParamsString(b *testing.B) {
 			"baz": "aaaaaaaa",
 		},
 	}
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_ = params.String()
-		}
-	})
+	for i := 0; i < b.N; i++ {
+		_ = params.String()
+	}
 }

@@ -22,14 +22,12 @@ func BenchmarkHTTPPoolContext(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			ctx := HTTPPoolContext(req)
-			if ctx == nil {
-				b.Fatal("context is nil")
-			}
+	for i := 0; i < b.N; i++ {
+		ctx := HTTPPoolContext(req)
+		if ctx == nil {
+			b.Fatal("context is nil")
 		}
-	})
+	}
 }
 
 func BenchmarkNewHTTPPoolTransport(b *testing.B) {
@@ -47,12 +45,10 @@ func BenchmarkNewHTTPPoolTransport(b *testing.B) {
 		b.Fatal(err)
 	}
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_, err := rt.RoundTrip(req)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		_, err := rt.RoundTrip(req)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 }

@@ -14,12 +14,10 @@ func BenchmarkHandler(b *testing.B) {
 			return g, nil
 		}),
 	}
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_, err := hdr.Handle(testdata.Animated, imageserver.Params{})
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		_, err := hdr.Handle(testdata.Animated, imageserver.Params{})
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 }

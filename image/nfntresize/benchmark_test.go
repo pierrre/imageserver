@@ -70,12 +70,10 @@ func benchmark(b *testing.B, im *imageserver.Image, params imageserver.Params) {
 	}
 	proc := &Processor{}
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			_, err := proc.Process(nim, params)
-			if err != nil {
-				b.Fatal(err)
-			}
+	for i := 0; i < b.N; i++ {
+		_, err := proc.Process(nim, params)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+	}
 }
