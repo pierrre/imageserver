@@ -25,7 +25,15 @@ func (h *CacheControlPublicHandler) ServeHTTP(rw http.ResponseWriter, req *http.
 	h.Handler.ServeHTTP(hrw, req)
 }
 
-var expiresHeaderLocation, _ = time.LoadLocation("GMT")
+var expiresHeaderLocation = getTimeLocation("GMT")
+
+func getTimeLocation(name string) *time.Location {
+	l, err := time.LoadLocation(name)
+	if err != nil {
+		panic(err)
+	}
+	return l
+}
 
 // ExpiresHandler is a HTTP Handler that sets "Expires" header.
 // It only sets the header if the status code is StatusOK/204 or StatusNotModified/304.

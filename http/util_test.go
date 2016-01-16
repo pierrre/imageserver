@@ -49,6 +49,24 @@ func TestCacheControlPublicHandlerUndefined(t *testing.T) {
 	}
 }
 
+func TestGetTimeLocation(t *testing.T) {
+	getTimeLocation("GMT")
+}
+
+func TestGetTimeLocationError(t *testing.T) {
+	defer func() {
+		v := recover()
+		if v == nil {
+			t.Fatal("no panic")
+		}
+		_, ok := v.(error)
+		if !ok {
+			t.Fatalf("unexpected recover type: got %T, want error", v)
+		}
+	}()
+	getTimeLocation("invalid")
+}
+
 var _ http.Handler = &ExpiresHandler{}
 
 func TestExpiresHandler(t *testing.T) {
