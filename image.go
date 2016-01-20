@@ -72,15 +72,13 @@ func (im *Image) UnmarshalBinary(data []byte) error {
 //
 // The caller must not reuse data after that.
 func (im *Image) UnmarshalBinaryNoCopy(data []byte) error {
-	dataPosition := 0
 	readData := func(length int) ([]byte, error) {
-		dataStart := dataPosition
-		dataEnd := dataPosition + length
-		if dataEnd > len(data) {
-			return nil, &ImageError{Message: fmt.Sprintf("unmarshal: unexpected end of data at index %d instead of %d", len(data), dataEnd)}
+		if length > len(data) {
+			return nil, &ImageError{Message: "unmarshal: unexpected end of data"}
 		}
-		dataPosition = dataEnd
-		return data[dataStart:dataEnd], nil
+		res := data[:length]
+		data = data[length:]
+		return res, nil
 	}
 
 	var buf []byte
