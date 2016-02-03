@@ -90,13 +90,3 @@ type PrefixKeyGenerator struct {
 func (g *PrefixKeyGenerator) GetKey(params imageserver.Params) string {
 	return g.Prefix + g.KeyGenerator.GetKey(params)
 }
-
-// StringKeyGenerator is a KeyGenerator that always returns the same string.
-//
-// It's useful for test.
-type StringKeyGenerator string
-
-// GetKey implements KeyGenerator
-func (k StringKeyGenerator) GetKey(params imageserver.Params) string {
-	return string(k)
-}

@@ -69,7 +69,9 @@ func benchmarkServer(b *testing.B, im *imageserver.Image, parallelism int) {
 		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return im, nil
 		}),
-		imageserver_cache.StringKeyGenerator("test"),
+		imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "test"
+		}),
 	)
 	params := imageserver.Params{}
 	b.SetParallelism(parallelism)

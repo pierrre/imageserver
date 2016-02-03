@@ -23,7 +23,9 @@ func TestServer(t *testing.T) {
 		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
-		imageserver_cache.StringKeyGenerator("test"),
+		imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "test"
+		}),
 	)
 	im, err := srv.Get(imageserver.Params{
 		imageserver.SourceParam: testdata.MediumFileName,
@@ -41,7 +43,9 @@ func TestServerErrorGroup(t *testing.T) {
 		imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
-		imageserver_cache.StringKeyGenerator("test"),
+		imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "test"
+		}),
 	)
 	_, err := srv.Get(imageserver.Params{})
 	if err == nil {
@@ -59,7 +63,9 @@ func TestServerErrorImageUnmarshal(t *testing.T) {
 				return nil
 			}),
 		),
-		KeyGenerator: imageserver_cache.StringKeyGenerator("test"),
+		KeyGenerator: imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
+			return "test"
+		}),
 	}
 	_, err := srv.Get(imageserver.Params{})
 	if err == nil {
