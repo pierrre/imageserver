@@ -37,25 +37,3 @@ func (prv *ProcessorProvider) Get(params imageserver.Params) (image.Image, error
 	}
 	return nim, nil
 }
-
-// ProviderServer is an Image Server for an Go Image Provider.
-type ProviderServer struct {
-	Provider Provider
-}
-
-// Get implements Server
-func (srv *ProviderServer) Get(params imageserver.Params) (*imageserver.Image, error) {
-	enc, format, err := getEncoderFormat("", params)
-	if err != nil {
-		return nil, err
-	}
-	nim, err := srv.Provider.Get(params)
-	if err != nil {
-		return nil, err
-	}
-	im, err := encode(nim, format, enc, params)
-	if err != nil {
-		return nil, err
-	}
-	return im, nil
-}
