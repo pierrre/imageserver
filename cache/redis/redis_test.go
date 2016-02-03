@@ -16,7 +16,7 @@ var _ imageserver_cache.Cache = &Cache{}
 
 func TestGetSet(t *testing.T) {
 	cache := newTestCache(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	for _, expire := range []time.Duration{0, 1 * time.Minute} {
 		cache.Expire = expire
 		cachetest.TestGetSet(t, cache)
@@ -25,13 +25,13 @@ func TestGetSet(t *testing.T) {
 
 func TestGetMiss(t *testing.T) {
 	cache := newTestCache(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	cachetest.TestGetMiss(t, cache)
 }
 
 func TestGetErrorAddress(t *testing.T) {
 	cache := newTestCacheInvalidAddress(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	_, err := cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -40,7 +40,7 @@ func TestGetErrorAddress(t *testing.T) {
 
 func TestSetErrorAddress(t *testing.T) {
 	cache := newTestCacheInvalidAddress(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -49,7 +49,7 @@ func TestSetErrorAddress(t *testing.T) {
 
 func TestGetErrorUnmarshal(t *testing.T) {
 	cache := newTestCache(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	data, err := testdata.Medium.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
@@ -70,7 +70,7 @@ func TestGetErrorUnmarshal(t *testing.T) {
 
 func TestSetErrorMarshal(t *testing.T) {
 	cache := newTestCache(t)
-	defer cache.Close()
+	defer cache.Pool.Close()
 	im := &imageserver.Image{
 		Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
 	}
@@ -111,7 +111,7 @@ func newTestRedigoPool(address string) *redigo.Pool {
 func checkTestCacheAvailable(tb testing.TB, cache *Cache) {
 	conn, err := cache.Pool.Dial()
 	if err != nil {
-		cache.Close()
+		cache.Pool.Close()
 		tb.Skip(err)
 	}
 	conn.Close()

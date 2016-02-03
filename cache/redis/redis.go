@@ -66,8 +66,3 @@ func (cache *Cache) setData(key string, data []byte) error {
 	_, err := conn.Do("SET", params...)
 	return err
 }
-
-// Close closes the underlying Redigo pool
-func (cache *Cache) Close() error {
-	return cache.Pool.Close()
-}
