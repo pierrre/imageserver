@@ -168,3 +168,9 @@ An image server toolkit in Go (Golang)
 
 ### Convert (JPEG to GIF)
 <a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&format=gif"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&format=gif" width="600" /></a>
+
+## Backward compatibility
+There is no backward compatibility promises.
+If you want to use it, vendor it.
+It's always OK to change things to make things better.
+The API is not 100% correct in the first commit.
