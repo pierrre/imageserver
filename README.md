@@ -62,11 +62,11 @@ An image server toolkit in Go (Golang)
     </thead>
     <tbody>
         <tr>
-            <th><a href="http://fuckingfrogs.fr:8080/animated.gif">Animated</a></th>
+            <th><a href="http://fuckingfrogs.fr:8080/animated.gif"><img src="http://fuckingfrogs.fr:8080/animated.gif" /></a></th>
             <th><a href="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill"><img src="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill" /></a></th>
         </tr>
         <tr>
-            <th><a href="http://fuckingfrogs.fr:8080/spaceship.gif">Spaceship</a></th>
+            <th><a href="http://fuckingfrogs.fr:8080/spaceship.gif"><img src="http://fuckingfrogs.fr:8080/spaceship.gif" /></a></th>
             <th><a href="http://fuckingfrogs.fr:8080/spaceship.gif?width=300"><img src="http://fuckingfrogs.fr:8080/spaceship.gif?width=300" /></a></th>
         </tr>
     </tbody>
