@@ -2,7 +2,6 @@ package http
 
 import (
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -78,14 +77,4 @@ func (hrw *headerResponseWriter) WriteHeader(code int) {
 	hrw.OnWriteHeaderFunc(code)
 	hrw.ResponseWriter.WriteHeader(code)
 	hrw.wroteHeader = true
-}
-
-func copyURL(u *url.URL) *url.URL {
-	uTmp := *u
-	uCopy := &uTmp
-	if u.User != nil {
-		usTmp := *u.User
-		uCopy.User = &usTmp
-	}
-	return uCopy
 }

@@ -3,8 +3,6 @@ package http
 import (
 	"net/http"
 	"net/http/httptest"
-	"net/url"
-	"reflect"
 	"testing"
 	"time"
 
@@ -120,20 +118,6 @@ func TestHeaderResponseWriter(t *testing.T) {
 		t.Fatal("not called")
 	}
 	rw.WriteHeader(200)
-}
-
-func TestCopyURL(t *testing.T) {
-	u, err := url.Parse("http://foo:bar@foo.bar/foobar?foo=bar#foobar")
-	if err != nil {
-		t.Fatal(err)
-	}
-	uCopy := copyURL(u)
-	if u == uCopy {
-		t.Fatal("same pointer")
-	}
-	if !reflect.DeepEqual(u, uCopy) {
-		t.Fatal("not equals")
-	}
 }
 
 type nopResponseWriter struct{}
