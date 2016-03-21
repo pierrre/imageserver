@@ -42,13 +42,14 @@ func NewAtFunc(p image.Image) AtFunc {
 func newAtFuncRGBA(p *image.RGBA) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		r = uint32(p.Pix[i+0])
+		s := p.Pix[i : i+4]
+		r = uint32(s[0])
 		r |= r << 8
-		g = uint32(p.Pix[i+1])
+		g = uint32(s[1])
 		g |= g << 8
-		b = uint32(p.Pix[i+2])
+		b = uint32(s[2])
 		b |= b << 8
-		a = uint32(p.Pix[i+3])
+		a = uint32(s[3])
 		a |= a << 8
 		return
 	}
@@ -57,10 +58,11 @@ func newAtFuncRGBA(p *image.RGBA) AtFunc {
 func newAtFuncRGBA64(p *image.RGBA64) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
-		r = uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
-		g = uint32(p.Pix[i+2])<<8 | uint32(p.Pix[i+3])
-		b = uint32(p.Pix[i+4])<<8 | uint32(p.Pix[i+5])
-		a = uint32(p.Pix[i+6])<<8 | uint32(p.Pix[i+7])
+		s := p.Pix[i : i+8]
+		r = uint32(s[0])<<8 | uint32(s[1])
+		g = uint32(s[2])<<8 | uint32(s[3])
+		b = uint32(s[4])<<8 | uint32(s[5])
+		a = uint32(s[6])<<8 | uint32(s[7])
 		return
 	}
 }
@@ -68,16 +70,17 @@ func newAtFuncRGBA64(p *image.RGBA64) AtFunc {
 func newAtFuncNRGBA(p *image.NRGBA) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		a = uint32(p.Pix[i+3])
+		s := p.Pix[i : i+4]
+		a = uint32(s[3])
 		a |= a << 8
 		if a == 0 {
 			return
 		}
-		r = uint32(p.Pix[i+0])
+		r = uint32(s[0])
 		r |= r << 8
-		g = uint32(p.Pix[i+1])
+		g = uint32(s[1])
 		g |= g << 8
-		b = uint32(p.Pix[i+2])
+		b = uint32(s[2])
 		b |= b << 8
 		if a == 0xffff {
 			return
@@ -92,13 +95,14 @@ func newAtFuncNRGBA(p *image.NRGBA) AtFunc {
 func newAtFuncNRGBA64(p *image.NRGBA64) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
-		a = uint32(p.Pix[i+6])<<8 | uint32(p.Pix[i+7])
+		s := p.Pix[i : i+8]
+		a = uint32(s[6])<<8 | uint32(s[7])
 		if a == 0 {
 			return
 		}
-		r = uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
-		g = uint32(p.Pix[i+2])<<8 | uint32(p.Pix[i+3])
-		b = uint32(p.Pix[i+4])<<8 | uint32(p.Pix[i+5])
+		r = uint32(s[0])<<8 | uint32(s[1])
+		g = uint32(s[2])<<8 | uint32(s[3])
+		b = uint32(s[4])<<8 | uint32(s[5])
 		if a == 0xffff {
 			return
 		}
@@ -121,7 +125,8 @@ func newAtFuncAlpha(p *image.Alpha) AtFunc {
 func newAtFuncAlpha16(p *image.Alpha16) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
-		a = uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
+		s := p.Pix[i : i+2]
+		a = uint32(s[0])<<8 | uint32(s[1])
 		return a, a, a, a
 	}
 }
@@ -138,7 +143,8 @@ func newAtFuncGray(p *image.Gray) AtFunc {
 func newAtFuncGray16(p *image.Gray16) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
-		yy := uint32(p.Pix[i+0])<<8 | uint32(p.Pix[i+1])
+		s := p.Pix[i : i+2]
+		yy := uint32(s[0])<<8 | uint32(s[1])
 		return yy, yy, yy, 0xffff
 	}
 }
@@ -252,10 +258,11 @@ func newAtFuncNYCbCrA(p *image.NYCbCrA) AtFunc {
 func newAtFuncCMYK(p *image.CMYK) AtFunc {
 	return func(x, y int) (r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		w := uint32(0xffff - uint32(p.Pix[i+3])*0x101)
-		r = uint32(0xffff-uint32(p.Pix[i+0])*0x101) * w / 0xffff
-		g = uint32(0xffff-uint32(p.Pix[i+1])*0x101) * w / 0xffff
-		b = uint32(0xffff-uint32(p.Pix[i+2])*0x101) * w / 0xffff
+		s := p.Pix[i : i+4]
+		w := uint32(0xffff - uint32(s[3])*0x101)
+		r = uint32(0xffff-uint32(s[0])*0x101) * w / 0xffff
+		g = uint32(0xffff-uint32(s[1])*0x101) * w / 0xffff
+		b = uint32(0xffff-uint32(s[2])*0x101) * w / 0xffff
 		a = 0xffff
 		return
 	}

@@ -40,25 +40,27 @@ func NewSetFunc(p draw.Image) SetFunc {
 func newSetFuncRGBA(p *image.RGBA) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		p.Pix[i+0] = uint8(r >> 8)
-		p.Pix[i+1] = uint8(g >> 8)
-		p.Pix[i+2] = uint8(b >> 8)
-		p.Pix[i+3] = uint8(a >> 8)
+		s := p.Pix[i : i+4]
+		s[0] = uint8(r >> 8)
+		s[1] = uint8(g >> 8)
+		s[2] = uint8(b >> 8)
+		s[3] = uint8(a >> 8)
 	}
 }
 
 func newSetFuncRGBA64(p *image.RGBA64) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
+		s := p.Pix[i : i+8]
 		r16, g16, b16, a16 := uint16(r), uint16(g), uint16(b), uint16(a)
-		p.Pix[i+0] = uint8(r16 >> 8)
-		p.Pix[i+1] = uint8(r16)
-		p.Pix[i+2] = uint8(g16 >> 8)
-		p.Pix[i+3] = uint8(g16)
-		p.Pix[i+4] = uint8(b16 >> 8)
-		p.Pix[i+5] = uint8(b16)
-		p.Pix[i+6] = uint8(a16 >> 8)
-		p.Pix[i+7] = uint8(a16)
+		s[0] = uint8(r16 >> 8)
+		s[1] = uint8(r16)
+		s[2] = uint8(g16 >> 8)
+		s[3] = uint8(g16)
+		s[4] = uint8(b16 >> 8)
+		s[5] = uint8(b16)
+		s[6] = uint8(a16 >> 8)
+		s[7] = uint8(a16)
 	}
 }
 
@@ -66,10 +68,11 @@ func newSetFuncNRGBA(p *image.NRGBA) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		r, g, b, a = RGBAToNRGBA(r, g, b, a)
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		p.Pix[i+0] = uint8(r >> 8)
-		p.Pix[i+1] = uint8(g >> 8)
-		p.Pix[i+2] = uint8(b >> 8)
-		p.Pix[i+3] = uint8(a >> 8)
+		s := p.Pix[i : i+4]
+		s[0] = uint8(r >> 8)
+		s[1] = uint8(g >> 8)
+		s[2] = uint8(b >> 8)
+		s[3] = uint8(a >> 8)
 	}
 }
 
@@ -77,14 +80,15 @@ func newSetFuncNRGBA64(p *image.NRGBA64) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		r, g, b, a = RGBAToNRGBA(r, g, b, a)
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*8
-		p.Pix[i+0] = uint8(r >> 8)
-		p.Pix[i+1] = uint8(r)
-		p.Pix[i+2] = uint8(g >> 8)
-		p.Pix[i+3] = uint8(g)
-		p.Pix[i+4] = uint8(b >> 8)
-		p.Pix[i+5] = uint8(b)
-		p.Pix[i+6] = uint8(a >> 8)
-		p.Pix[i+7] = uint8(a)
+		s := p.Pix[i : i+8]
+		s[0] = uint8(r >> 8)
+		s[1] = uint8(r)
+		s[2] = uint8(g >> 8)
+		s[3] = uint8(g)
+		s[4] = uint8(b >> 8)
+		s[5] = uint8(b)
+		s[6] = uint8(a >> 8)
+		s[7] = uint8(a)
 	}
 }
 
@@ -98,9 +102,10 @@ func newSetFuncAlpha(p *image.Alpha) SetFunc {
 func newSetFuncAlpha16(p *image.Alpha16) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
+		s := p.Pix[i : i+2]
 		a16 := uint16(a)
-		p.Pix[i+0] = uint8(a16 >> 8)
-		p.Pix[i+1] = uint8(a16)
+		s[0] = uint8(a16 >> 8)
+		s[1] = uint8(a16)
 	}
 }
 
@@ -114,9 +119,10 @@ func newSetFuncGray(p *image.Gray) SetFunc {
 func newSetFuncGray16(p *image.Gray16) SetFunc {
 	return func(x, y int, r, g, b, a uint32) {
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
+		s := p.Pix[i : i+2]
 		y16 := uint16((299*r + 587*g + 114*b + 500) / 1000)
-		p.Pix[i+0] = uint8(y16 >> 8)
-		p.Pix[i+1] = uint8(y16)
+		s[0] = uint8(y16 >> 8)
+		s[1] = uint8(y16)
 	}
 }
 
@@ -150,10 +156,11 @@ func newSetFuncCMYK(p *image.CMYK) SetFunc {
 			k8 = uint8(0xff - w)
 		}
 		i := (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*4
-		p.Pix[i+0] = c8
-		p.Pix[i+1] = m8
-		p.Pix[i+2] = y8
-		p.Pix[i+3] = k8
+		s := p.Pix[i : i+4]
+		s[0] = c8
+		s[1] = m8
+		s[2] = y8
+		s[3] = k8
 	}
 }
 
