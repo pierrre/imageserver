@@ -93,7 +93,9 @@ func BenchmarkNewAtFuncDefault(b *testing.B) {
 func benchmarkNewAtFunc(b *testing.B, p image.Image) {
 	at := NewAtFunc(p)
 	b.ResetTimer()
+	var resR, resG, resB, resA uint32
 	for i := 0; i < b.N; i++ {
-		at(0, 0)
+		resR, resG, resB, resA = at(0, 0)
 	}
+	benchResR, benchResG, benchResB, benchResA = resR, resG, resB, resA
 }
