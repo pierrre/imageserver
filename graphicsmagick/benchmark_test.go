@@ -24,8 +24,9 @@ func BenchmarkResizeHuge(b *testing.B) {
 }
 
 func benchmarkResize(b *testing.B, im *imageserver.Image) {
+	testCheckAvailable(b)
 	hdr := &Handler{
-		Executable: "gm",
+		Executable: testExecutable,
 	}
 	params := imageserver.Params{
 		globalParam: imageserver.Params{

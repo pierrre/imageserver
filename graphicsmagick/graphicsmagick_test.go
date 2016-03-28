@@ -1,6 +1,7 @@
 package graphicsmagick
 
 import (
+	"os/exec"
 	"testing"
 	"time"
 
@@ -8,11 +9,14 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+const testExecutable = "gm"
+
 var _ imageserver.Handler = &Handler{}
 
 func TestHandle(t *testing.T) {
+	testCheckAvailable(t)
 	hdr := &Handler{
-		Executable: "gm",
+		Executable: testExecutable,
 	}
 	params := imageserver.Params{
 		globalParam: imageserver.Params{
@@ -27,8 +31,9 @@ func TestHandle(t *testing.T) {
 }
 
 func TestHandleErrorTimeout(t *testing.T) {
+	testCheckAvailable(t)
 	hdr := &Handler{
-		Executable: "gm",
+		Executable: testExecutable,
 		Timeout:    1 * time.Nanosecond,
 	}
 	params := imageserver.Params{
@@ -43,5 +48,12 @@ func TestHandleErrorTimeout(t *testing.T) {
 	}
 	if _, ok := err.(*imageserver.ImageError); !ok {
 		t.Fatalf("unexpected error type: %T", err)
+	}
+}
+
+func testCheckAvailable(tb testing.TB) {
+	_, err := exec.LookPath(testExecutable)
+	if err != nil {
+		tb.Skipf("GraphicsMagick is not available: %s", err)
 	}
 }
