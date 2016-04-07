@@ -102,13 +102,11 @@ func newLoggerHTTPHandler(h http.Handler) http.Handler {
 		lrw := &logResponseWriter{ResponseWriter: rw}
 		start := time.Now()
 		h.ServeHTTP(lrw, req)
-		end := time.Now()
-		dur := end.Sub(start)
 		log.Printf(
 			"HTTP %s %s (%s %s) => %d %d %s",
 			req.Method, req.URL,
 			req.RemoteAddr, req.UserAgent(),
-			lrw.Code, lrw.Size, dur,
+			lrw.Code, lrw.Size, time.Since(start),
 		)
 	})
 }
