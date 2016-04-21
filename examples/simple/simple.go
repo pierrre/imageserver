@@ -20,14 +20,14 @@ func main() {
 	http.Handle("/", &imageserver_http.Handler{
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourceParser{},
-			&imageserver_http_gift.Parser{},
+			&imageserver_http_gift.ResizeParser{},
 			&imageserver_http_image.FormatParser{},
 			&imageserver_http_image.QualityParser{},
 		}),
 		Server: &imageserver.HandlerServer{
 			Server: imageserver_testdata.Server,
 			Handler: &imageserver_image.Handler{
-				Processor: &imageserver_image_gift.Processor{},
+				Processor: &imageserver_image_gift.ResizeProcessor{},
 			},
 		},
 	})

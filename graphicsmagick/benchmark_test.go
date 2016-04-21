@@ -29,7 +29,7 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 		Executable: testExecutable,
 	}
 	params := imageserver.Params{
-		globalParam: imageserver.Params{
+		param: imageserver.Params{
 			"width": 100,
 		},
 	}

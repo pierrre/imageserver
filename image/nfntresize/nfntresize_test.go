@@ -31,12 +31,12 @@ func TestProcessor(t *testing.T) {
 			expectedHeight: 819,
 		},
 		{
-			params:         imageserver.Params{Param: imageserver.Params{}},
+			params:         imageserver.Params{param: imageserver.Params{}},
 			expectedWidth:  1024,
 			expectedHeight: 819,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":  0,
 				"height": 0,
 			}},
@@ -45,19 +45,19 @@ func TestProcessor(t *testing.T) {
 		},
 		// with size
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": 100,
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"height": 100,
 			}},
 			expectedHeight: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":  100,
 				"height": 100,
 			}},
@@ -66,7 +66,7 @@ func TestProcessor(t *testing.T) {
 		},
 		// mode
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":  100,
 				"height": 100,
 				"mode":   "resize",
@@ -75,7 +75,7 @@ func TestProcessor(t *testing.T) {
 			expectedHeight: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":  100,
 				"height": 100,
 				"mode":   "thumbnail",
@@ -85,42 +85,42 @@ func TestProcessor(t *testing.T) {
 		},
 		// interpolation
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "nearest_neighbor",
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "bilinear",
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "bicubic",
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "mitchell_netravali",
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "lanczos2",
 			}},
 			expectedWidth: 100,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "lanczos3",
 			}},
@@ -128,74 +128,74 @@ func TestProcessor(t *testing.T) {
 		},
 		// error
 		{
-			params:             imageserver.Params{Param: "invalid"},
-			expectedParamError: Param,
+			params:             imageserver.Params{param: "invalid"},
+			expectedParamError: param,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": "invalid",
 			}},
-			expectedParamError: Param + ".width",
+			expectedParamError: param + ".width",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"height": "invalid",
 			}},
-			expectedParamError: Param + ".height",
+			expectedParamError: param + ".height",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": -1,
 			}},
-			expectedParamError: Param + ".width",
+			expectedParamError: param + ".width",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"height": -1,
 			}},
-			expectedParamError: Param + ".height",
+			expectedParamError: param + ".height",
 		},
 		{
 			processor: &Processor{MaxWidth: 500},
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": 1000,
 			}},
-			expectedParamError: Param + ".width",
+			expectedParamError: param + ".width",
 		},
 		{
 			processor: &Processor{MaxHeight: 500},
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"height": 1000,
 			}},
-			expectedParamError: Param + ".height",
+			expectedParamError: param + ".height",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": false,
 			}},
-			expectedParamError: Param + ".interpolation",
+			expectedParamError: param + ".interpolation",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width":         100,
 				"interpolation": "invalid",
 			}},
-			expectedParamError: Param + ".interpolation",
+			expectedParamError: param + ".interpolation",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": 100,
 				"mode":  false,
 			}},
-			expectedParamError: Param + ".mode",
+			expectedParamError: param + ".mode",
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": 100,
 				"mode":  "invalid",
 			}},
-			expectedParamError: Param + ".mode",
+			expectedParamError: param + ".mode",
 		},
 	} {
 		func() {
@@ -240,27 +240,27 @@ func TestProcessorChange(t *testing.T) {
 			expected: false,
 		},
 		{
-			params:   imageserver.Params{Param: imageserver.Params{}},
+			params:   imageserver.Params{param: imageserver.Params{}},
 			expected: false,
 		},
 		{
-			params:   imageserver.Params{Param: 666},
+			params:   imageserver.Params{param: 666},
 			expected: true,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"width": 100,
 			}},
 			expected: true,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"height": 100,
 			}},
 			expected: true,
 		},
 		{
-			params: imageserver.Params{Param: imageserver.Params{
+			params: imageserver.Params{param: imageserver.Params{
 				"foo": "bar",
 			}},
 			expected: false,

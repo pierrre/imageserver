@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	// Param is the sub-param used by this package.
-	Param = "nfntresize"
+	param = "nfntresize"
 )
 
 // Processor is a nfnt/resize imageserver/image.Processor implementation.
@@ -39,10 +38,10 @@ type Processor struct {
 
 // Process implements imageserver/image.Processor.
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	if !params.Has(Param) {
+	if !params.Has(param) {
 		return nim, nil
 	}
-	params, err := params.GetParams(Param)
+	params, err := params.GetParams(param)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +51,7 @@ func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image
 	nim, err = prc.process(nim, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = fmt.Sprintf("%s.%s", Param, err.Param)
+			err.Param = fmt.Sprintf("%s.%s", param, err.Param)
 		}
 		return nil, err
 	}
@@ -156,10 +155,10 @@ func getModeFunc(params imageserver.Params) (modeFunc, error) {
 
 // Change implements imageserver/image.Processor.
 func (prc *Processor) Change(params imageserver.Params) bool {
-	if !params.Has(Param) {
+	if !params.Has(param) {
 		return false
 	}
-	params, err := params.GetParams(Param)
+	params, err := params.GetParams(param)
 	if err != nil {
 		return true
 	}

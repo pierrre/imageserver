@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	globalParam   = "graphicsmagick"
+	param         = "graphicsmagick"
 	tempDirPrefix = "imageserver_"
 )
 
@@ -51,10 +51,10 @@ type Handler struct {
 
 // Handle implements imageserver.Handler.
 func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
-	if !params.Has(globalParam) {
+	if !params.Has(param) {
 		return im, nil
 	}
-	params, err := params.GetParams(globalParam)
+	params, err := params.GetParams(param)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	im, err = hdr.handle(im, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
-			err.Param = globalParam + "." + err.Param
+			err.Param = param + "." + err.Param
 		}
 		return nil, err
 	}

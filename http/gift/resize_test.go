@@ -9,9 +9,9 @@ import (
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
 
-var _ imageserver_http.Parser = &Parser{}
+var _ imageserver_http.Parser = &ResizeParser{}
 
-func TestParse(t *testing.T) {
+func TestResizeParserParse(t *testing.T) {
 	type TC struct {
 		query              url.Values
 		expectedParams     imageserver.Params
@@ -21,35 +21,35 @@ func TestParse(t *testing.T) {
 		{},
 		{
 			query: url.Values{"width": {"100"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 100,
 			}},
 		},
 		{
 			query: url.Values{"height": {"100"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{resizeParam: imageserver.Params{
 				"height": 100,
 			}},
 		},
 		{
 			query: url.Values{"resampling": {"lanczos"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{resizeParam: imageserver.Params{
 				"resampling": "lanczos",
 			}},
 		},
 		{
 			query: url.Values{"mode": {"fit"}},
-			expectedParams: imageserver.Params{globalParam: imageserver.Params{
+			expectedParams: imageserver.Params{resizeParam: imageserver.Params{
 				"mode": "fit",
 			}},
 		},
 		{
 			query:              url.Values{"width": {"invalid"}},
-			expectedParamError: globalParam + ".width",
+			expectedParamError: resizeParam + ".width",
 		},
 		{
 			query:              url.Values{"height": {"invalid"}},
-			expectedParamError: globalParam + ".height",
+			expectedParamError: resizeParam + ".height",
 		},
 	} {
 		func() {
@@ -67,9 +67,9 @@ func TestParse(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			p := &Parser{}
+			prc := &ResizeParser{}
 			params := imageserver.Params{}
-			err = p.Parse(req, params)
+			err = prc.Parse(req, params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && tc.expectedParamError == err.Param {
 					return
@@ -83,17 +83,17 @@ func TestParse(t *testing.T) {
 	}
 }
 
-func TestResolve(t *testing.T) {
-	p := &Parser{}
-	httpParam := p.Resolve(globalParam + ".width")
+func TestResizeParserResolve(t *testing.T) {
+	prc := &ResizeParser{}
+	httpParam := prc.Resolve(resizeParam + ".width")
 	if httpParam != "width" {
 		t.Fatal("not equal")
 	}
 }
 
-func TestResolveNoMatch(t *testing.T) {
-	p := &Parser{}
-	httpParam := p.Resolve("foo")
+func TestResizeParserResolveNoMatch(t *testing.T) {
+	prc := &ResizeParser{}
+	httpParam := prc.Resolve("foo")
 	if httpParam != "" {
 		t.Fatal("not equal")
 	}

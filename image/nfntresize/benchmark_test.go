@@ -66,7 +66,7 @@ func benchmark(b *testing.B, im *imageserver.Image, params imageserver.Params) {
 	}
 	params.Set("width", 100)
 	params = imageserver.Params{
-		Param: params,
+		param: params,
 	}
 	proc := &Processor{}
 	b.ResetTimer()

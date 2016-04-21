@@ -19,7 +19,7 @@ func TestHandle(t *testing.T) {
 		Executable: testExecutable,
 	}
 	params := imageserver.Params{
-		globalParam: imageserver.Params{
+		param: imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},
@@ -37,7 +37,7 @@ func TestHandleErrorTimeout(t *testing.T) {
 		Timeout:    1 * time.Nanosecond,
 	}
 	params := imageserver.Params{
-		globalParam: imageserver.Params{
+		param: imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},

@@ -161,7 +161,8 @@ func newImageHTTPHandler() http.Handler {
 	handler = &imageserver_http.Handler{
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourcePathParser{},
-			&imageserver_http_gift.Parser{},
+			&imageserver_http_gift.RotateParser{},
+			&imageserver_http_gift.ResizeParser{},
 			&imageserver_http_image.FormatParser{},
 			&imageserver_http_image.QualityParser{},
 			&imageserver_http_gamma.CorrectionParser{},
@@ -195,10 +196,15 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 	var hdr imageserver.Handler
 	hdr = &imageserver_image.Handler{
 		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			&imageserver_image_gift.Processor{
-				DefaultResampling: gift.LanczosResampling,
-				MaxWidth:          2048,
-				MaxHeight:         2048,
+			imageserver_image.ListProcessor{
+				&imageserver_image_gift.RotateProcessor{
+					DefaultInterpolation: gift.CubicInterpolation,
+				},
+				&imageserver_image_gift.ResizeProcessor{
+					DefaultResampling: gift.LanczosResampling,
+					MaxWidth:          2048,
+					MaxHeight:         2048,
+				},
 			},
 			true,
 		),
@@ -206,10 +212,15 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 	hdr = &imageserver_image_gif.FallbackHandler{
 		Handler: &imageserver_image_gif.Handler{
 			Processor: &imageserver_image_gif.SimpleProcessor{
-				Processor: &imageserver_image_gift.Processor{
-					DefaultResampling: gift.NearestNeighborResampling,
-					MaxWidth:          1024,
-					MaxHeight:         1024,
+				Processor: imageserver_image.ListProcessor{
+					&imageserver_image_gift.RotateProcessor{
+						DefaultInterpolation: gift.NearestNeighborInterpolation,
+					},
+					&imageserver_image_gift.ResizeProcessor{
+						DefaultResampling: gift.NearestNeighborResampling,
+						MaxWidth:          1024,
+						MaxHeight:         1024,
+					},
 				},
 			},
 		},
