@@ -8,7 +8,9 @@ An image server toolkit in Go (Golang)
 
 ## Features
 - HTTP server
-- Resize / convert ([GIFT](https://github.com/disintegration/gift), [nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
+- Resize ([GIFT](https://github.com/disintegration/gift), [nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
+- Rotate
+- Convert (JPEG, GIF (animated), PNG , BMP, TIFF, ...)
 - Cache ([groupcache](https://github.com/golang/groupcache), [Redis](https://github.com/garyburd/redigo), [Memcache](https://github.com/bradfitz/gomemcache), in memory)
 - Gamma correction
 - Fully modular
