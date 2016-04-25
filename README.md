@@ -52,6 +52,26 @@ An image server toolkit in Go (Golang)
     </tbody>
 </table>
 
+### Rotate
+<table>
+    <thead>
+        <tr>
+            <th>Options</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>rotation=90</code><br />(counterclockwise)</td>
+            <td><a href="http://fuckingfrogs.fr:8080/large.jpg?rotation=90&width=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?rotation=90&width=200" /></a></td>
+        </tr>
+        <tr>
+            <td><code>rotation=45&background=ffaa88</code><br />(background)</td>
+            <td><a href="http://fuckingfrogs.fr:8080/large.jpg?rotation=45&background=ffaa88&width=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?rotation=45&background=ffaa88&width=200" /></a></td>
+        </tr>
+    </tbody>
+</table>
+
 ### Animated GIF
 <table>
     <thead>
