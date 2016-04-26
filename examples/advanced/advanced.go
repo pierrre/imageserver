@@ -198,7 +198,7 @@ func newServer() imageserver.Server {
 func newServerImage(srv imageserver.Server) imageserver.Server {
 	basicHdr := &imageserver_image.Handler{
 		Processor: imageserver_image_gamma.NewCorrectionProcessor(
-			imageserver_image.ListProcessor{
+			imageserver_image.ListProcessor([]imageserver_image.Processor{
 				&imageserver_image_crop.Processor{},
 				&imageserver_image_gift.RotateProcessor{
 					DefaultInterpolation: gift.CubicInterpolation,
@@ -208,14 +208,14 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 					MaxWidth:          2048,
 					MaxHeight:         2048,
 				},
-			},
+			}),
 			true,
 		),
 	}
 	gifHdr := &imageserver_image_gif.FallbackHandler{
 		Handler: &imageserver_image_gif.Handler{
 			Processor: &imageserver_image_gif.SimpleProcessor{
-				Processor: imageserver_image.ListProcessor{
+				Processor: imageserver_image.ListProcessor([]imageserver_image.Processor{
 					&imageserver_image_crop.Processor{},
 					&imageserver_image_gift.RotateProcessor{
 						DefaultInterpolation: gift.NearestNeighborInterpolation,
@@ -225,7 +225,7 @@ func newServerImage(srv imageserver.Server) imageserver.Server {
 						MaxWidth:          1024,
 						MaxHeight:         1024,
 					},
-				},
+				}),
 			},
 		},
 		Fallback: basicHdr,
