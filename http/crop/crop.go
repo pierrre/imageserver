@@ -1,3 +1,4 @@
+// Package crop provides a imageserver/http.Parser implementation for imageserver/image/crop.Processor.
 package crop
 
 import (

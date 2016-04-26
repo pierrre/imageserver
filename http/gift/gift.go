@@ -1,2 +1,2 @@
-// Package gift provides a imageserver/http.Parser implementation for imageserver/image/gift.Processor.
+// Package gift provides imageserver/http.Parser implementations for imageserver/image/gift.
 package gift

@@ -1,3 +1,4 @@
+// Package crop provides a imageserver/image.Processor implementation that allows to crop Image.
 package crop
 
 import (

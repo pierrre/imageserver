@@ -1,2 +1,2 @@
-// Package gift provides a GIFT imageserver/image.Processor implementation.
+// Package gift provides imageserver/image.Processor implementations for GIFT.
 package gift
