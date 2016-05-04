@@ -34,23 +34,23 @@ An image server toolkit in Go (Golang)
 	<tbody>
 		<tr>
 			<td><code>width=200</code><br />(preserve aspect ratio)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>height=200</code><br />(preserve aspect ratio)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?height=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?height=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?height=200"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?height=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>width=200&height=200</code><br />(change aspect ratio)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>width=200&height=200&mode=fit</code><br />(fit in 200x200)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200&mode=fit"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200&mode=fit" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200&mode=fit"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200&mode=fit" /></a></td>
 		</tr>
 		<tr>
 			<td><code>width=200&height=200&mode=fill</code><br />(fill 200x200 and crop)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200&mode=fill"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&height=200&mode=fill" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200&mode=fill"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&height=200&mode=fill" /></a></td>
 		</tr>
 	</tbody>
 </table>
@@ -66,11 +66,11 @@ An image server toolkit in Go (Golang)
 	<tbody>
 		<tr>
 			<td><code>rotation=90</code><br />(counterclockwise)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?rotation=90&width=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?rotation=90&width=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?rotation=90&width=200"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?rotation=90&width=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>rotation=45&background=ffaa88</code><br />(background)</td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?rotation=45&background=ffaa88&width=200"><img src="http://fuckingfrogs.fr:8080/large.jpg?rotation=45&background=ffaa88&width=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?rotation=45&background=ffaa88&width=200"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?rotation=45&background=ffaa88&width=200" /></a></td>
 		</tr>
 	</tbody>
 </table>
@@ -88,15 +88,15 @@ Format: `min_x,min_y|max_x,max_y`
 	<tbody>
 		<tr>
 			<td><code>crop=556,111|2156,1711</code></td>
-			<td><a href="http://fuckingfrogs.fr:8080/huge.jpg?crop=556,111|2156,1711&width=200"><img src="http://fuckingfrogs.fr:8080/huge.jpg?crop=556,111|2156,1711&width=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=556,111|2156,1711&width=200"><img src="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=556,111|2156,1711&width=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>crop=956,511|1756,1311</code></td>
-			<td><a href="http://fuckingfrogs.fr:8080/huge.jpg?crop=956,511|1756,1311&width=200"><img src="http://fuckingfrogs.fr:8080/huge.jpg?crop=956,511|1756,1311&width=200" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=956,511|1756,1311&width=200"><img src="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=956,511|1756,1311&width=200" /></a></td>
 		</tr>
 		<tr>
 			<td><code>crop=1252,799|1460,1022</code></td>
-			<td><a href="http://fuckingfrogs.fr:8080/huge.jpg?crop=1252,799|1460,1022"><img src="http://fuckingfrogs.fr:8080/huge.jpg?crop=1252,799|1460,1022" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=1252,799|1460,1022"><img src="https://imageserver.fuckingfrogs.fr/huge.jpg?crop=1252,799|1460,1022" /></a></td>
 		</tr>
 	</tbody>
 </table>
@@ -112,12 +112,12 @@ Format: `min_x,min_y|max_x,max_y`
 	</thead>
 	<tbody>
 		<tr>
-			<th><a href="http://fuckingfrogs.fr:8080/animated.gif">Animated</a></th>
-			<th><a href="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill"><img src="http://fuckingfrogs.fr:8080/animated.gif?width=300&height=300&mode=fill" /></a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/animated.gif">Animated</a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/animated.gif?width=300&height=300&mode=fill"><img src="https://imageserver.fuckingfrogs.fr/animated.gif?width=300&height=300&mode=fill" /></a></th>
 		</tr>
 		<tr>
-			<th><a href="http://fuckingfrogs.fr:8080/spaceship.gif">Spaceship</a></th>
-			<th><a href="http://fuckingfrogs.fr:8080/spaceship.gif?width=300"><img src="http://fuckingfrogs.fr:8080/spaceship.gif?width=300" /></a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/spaceship.gif">Spaceship</a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/spaceship.gif?width=300"><img src="https://imageserver.fuckingfrogs.fr/spaceship.gif?width=300" /></a></th>
 		</tr>
 	</tbody>
 </table>
@@ -133,24 +133,24 @@ Format: `min_x,min_y|max_x,max_y`
 	</thead>
 	<tbody>
 		<tr>
-			<td><a href="http://fuckingfrogs.fr:8080/dalai_gamma.jpg">Dalai Gamma</a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/dalai_gamma.jpg?width=200&gamma_correction=false"><img src="http://fuckingfrogs.fr:8080/dalai_gamma.jpg?width=200&gamma_correction=false" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/dalai_gamma.jpg?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/dalai_gamma.jpg?width=200&gamma_correction=true" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/dalai_gamma.jpg">Dalai Gamma</a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/dalai_gamma.jpg?width=200&gamma_correction=false"><img src="https://imageserver.fuckingfrogs.fr/dalai_gamma.jpg?width=200&gamma_correction=false" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/dalai_gamma.jpg?width=200&gamma_correction=true"><img src="https://imageserver.fuckingfrogs.fr/dalai_gamma.jpg?width=200&gamma_correction=true" /></a></td>
 		</tr>
 		<tr>
-			<td><a href="http://fuckingfrogs.fr:8080/gray_squares.jpg">Gray squares</a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/gray_squares.jpg?width=200&gamma_correction=false"><img src="http://fuckingfrogs.fr:8080/gray_squares.jpg?width=200&gamma_correction=false" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/gray_squares.jpg?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/gray_squares.jpg?width=200&gamma_correction=true" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/gray_squares.jpg">Gray squares</a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/gray_squares.jpg?width=200&gamma_correction=false"><img src="https://imageserver.fuckingfrogs.fr/gray_squares.jpg?width=200&gamma_correction=false" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/gray_squares.jpg?width=200&gamma_correction=true"><img src="https://imageserver.fuckingfrogs.fr/gray_squares.jpg?width=200&gamma_correction=true" /></a></td>
 		</tr>
 		<tr>
-			<td><a href="http://fuckingfrogs.fr:8080/random.png">Random</a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=false"><img src="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=false" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/random.png?width=200&gamma_correction=true" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/random.png">Random</a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/random.png?width=200&gamma_correction=false"><img src="https://imageserver.fuckingfrogs.fr/random.png?width=200&gamma_correction=false" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/random.png?width=200&gamma_correction=true"><img src="https://imageserver.fuckingfrogs.fr/random.png?width=200&gamma_correction=true" /></a></td>
 		</tr>
 		<tr>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png">Rings</a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=false"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=false" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=true"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&gamma_correction=true" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png">Rings</a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&gamma_correction=false"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&gamma_correction=false" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&gamma_correction=true"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&gamma_correction=true" /></a></td>
 		</tr>
 	</tbody>
 </table>
@@ -160,35 +160,35 @@ Format: `min_x,min_y|max_x,max_y`
 	<thead>
 		<tr>
 			<th>Resampling</th>
-			<th><a href="http://fuckingfrogs.fr:8080/rings.png">Rings</a></th>
-			<th><a href="http://fuckingfrogs.fr:8080/large.jpg">Large</a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/rings.png">Rings</a></th>
+			<th><a href="https://imageserver.fuckingfrogs.fr/large.jpg">Large</a></th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td>Nearest neighbor</td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=nearest_neighbor&format=png"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=nearest_neighbor&format=png" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=nearest_neighbor&format=png"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=nearest_neighbor&format=png" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=nearest_neighbor&format=png"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=nearest_neighbor&format=png" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=nearest_neighbor&format=png"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=nearest_neighbor&format=png" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>Box</td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=box&format=png"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=box&format=png" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=box&format=png"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=box&format=png" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=box&format=png"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=box&format=png" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=box&format=png"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=box&format=png" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>Linear</td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=linear&format=png"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=linear&format=png" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=linear&format=png"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=linear&format=png" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=linear&format=png"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=linear&format=png" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=linear&format=png"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=linear&format=png" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>Cubic</td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=cubic&format=png"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=cubic&format=png" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=cubic&format=png"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=cubic&format=png" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=cubic&format=png"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=cubic&format=png" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=cubic&format=png"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=cubic&format=png" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>Lanczos</td>
-			<td><a href="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=lanczos&format=png"><img src="http://fuckingfrogs.fr:8080/rings.png?width=200&resampling=lanczos&format=png" /></a></td>
-			<td><a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=lanczos&format=png"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&resampling=lanczos&format=png" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=lanczos&format=png"><img src="https://imageserver.fuckingfrogs.fr/rings.png?width=200&resampling=lanczos&format=png" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=lanczos&format=png"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&resampling=lanczos&format=png" width="400" /></a></td>
 		</tr>
 	</tbody>
 </table>
@@ -204,21 +204,21 @@ Format: `min_x,min_y|max_x,max_y`
 	<tbody>
 		<tr>
 			<td>5%</td>
-			<td><a href="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=5"><img src="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=5" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=5"><img src="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=5" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>10%</td>
-			<td><a href="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=10"><img src="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=10" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=10"><img src="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=10" width="400" /></a></td>
 		</tr>
 		<tr>
 			<td>50%</td>
-			<td><a href="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=50"><img src="http://fuckingfrogs.fr:8080/medium.jpg?width=200&quality=50" width="400" /></a></td>
+			<td><a href="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=50"><img src="https://imageserver.fuckingfrogs.fr/medium.jpg?width=200&quality=50" width="400" /></a></td>
 		</tr>
 	</tbody>
 </table>
 
 ### Convert (JPEG to GIF)
-<a href="http://fuckingfrogs.fr:8080/large.jpg?width=200&format=gif"><img src="http://fuckingfrogs.fr:8080/large.jpg?width=200&format=gif" width="600" /></a>
+<a href="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&format=gif"><img src="https://imageserver.fuckingfrogs.fr/large.jpg?width=200&format=gif" width="600" /></a>
 
 ## Backward compatibility
 There is no backward compatibility promises.
