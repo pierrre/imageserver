@@ -6,14 +6,15 @@ import (
 
 // Server is a imageserver.Server implementation that gets the Image from a Provider.
 //
-// It uses the "format" param to determine which Encoder is used.
+// It uses the "format" param or the DefaultFormat variable to determine which Encoder is used.
 type Server struct {
-	Provider Provider
+	Provider      Provider
+	DefaultFormat string
 }
 
 // Get implements Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	enc, format, err := getEncoderFormat("", params)
+	enc, format, err := getEncoderFormat(srv.DefaultFormat, params)
 	if err != nil {
 		return nil, err
 	}

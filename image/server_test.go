@@ -29,6 +29,26 @@ func TestServer(t *testing.T) {
 	}
 }
 
+func TestServerDefaultFormat(t *testing.T) {
+	srv := &Server{
+		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
+			return image.NewRGBA(image.Rect(0, 0, 1, 1)), nil
+		}),
+		DefaultFormat: "jpeg",
+	}
+	im, err := srv.Get(imageserver.Params{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if im.Format != "jpeg" {
+		t.Fatalf("unexpected format: got %s, want %s", im.Format, "jpeg")
+	}
+	_, err = Decode(im)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestServerErrorFormatNotSet(t *testing.T) {
 	srv := &Server{}
 	_, err := srv.Get(imageserver.Params{})
