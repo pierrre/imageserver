@@ -144,7 +144,7 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 		Delivery: func(event string, deliveryID string, payload interface{}) {
 			log.Printf("Received GitHub webhook: %s", event)
 			if event == "push" {
-				delay := time.Duration(5 * time.Second)
+				delay := 5 * time.Second
 				log.Printf("Killing process in %s", delay)
 				time.AfterFunc(delay, func() {
 					log.Println("Killing process now")
@@ -178,7 +178,7 @@ func newImageHTTPHandler() http.Handler {
 	}
 	handler = &imageserver_http.ExpiresHandler{
 		Handler: handler,
-		Expires: time.Duration(7 * 24 * time.Hour),
+		Expires: 7 * 24 * time.Hour,
 	}
 	handler = &imageserver_http.CacheControlPublicHandler{
 		Handler: handler,
