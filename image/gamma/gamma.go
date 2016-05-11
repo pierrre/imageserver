@@ -9,6 +9,7 @@ import (
 	"github.com/pierrre/imageserver"
 	imageserver_image "github.com/pierrre/imageserver/image"
 	imageserver_image_internal "github.com/pierrre/imageserver/image/internal"
+	"github.com/pierrre/imageutil"
 )
 
 // Processor is a imageserver/image.Processor implementation that applies gamma transformation.
@@ -42,17 +43,17 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
 	out := prc.newDrawable(nim)
 	bd := nim.Bounds().Intersect(out.Bounds())
-	at := imageserver_image_internal.NewAtFunc(nim)
-	set := imageserver_image_internal.NewSetFunc(out)
-	imageserver_image_internal.Parallel(bd, func(bd image.Rectangle) {
+	at := imageutil.NewAtFunc(nim)
+	set := imageutil.NewSetFunc(out)
+	imageutil.Parallel1D(bd, func(bd image.Rectangle) {
 		for y := bd.Min.Y; y < bd.Max.Y; y++ {
 			for x := bd.Min.X; x < bd.Max.X; x++ {
 				r, g, b, a := at(x, y)
-				r, g, b, a = imageserver_image_internal.RGBAToNRGBA(r, g, b, a)
+				r, g, b, a = imageutil.RGBAToNRGBA(r, g, b, a)
 				r = uint32(prc.vals[uint16(r)])
 				g = uint32(prc.vals[uint16(g)])
 				b = uint32(prc.vals[uint16(b)])
-				r, g, b, a = imageserver_image_internal.NRGBAToRGBA(r, g, b, a)
+				r, g, b, a = imageutil.NRGBAToRGBA(r, g, b, a)
 				set(x, y, r, g, b, a)
 			}
 		}
