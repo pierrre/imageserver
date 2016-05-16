@@ -32,7 +32,7 @@ import (
 )
 
 var (
-	flagHTTPAddr            = ":8080"
+	flagHTTP                = ":8080"
 	flagGitHubWebhookSecret string
 	flagCache               = int64(128 * (1 << 20))
 )
@@ -43,14 +43,14 @@ func main() {
 }
 
 func parseFlags() {
-	flag.StringVar(&flagHTTPAddr, "http", flagHTTPAddr, "HTTP addr")
+	flag.StringVar(&flagHTTP, "http", flagHTTP, "HTTP")
 	flag.StringVar(&flagGitHubWebhookSecret, "github-webhook-secret", flagGitHubWebhookSecret, "GitHub webhook secret")
 	flag.Int64Var(&flagCache, "cache", flagCache, "Cache")
 	flag.Parse()
 }
 
 func startHTTPServer() {
-	err := http.ListenAndServe(flagHTTPAddr, newHTTPHandler())
+	err := http.ListenAndServe(flagHTTP, newHTTPHandler())
 	if err != nil {
 		panic(err)
 	}

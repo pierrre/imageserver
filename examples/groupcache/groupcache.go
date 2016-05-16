@@ -40,7 +40,7 @@ const (
 )
 
 var (
-	flagHTTPAddr        = ":8080"
+	flagHTTP            = ":8080"
 	flagGroupcache      = int64(128 * (1 << 20))
 	flagGroupcachePeers string
 )
@@ -51,7 +51,7 @@ func main() {
 }
 
 func parseFlags() {
-	flag.StringVar(&flagHTTPAddr, "http", flagHTTPAddr, "HTTP addr")
+	flag.StringVar(&flagHTTP, "http", flagHTTP, "HTTP")
 	flag.Int64Var(&flagGroupcache, "groupcache", flagGroupcache, "Groupcache")
 	flag.StringVar(&flagGroupcachePeers, "groupcache-peers", flagGroupcachePeers, "Groupcache peers")
 	flag.Parse()
@@ -62,7 +62,7 @@ func startHTTPServer() {
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	initGroupcacheHTTPPool() // it automatically registers itself to "/_groupcache"
 	http.HandleFunc("/stats", groupcacheStatsHTTPHandler)
-	err := http.ListenAndServe(flagHTTPAddr, nil)
+	err := http.ListenAndServe(flagHTTP, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +111,7 @@ func newServerGroupcache(srv imageserver.Server) imageserver.Server {
 }
 
 func initGroupcacheHTTPPool() {
-	self := (&url.URL{Scheme: "http", Host: flagHTTPAddr}).String()
+	self := (&url.URL{Scheme: "http", Host: flagHTTP}).String()
 	var peers []string
 	peers = append(peers, self)
 	for _, p := range strings.Split(flagGroupcachePeers, ",") {

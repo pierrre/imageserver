@@ -19,6 +19,7 @@ An image server toolkit in Go (Golang)
 ## Examples
 - [Simple](https://github.com/pierrre/imageserver/blob/master/examples/simple/simple.go)
 - [Advanced](https://github.com/pierrre/imageserver/blob/master/examples/advanced/advanced.go)
+- [Cache](https://github.com/pierrre/imageserver/blob/master/examples/cache/cache.go)
 - [Groupcache](https://github.com/pierrre/imageserver/blob/master/examples/groupcache/groupcache.go)
 - [Mandelbrot](https://github.com/pierrre/mandelbrot/blob/master/examples/httpserver/httpserver.go) ([see interactive demo](https://mandelbrot.pierredurand.fr)) <img src="https://mandelbrot.pierredurand.fr/i?x=0&y=0&z=0" width="32" height="32" />
 
