@@ -16,13 +16,12 @@ addons:
       - graphicsmagick
 
 before_install:
-  - go get -v github.com/pierrre/gotestcover
   - go get -v github.com/golang/lint/golint
 
-install: go get -v -t ./...
+install: go get -v -d -t ./...
 
 script:
-  - gotestcover -v -coverprofile=coverage.txt -covermode=atomic ./...
+  - "echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp"
   - gofmt -d .
   - go tool vet .
   - golint ./...
