@@ -4,7 +4,7 @@ sudo: false
 
 go:
   - 1.6.2
-  #- tip See https://github.com/golang/lint/issues/207
+  - tip
 
 services:
   - memcached
