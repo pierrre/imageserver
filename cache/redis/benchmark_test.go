@@ -67,5 +67,5 @@ func benchmarkGetParallelism(b *testing.B, parallelism int) {
 func benchmarkGet(b *testing.B, image *imageserver.Image, parallelism int) {
 	cache := newTestCache(b)
 	defer cache.Pool.Close()
-	cachetest.BenchmarkGet(b, cache, 16, image)
+	cachetest.BenchmarkGet(b, cache, parallelism, image)
 }
