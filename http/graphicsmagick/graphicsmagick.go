@@ -56,14 +56,14 @@ func (parser *Parser) parse(req *http.Request, params imageserver.Params) error 
 	if err := imageserver_http.ParseQueryBool("only_enlarge_smaller", req, params); err != nil {
 		return err
 	}
-	imageserver_http.ParseQueryString("background", req, params)
 	if err := imageserver_http.ParseQueryBool("extent", req, params); err != nil {
 		return err
 	}
-	imageserver_http.ParseQueryString("format", req, params)
 	if err := imageserver_http.ParseQueryInt("quality", req, params); err != nil {
 		return err
 	}
+	imageserver_http.ParseQueryString("background", req, params)
+	imageserver_http.ParseQueryString("format", req, params)
 	return nil
 }
 

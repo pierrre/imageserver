@@ -57,14 +57,14 @@ func testEncoderParams(t *testing.T, enc *Encoder, params imageserver.Params) {
 
 func TestEncoderChange(t *testing.T) {
 	c := (&Encoder{}).Change(imageserver.Params{})
-	if c != false {
+	if c {
 		t.Fatal("not false")
 	}
 }
 
 func TestEncoderChangeQuality(t *testing.T) {
 	c := (&Encoder{}).Change(imageserver.Params{"quality": 75})
-	if c != true {
+	if !c {
 		t.Fatal("not true")
 	}
 }

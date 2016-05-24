@@ -30,7 +30,7 @@ func TestProcessorProcess(t *testing.T) {
 func TestProcessorChange(t *testing.T) {
 	prc := NewProcessor(2.2, true)
 	c := prc.Change(imageserver.Params{})
-	if c != true {
+	if !c {
 		t.Fatal("not true")
 	}
 }

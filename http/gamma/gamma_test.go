@@ -25,7 +25,7 @@ func TestCorrectionParserParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res != true {
+	if !res {
 		t.Fatalf("unexpected result: got %t, want %t", res, true)
 	}
 }

@@ -58,10 +58,7 @@ func (enc *Encoder) getQuality(params imageserver.Params) (int, error) {
 
 // Change implements imageserver/image.Encoder.
 func (enc *Encoder) Change(params imageserver.Params) bool {
-	if params.Has("quality") {
-		return true
-	}
-	return false
+	return params.Has("quality")
 }
 
 func init() {

@@ -106,7 +106,7 @@ func TestParamsGetBool(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if value != true {
+	if !value {
 		t.Fatal("Not equals")
 	}
 }

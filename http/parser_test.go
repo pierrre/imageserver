@@ -379,7 +379,7 @@ func TestParseQueryBool(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if b != true {
+	if !b {
 		t.Fatal("not equals")
 	}
 }

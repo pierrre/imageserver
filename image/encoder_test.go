@@ -28,7 +28,7 @@ func TestEncoderFunc(t *testing.T) {
 	if !called {
 		t.Fatal("not called")
 	}
-	if f.Change(imageserver.Params{}) != true {
+	if !f.Change(imageserver.Params{}) {
 		t.Fatal("not true")
 	}
 }

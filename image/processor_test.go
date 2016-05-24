@@ -21,7 +21,7 @@ func TestProcessorFunc(t *testing.T) {
 	if !called {
 		t.Fatal("not called")
 	}
-	if f.Change(imageserver.Params{}) != true {
+	if !f.Change(imageserver.Params{}) {
 		t.Fatal("not true")
 	}
 }
@@ -69,22 +69,22 @@ func TestListProcessorChange(t *testing.T) {
 	params := imageserver.Params{}
 	prc := ListProcessor{}
 
-	if prc.Change(params) != false {
+	if prc.Change(params) {
 		t.Fatal("not false")
 	}
 
 	prc = append(prc, testChangeProcessor(false))
-	if prc.Change(params) != false {
+	if prc.Change(params) {
 		t.Fatal("not false")
 	}
 
 	prc = append(prc, testChangeProcessor(true))
-	if prc.Change(params) != true {
+	if !prc.Change(params) {
 		t.Fatal("not true")
 	}
 
 	prc = append(prc, testChangeProcessor(false))
-	if prc.Change(params) != true {
+	if !prc.Change(params) {
 		t.Fatal("not true")
 	}
 }
@@ -104,7 +104,7 @@ var _ Processor = &ChangeProcessor{}
 func TestChangeProcessor(t *testing.T) {
 	prc := &ChangeProcessor{}
 	change := prc.Change(imageserver.Params{})
-	if change != true {
+	if !change {
 		t.Fatal("not true")
 	}
 }

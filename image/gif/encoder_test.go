@@ -16,7 +16,7 @@ func TestEncoder(t *testing.T) {
 
 func TestEncoderChange(t *testing.T) {
 	c := (&Encoder{}).Change(imageserver.Params{})
-	if c != false {
+	if c {
 		t.Fatal("not false")
 	}
 }

@@ -70,11 +70,7 @@ func (gt *Getter) Get(ctx groupcache.Context, key string, dest groupcache.Sink) 
 	if err != nil {
 		return err
 	}
-	err = dest.SetBytes(data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return dest.SetBytes(data)
 }
 
 // Context is a groupcache.Context implementation used by Getter.
