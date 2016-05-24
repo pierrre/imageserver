@@ -6,12 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"regexp"
+	"strings"
 
 	"github.com/pierrre/imageserver"
 )
-
-var contentTypeRegexp = regexp.MustCompile("^image/(.+)$")
 
 // Server is a imageserver.Server implementation that gets the Image from an HTTP URL.
 //
@@ -36,11 +34,7 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
-	image, err := parseResponse(response)
-	if err != nil {
-		return nil, err
-	}
-	return image, nil
+	return parseResponse(response)
 }
 
 func getSourceURL(params imageserver.Params) (*url.URL, error) {
@@ -86,9 +80,9 @@ func parseResponse(response *http.Response) (*imageserver.Image, error) {
 	im := new(imageserver.Image)
 	contentType := response.Header.Get("Content-Type")
 	if contentType != "" {
-		matches := contentTypeRegexp.FindStringSubmatch(contentType)
-		if matches != nil && len(matches) == 2 {
-			im.Format = matches[1]
+		const pref = "image/"
+		if strings.HasPrefix(contentType, pref) {
+			im.Format = contentType[len(pref):]
 		}
 	}
 	data, err := ioutil.ReadAll(response.Body)
