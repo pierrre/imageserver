@@ -16,7 +16,7 @@ func TestProviderFunc(t *testing.T) {
 		called = true
 		return nil, nil
 	})
-	prv.Get(imageserver.Params{})
+	_, _ = prv.Get(imageserver.Params{})
 	if !called {
 		t.Fatal("not called")
 	}

@@ -59,8 +59,7 @@ func TestServerErrorImageUnmarshal(t *testing.T) {
 			newTestServerName(),
 			testSize,
 			groupcache.GetterFunc(func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
-				dest.SetBytes(nil)
-				return nil
+				return dest.SetBytes(nil)
 			}),
 		),
 		KeyGenerator: imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {

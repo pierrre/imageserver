@@ -96,7 +96,9 @@ func TestNewHTTPPoolTransport(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 }
 
 func TestNewHTTPPoolTransportErrorGob(t *testing.T) {

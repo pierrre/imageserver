@@ -17,7 +17,7 @@ func TestProcessorFunc(t *testing.T) {
 		return nim, nil
 	})
 	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	f.Process(nim, imageserver.Params{})
+	_, _ = f.Process(nim, imageserver.Params{})
 	if !called {
 		t.Fatal("not called")
 	}

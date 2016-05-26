@@ -32,7 +32,7 @@ func (c *IgnoreError) Get(key string, params imageserver.Params) (*imageserver.I
 
 // Set implements Cache.
 func (c *IgnoreError) Set(key string, image *imageserver.Image, params imageserver.Params) error {
-	c.Cache.Set(key, image, params)
+	_ = c.Cache.Set(key, image, params)
 	return nil
 }
 
@@ -46,7 +46,7 @@ type Async struct {
 // Set implements Cache.
 func (a *Async) Set(key string, image *imageserver.Image, params imageserver.Params) error {
 	go func() {
-		a.Cache.Set(key, image, params)
+		_ = a.Cache.Set(key, image, params)
 	}()
 	return nil
 }

@@ -109,7 +109,9 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		_ = os.RemoveAll(tempDir)
+	}()
 
 	file := filepath.Join(tempDir, "image")
 	arguments.PushBack(file)
@@ -329,7 +331,7 @@ func (hdr *Handler) runCommand(cmd *exec.Cmd) error {
 	select {
 	case err = <-cmdChan:
 	case <-timeoutChan:
-		cmd.Process.Kill()
+		_ = cmd.Process.Kill()
 		err = fmt.Errorf("timeout after %s", hdr.Timeout)
 	}
 	if err != nil {

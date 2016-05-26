@@ -109,7 +109,7 @@ func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, ima
 	}
 	rw.Header().Set("Content-Length", strconv.Itoa(len(image.Data)))
 	if req.Method == "GET" {
-		rw.Write(image.Data)
+		_, _ = rw.Write(image.Data)
 	}
 }
 
@@ -157,7 +157,7 @@ func NewParamsHashETagFunc(newHashFunc func() hash.Hash) func(params imageserver
 	}
 	return func(params imageserver.Params) string {
 		h := pool.Get().(hash.Hash)
-		io.WriteString(h, params.String())
+		_, _ = io.WriteString(h, params.String())
 		data := h.Sum(nil)
 		h.Reset()
 		pool.Put(h)

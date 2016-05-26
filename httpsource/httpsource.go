@@ -33,7 +33,9 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
 	return parseResponse(response)
 }
 

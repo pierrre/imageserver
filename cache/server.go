@@ -66,7 +66,7 @@ func NewParamsHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 	}
 	return KeyGeneratorFunc(func(params imageserver.Params) string {
 		h := pool.Get().(hash.Hash)
-		io.WriteString(h, params.String())
+		_, _ = io.WriteString(h, params.String())
 		data := h.Sum(nil)
 		h.Reset()
 		pool.Put(h)

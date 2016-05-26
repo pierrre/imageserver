@@ -146,22 +146,22 @@ func (params Params) String() string {
 func (params Params) toBuffer(buf *bytes.Buffer) {
 	keys := params.Keys()
 	sort.Strings(keys)
-	buf.WriteString("map[")
+	_, _ = buf.WriteString("map[")
 	for i, key := range keys {
 		if i != 0 {
-			buf.WriteString(" ")
+			_, _ = buf.WriteString(" ")
 		}
-		buf.WriteString(key)
-		buf.WriteString(":")
+		_, _ = buf.WriteString(key)
+		_, _ = buf.WriteString(":")
 		switch value := params[key].(type) {
 		case Params:
 			value.toBuffer(buf)
 		default:
-			fmt.Fprint(buf, value)
+			_, _ = fmt.Fprint(buf, value)
 		}
 
 	}
-	buf.WriteString("]")
+	_, _ = buf.WriteString("]")
 }
 
 // ParamError is an error for a param.

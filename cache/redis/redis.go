@@ -38,7 +38,9 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 
 func (cache *Cache) getData(key string) ([]byte, error) {
 	conn := cache.Pool.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	data, err := redigo.Bytes(conn.Do("GET", key))
 	if err != nil {
 		if err == redigo.ErrNil {
@@ -64,7 +66,9 @@ func (cache *Cache) setData(key string, data []byte) error {
 		params = append(params, "EX", strconv.Itoa(int(cache.Expire.Seconds())))
 	}
 	conn := cache.Pool.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	_, err := conn.Do("SET", params...)
 	return err
 }

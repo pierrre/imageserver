@@ -9,7 +9,7 @@ import (
 func BenchmarkExpiresHandler(b *testing.B) {
 	eh := &ExpiresHandler{
 		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			rw.Write(nil)
+			_, _ = rw.Write(nil)
 		}),
 		Expires: 1 * time.Hour,
 	}

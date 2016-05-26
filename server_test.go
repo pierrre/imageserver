@@ -13,7 +13,7 @@ func TestServerFunc(t *testing.T) {
 		called = true
 		return &Image{}, nil
 	})
-	srv.Get(Params{})
+	_, _ = srv.Get(Params{})
 	if !called {
 		t.Fatal("not called")
 	}

@@ -14,7 +14,7 @@ var _ http.Handler = &CacheControlPublicHandler{}
 func TestCacheControlPublicHandler(t *testing.T) {
 	h := &CacheControlPublicHandler{
 		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			rw.Write([]byte("foobar"))
+			_, _ = rw.Write([]byte("foobar"))
 		}),
 	}
 	rw := httptest.NewRecorder()
@@ -70,7 +70,7 @@ var _ http.Handler = &ExpiresHandler{}
 func TestExpiresHandler(t *testing.T) {
 	h := &ExpiresHandler{
 		Handler: http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			rw.Write([]byte("foobar"))
+			_, _ = rw.Write([]byte("foobar"))
 		}),
 		Expires: 1 * time.Hour,
 	}
@@ -113,7 +113,7 @@ func TestHeaderResponseWriter(t *testing.T) {
 			called = true
 		},
 	}
-	rw.Write([]byte("foobar"))
+	_, _ = rw.Write([]byte("foobar"))
 	if !called {
 		t.Fatal("not called")
 	}

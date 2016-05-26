@@ -13,7 +13,7 @@ func TestHandlerFunc(t *testing.T) {
 		called = true
 		return im, nil
 	})
-	hdr.Handle(&Image{}, Params{})
+	_, _ = hdr.Handle(&Image{}, Params{})
 	if !called {
 		t.Fatal("not called")
 	}
