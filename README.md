@@ -2,8 +2,8 @@
 An image server toolkit in Go (Golang)
 
 [![GoDoc](https://godoc.org/github.com/pierrre/imageserver?status.svg)](https://godoc.org/github.com/pierrre/imageserver)
-[![Build Status](https://travis-ci.org/pierrre/imageserver.svg)](https://travis-ci.org/pierrre/imageserver)
-[![codecov.io](https://codecov.io/github/pierrre/imageserver/coverage.svg)](https://codecov.io/github/pierrre/imageserver)
+[![Build Status](https://travis-ci.org/pierrre/imageserver.svg?branch=master)](https://travis-ci.org/pierrre/imageserver)
+[![codecov](https://codecov.io/gh/pierrre/imageserver/branch/master/graph/badge.svg)](https://codecov.io/gh/pierrre/imageserver)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pierrre/imageserver)](https://goreportcard.com/report/github.com/pierrre/imageserver)
 
 ## Features
