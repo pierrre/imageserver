@@ -7,7 +7,7 @@ type Server interface {
 }
 
 // ServerFunc is a Server func.
-type ServerFunc func(params Params) (*Image, error)
+type ServerFunc func(Params) (*Image, error)
 
 // Get implements Server.
 func (f ServerFunc) Get(params Params) (*Image, error) {

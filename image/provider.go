@@ -8,7 +8,7 @@ import (
 
 // Provider returns a Go Image.
 type Provider interface {
-	Get(params imageserver.Params) (image.Image, error)
+	Get(imageserver.Params) (image.Image, error)
 }
 
 // ProviderFunc is a Provider func.
