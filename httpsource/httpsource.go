@@ -23,7 +23,7 @@ type Server struct {
 	Client *http.Client
 }
 
-// Get implements Server.
+// Get implements imageserver.Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	sourceURL, err := getSourceURL(params)
 	if err != nil {

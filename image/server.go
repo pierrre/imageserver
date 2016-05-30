@@ -12,7 +12,7 @@ type Server struct {
 	DefaultFormat string
 }
 
-// Get implements Server.
+// Get implements imageserver.Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	enc, format, err := getEncoderFormat(srv.DefaultFormat, params)
 	if err != nil {
