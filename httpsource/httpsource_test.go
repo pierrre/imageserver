@@ -48,48 +48,36 @@ func TestGetErrorNoSource(t *testing.T) {
 	}
 }
 
+func TestGetErrorNewRequest(t *testing.T) {
+	params := imageserver.Params{imageserver.SourceParam: "%"}
+	srv := &Server{}
+	_, err := srv.Get(params)
+	if err == nil {
+		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
+}
+
+func TestGetErrorDoRequest(t *testing.T) {
+	params := imageserver.Params{imageserver.SourceParam: "http://localhost:123456"}
+	srv := &Server{}
+	_, err := srv.Get(params)
+	if err == nil {
+		t.Fatal("no error")
+	}
+	if _, ok := err.(*imageserver.ParamError); !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
+}
+
 func TestGetErrorNotFound(t *testing.T) {
 	httpSrv := createTestHTTPServer(t)
 	defer httpSrv.Close()
 	source := createTestSource(httpSrv, testdata.MediumFileName)
 	source += "foobar"
 	params := imageserver.Params{imageserver.SourceParam: source}
-	srv := &Server{}
-	_, err := srv.Get(params)
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ParamError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func TestGetErrorInvalidUrl(t *testing.T) {
-	params := imageserver.Params{imageserver.SourceParam: "foobar"}
-	srv := &Server{}
-	_, err := srv.Get(params)
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ParamError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func TestGetErrorInvalidUrlScheme(t *testing.T) {
-	params := imageserver.Params{imageserver.SourceParam: "custom://foobar"}
-	srv := &Server{}
-	_, err := srv.Get(params)
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if _, ok := err.(*imageserver.ParamError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
-	}
-}
-
-func TestGetErrorRequest(t *testing.T) {
-	params := imageserver.Params{imageserver.SourceParam: "http://localhost:123456"}
 	srv := &Server{}
 	_, err := srv.Get(params)
 	if err == nil {

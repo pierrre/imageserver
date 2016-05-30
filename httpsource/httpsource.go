@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/pierrre/imageserver"
@@ -25,11 +24,7 @@ type Server struct {
 
 // Get implements imageserver.Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	sourceURL, err := getSourceURL(params)
-	if err != nil {
-		return nil, err
-	}
-	response, err := srv.doRequest(sourceURL)
+	response, err := srv.doRequest(params)
 	if err != nil {
 		return nil, err
 	}
@@ -39,45 +34,29 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	return parseResponse(response)
 }
 
-func getSourceURL(params imageserver.Params) (*url.URL, error) {
-	source, err := params.GetString(imageserver.SourceParam)
+func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) {
+	src, err := params.GetString(imageserver.SourceParam)
 	if err != nil {
 		return nil, err
 	}
-	sourceURL, err := url.ParseRequestURI(source)
+	req, err := http.NewRequest("GET", src, nil)
 	if err != nil {
-		return nil, &imageserver.ParamError{
-			Param:   imageserver.SourceParam,
-			Message: fmt.Sprintf("parse url error: %s", err),
-		}
+		return nil, newSourceError(err.Error())
 	}
-	if sourceURL.Scheme != "http" && sourceURL.Scheme != "https" {
-		return nil, &imageserver.ParamError{
-			Param:   imageserver.SourceParam,
-			Message: "url scheme must be http(s)",
-		}
-	}
-	return sourceURL, nil
-}
-
-func (srv *Server) doRequest(sourceURL *url.URL) (*http.Response, error) {
 	c := srv.Client
 	if c == nil {
 		c = http.DefaultClient
 	}
-	response, err := c.Get(sourceURL.String())
+	response, err := c.Do(req)
 	if err != nil {
-		return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}
+		return nil, newSourceError(err.Error())
 	}
 	return response, nil
 }
 
 func parseResponse(response *http.Response) (*imageserver.Image, error) {
 	if response.StatusCode != http.StatusOK {
-		return nil, &imageserver.ParamError{
-			Param:   imageserver.SourceParam,
-			Message: fmt.Sprintf("http status code %d while downloading", response.StatusCode),
-		}
+		return nil, newSourceError(fmt.Sprintf("http status code %d while downloading", response.StatusCode))
 	}
 	im := new(imageserver.Image)
 	contentType := response.Header.Get("Content-Type")
@@ -89,11 +68,15 @@ func parseResponse(response *http.Response) (*imageserver.Image, error) {
 	}
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, &imageserver.ParamError{
-			Param:   imageserver.SourceParam,
-			Message: fmt.Sprintf("error while downloading: %s", err),
-		}
+		return nil, newSourceError(fmt.Sprintf("error while downloading: %s", err))
 	}
 	im.Data = data
 	return im, nil
+}
+
+func newSourceError(msg string) error {
+	return &imageserver.ParamError{
+		Param:   imageserver.SourceParam,
+		Message: msg,
+	}
 }
