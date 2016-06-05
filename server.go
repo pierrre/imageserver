@@ -14,26 +14,6 @@ func (f ServerFunc) Get(params Params) (*Image, error) {
 	return f(params)
 }
 
-// SourceParam is the source Param name.
-const SourceParam = "source"
-
-// SourceServer is a Server implementation that forwards calls to the underlying Server with only the "source" param.
-//
-// It should be used to cache the source Image.
-type SourceServer struct {
-	Server
-}
-
-// Get implements Server.
-func (s *SourceServer) Get(params Params) (*Image, error) {
-	source, err := params.Get(SourceParam)
-	if err != nil {
-		return nil, err
-	}
-	params = Params{SourceParam: source}
-	return s.Server.Get(params)
-}
-
 // NewLimitServer creates a new Server that limits the number of concurrent executions.
 //
 // It uses a buffered channel to limit the number of concurrent executions.

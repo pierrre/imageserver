@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 )
 
 var _ Parser = ListParser{}
@@ -22,7 +23,7 @@ func TestListParserParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !params.Has(imageserver.SourceParam) {
+	if !params.Has(imageserver_source.Param) {
 		t.Fatal("not set")
 	}
 }
@@ -47,8 +48,8 @@ func TestListParserResolve(t *testing.T) {
 		&SourceParser{},
 	}
 
-	httpParam := parser.Resolve(imageserver.SourceParam)
-	if httpParam != imageserver.SourceParam {
+	httpParam := parser.Resolve(imageserver_source.Param)
+	if httpParam != imageserver_source.Param {
 		t.Fatal("not equals")
 	}
 
@@ -71,7 +72,7 @@ func TestSourceParserParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	source, err := params.GetString(imageserver.SourceParam)
+	source, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,15 +93,15 @@ func TestSourceParserParseUndefined(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if params.Has(imageserver.SourceParam) {
+	if params.Has(imageserver_source.Param) {
 		t.Fatal("should not be set")
 	}
 }
 
 func TestSourceParserResolve(t *testing.T) {
 	parser := &SourceParser{}
-	httpParam := parser.Resolve(imageserver.SourceParam)
-	if httpParam != imageserver.SourceParam {
+	httpParam := parser.Resolve(imageserver_source.Param)
+	if httpParam != imageserver_source.Param {
 		t.Fatal("not equals")
 	}
 	httpParam = parser.Resolve("foobar")
@@ -122,7 +123,7 @@ func TestSourcePathParserParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	source, err := params.GetString(imageserver.SourceParam)
+	source, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,7 +134,7 @@ func TestSourcePathParserParse(t *testing.T) {
 
 func TestSourcePathParserResolve(t *testing.T) {
 	parser := &SourcePathParser{}
-	httpParam := parser.Resolve(imageserver.SourceParam)
+	httpParam := parser.Resolve(imageserver_source.Param)
 	if httpParam != "path" {
 		t.Fatal("not equals")
 	}
@@ -161,7 +162,7 @@ func TestSourceTransformParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	source, err := params.GetString(imageserver.SourceParam)
+	source, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +184,7 @@ func TestSourceTransformParserUndefined(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if params.Has(imageserver.SourceParam) {
+	if params.Has(imageserver_source.Param) {
 		t.Fatal("should not be set")
 	}
 }
@@ -212,7 +213,7 @@ func TestSourceTransformParserErrorParams(t *testing.T) {
 		Parser: &SourceParser{},
 	}
 	params := imageserver.Params{
-		imageserver.SourceParam: 666,
+		imageserver_source.Param: 666,
 	}
 	err = ps.Parse(req, params)
 	if err == nil {
@@ -236,7 +237,7 @@ func TestSourcePrefixParser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	source, err := params.GetString(imageserver.SourceParam)
+	source, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		t.Fatal(err)
 	}

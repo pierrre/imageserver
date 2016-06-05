@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -32,7 +33,7 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 			expectedHeader: map[string]string{
 				"Etag": fmt.Sprintf("\"%s\"", NewParamsHashETagFunc(sha256.New)(imageserver.Params{
-					imageserver.SourceParam: testdata.MediumFileName,
+					imageserver_source.Param: testdata.MediumFileName,
 				})),
 				"Content-Type":   fmt.Sprintf("image/%s", testdata.Medium.Format),
 				"Content-Length": fmt.Sprint(len(testdata.Medium.Data)),
@@ -47,7 +48,7 @@ func TestHandler(t *testing.T) {
 			url: "http://localhost?source=medium.jpg",
 			header: map[string]string{
 				"If-None-Match": fmt.Sprintf("\"%s\"", NewParamsHashETagFunc(sha256.New)(imageserver.Params{
-					imageserver.SourceParam: testdata.MediumFileName,
+					imageserver_source.Param: testdata.MediumFileName,
 				})),
 			},
 			expectedStatusCode: http.StatusOK,
@@ -57,7 +58,7 @@ func TestHandler(t *testing.T) {
 			url:         "http://localhost?source=medium.jpg",
 			header: map[string]string{
 				"If-None-Match": fmt.Sprintf("\"%s\"", NewParamsHashETagFunc(sha256.New)(imageserver.Params{
-					imageserver.SourceParam: testdata.MediumFileName,
+					imageserver_source.Param: testdata.MediumFileName,
 				})),
 			},
 			expectedStatusCode: http.StatusNotModified,
@@ -91,7 +92,7 @@ func TestHandler(t *testing.T) {
 			url: "http://localhost",
 			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ParamError{
-					Param:   imageserver.SourceParam,
+					Param:   imageserver_source.Param,
 					Message: "error",
 				}
 			}),

@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 )
 
 var (
@@ -74,13 +75,13 @@ var (
 
 	// Server is an Image Server that uses filename as source.
 	Server = imageserver.Server(imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
-		source, err := params.GetString(imageserver.SourceParam)
+		source, err := params.GetString(imageserver_source.Param)
 		if err != nil {
 			return nil, err
 		}
 		im, err := Get(source)
 		if err != nil {
-			return nil, &imageserver.ParamError{Param: imageserver.SourceParam, Message: err.Error()}
+			return nil, &imageserver.ParamError{Param: imageserver_source.Param, Message: err.Error()}
 		}
 		return im, nil
 	}))

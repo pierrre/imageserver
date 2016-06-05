@@ -1,4 +1,4 @@
-package httpsource
+package http
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -16,7 +17,7 @@ func TestGet(t *testing.T) {
 	httpSrv := createTestHTTPServer(t)
 	defer httpSrv.Close()
 	params := imageserver.Params{
-		imageserver.SourceParam: createTestSource(httpSrv, testdata.MediumFileName),
+		imageserver_source.Param: createTestSource(httpSrv, testdata.MediumFileName),
 	}
 	srv := &Server{}
 	im, err := srv.Get(params)
@@ -49,7 +50,7 @@ func TestGetErrorNoSource(t *testing.T) {
 }
 
 func TestGetErrorNewRequest(t *testing.T) {
-	params := imageserver.Params{imageserver.SourceParam: "%"}
+	params := imageserver.Params{imageserver_source.Param: "%"}
 	srv := &Server{}
 	_, err := srv.Get(params)
 	if err == nil {
@@ -61,7 +62,7 @@ func TestGetErrorNewRequest(t *testing.T) {
 }
 
 func TestGetErrorDoRequest(t *testing.T) {
-	params := imageserver.Params{imageserver.SourceParam: "http://localhost:123456"}
+	params := imageserver.Params{imageserver_source.Param: "http://localhost:123456"}
 	srv := &Server{}
 	_, err := srv.Get(params)
 	if err == nil {
@@ -77,7 +78,7 @@ func TestGetErrorNotFound(t *testing.T) {
 	defer httpSrv.Close()
 	source := createTestSource(httpSrv, testdata.MediumFileName)
 	source += "foobar"
-	params := imageserver.Params{imageserver.SourceParam: source}
+	params := imageserver.Params{imageserver_source.Param: source}
 	srv := &Server{}
 	_, err := srv.Get(params)
 	if err == nil {

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 )
 
 // Parser represents a *net/http.Request parser.
@@ -54,14 +55,14 @@ type SourceParser struct{}
 
 // Parse implements Parser.
 func (parser *SourceParser) Parse(req *http.Request, params imageserver.Params) error {
-	ParseQueryString(imageserver.SourceParam, req, params)
+	ParseQueryString(imageserver_source.Param, req, params)
 	return nil
 }
 
 // Resolve implements Parser.
 func (parser *SourceParser) Resolve(param string) string {
-	if param == imageserver.SourceParam {
-		return imageserver.SourceParam
+	if param == imageserver_source.Param {
+		return imageserver_source.Param
 	}
 	return ""
 }
@@ -72,14 +73,14 @@ type SourcePathParser struct{}
 // Parse implements Parser.
 func (parser *SourcePathParser) Parse(req *http.Request, params imageserver.Params) error {
 	if len(req.URL.Path) > 0 {
-		params.Set(imageserver.SourceParam, req.URL.Path)
+		params.Set(imageserver_source.Param, req.URL.Path)
 	}
 	return nil
 }
 
 // Resolve implements Parser.
 func (parser *SourcePathParser) Resolve(param string) string {
-	if param == imageserver.SourceParam {
+	if param == imageserver_source.Param {
 		return "path"
 	}
 	return ""
@@ -101,15 +102,15 @@ func parseSourceTransform(ps Parser, req *http.Request, params imageserver.Param
 	if err != nil {
 		return err
 	}
-	if !params.Has(imageserver.SourceParam) {
+	if !params.Has(imageserver_source.Param) {
 		return nil
 	}
-	source, err := params.GetString(imageserver.SourceParam)
+	source, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		return err
 	}
 	source = f(source)
-	params.Set(imageserver.SourceParam, source)
+	params.Set(imageserver_source.Param, source)
 	return nil
 }
 

@@ -9,10 +9,10 @@ import (
 	"net/http"
 
 	imageserver_http "github.com/pierrre/imageserver/http"
-	imageserver_httpsource "github.com/pierrre/imageserver/httpsource"
 	_ "github.com/pierrre/imageserver/image/gif"
 	_ "github.com/pierrre/imageserver/image/jpeg"
 	_ "github.com/pierrre/imageserver/image/png"
+	imageserver_source_http "github.com/pierrre/imageserver/source/http"
 )
 
 const (
@@ -48,6 +48,6 @@ func newImageHTTPHandler() http.Handler {
 			Parser: &imageserver_http.SourcePathParser{},
 			Prefix: urlPrefix,
 		},
-		Server: &imageserver_httpsource.Server{},
+		Server: &imageserver_source_http.Server{},
 	}
 }

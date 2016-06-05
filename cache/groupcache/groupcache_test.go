@@ -9,6 +9,7 @@ import (
 	"github.com/golang/groupcache"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
+	imageserver_source "github.com/pierrre/imageserver/source"
 	"github.com/pierrre/imageserver/testdata"
 )
 
@@ -28,7 +29,7 @@ func TestServer(t *testing.T) {
 		}),
 	)
 	im, err := srv.Get(imageserver.Params{
-		imageserver.SourceParam: testdata.MediumFileName,
+		imageserver_source.Param: testdata.MediumFileName,
 	})
 	if err != nil {
 		t.Fatal(err)

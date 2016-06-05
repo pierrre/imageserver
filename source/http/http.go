@@ -1,5 +1,5 @@
-// Package httpsource provides a imageserver.Server implementation that gets the Image from an HTTP URL.
-package httpsource
+// Package http provides a imageserver.Server implementation that gets the Image from an HTTP URL.
+package http
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/pierrre/imageserver"
+	imageserver_source "github.com/pierrre/imageserver/source"
 )
 
 // Server is a imageserver.Server implementation that gets the Image from an HTTP URL.
@@ -35,7 +36,7 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 }
 
 func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) {
-	src, err := params.GetString(imageserver.SourceParam)
+	src, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,7 @@ func parseResponse(response *http.Response) (*imageserver.Image, error) {
 
 func newSourceError(msg string) error {
 	return &imageserver.ParamError{
-		Param:   imageserver.SourceParam,
+		Param:   imageserver_source.Param,
 		Message: msg,
 	}
 }
