@@ -1,3 +1,4 @@
+// Package source provides a imageserver.Server implementation that forwards calls to the underlying Server with only the "source" param.
 package source
 
 import (
