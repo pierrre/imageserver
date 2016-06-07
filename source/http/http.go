@@ -15,24 +15,37 @@ import (
 //
 // It parses the "source" param as URL, then do a GET request.
 // It returns an error if the HTTP status code is not 200 (OK).
-//
-// The Image type is determined by the "Content-Type" header.
 type Server struct {
 	// Client is an optional HTTP client.
 	// http.DefaultClient is used by default.
 	Client *http.Client
+
+	// Identify identifies the Image format.
+	// By default, it uses IdentifyHeader().
+	Identify func(resp *http.Response, data []byte) (format string, err error)
 }
 
 // Get implements imageserver.Server.
 func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	response, err := srv.doRequest(params)
+	resp, err := srv.doRequest(params)
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = response.Body.Close()
+		_ = resp.Body.Close()
 	}()
-	return parseResponse(response)
+	data, err := loadData(resp)
+	if err != nil {
+		return nil, err
+	}
+	format, err := srv.identify(resp, data)
+	if err != nil {
+		return nil, err
+	}
+	return &imageserver.Image{
+		Format: format,
+		Data:   data,
+	}, nil
 }
 
 func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) {
@@ -55,24 +68,27 @@ func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) 
 	return response, nil
 }
 
-func parseResponse(response *http.Response) (*imageserver.Image, error) {
-	if response.StatusCode != http.StatusOK {
-		return nil, newSourceError(fmt.Sprintf("http status code %d while downloading", response.StatusCode))
+func loadData(resp *http.Response) ([]byte, error) {
+	if resp.StatusCode != http.StatusOK {
+		return nil, newSourceError(fmt.Sprintf("HTTP status code %d while downloading", resp.StatusCode))
 	}
-	im := new(imageserver.Image)
-	contentType := response.Header.Get("Content-Type")
-	if contentType != "" {
-		const pref = "image/"
-		if strings.HasPrefix(contentType, pref) {
-			im.Format = contentType[len(pref):]
-		}
-	}
-	data, err := ioutil.ReadAll(response.Body)
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, newSourceError(fmt.Sprintf("error while downloading: %s", err))
 	}
-	im.Data = data
-	return im, nil
+	return data, nil
+}
+
+func (srv *Server) identify(resp *http.Response, data []byte) (format string, err error) {
+	idf := srv.Identify
+	if idf == nil {
+		idf = IdentifyHeader
+	}
+	format, err = idf(resp, data)
+	if err != nil {
+		return "", newSourceError(fmt.Sprintf("unable to identify image format: %s", err.Error()))
+	}
+	return format, nil
 }
 
 func newSourceError(msg string) error {
@@ -80,4 +96,17 @@ func newSourceError(msg string) error {
 		Param:   imageserver_source.Param,
 		Message: msg,
 	}
+}
+
+// IdentifyHeader identifies the Image format with the "Content-Type" header.
+func IdentifyHeader(resp *http.Response, data []byte) (format string, err error) {
+	ct := resp.Header.Get("Content-Type")
+	if ct == "" {
+		return "", fmt.Errorf("no HTTP \"Content-Type\" header")
+	}
+	const pref = "image/"
+	if !strings.HasPrefix(ct, pref) {
+		return "", fmt.Errorf("HTTP \"Content-Type\" header does not begin with \"%s\": %s", pref, ct)
+	}
+	return ct[len(pref):], nil
 }

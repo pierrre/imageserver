@@ -32,28 +32,35 @@ func TestGet(t *testing.T) {
 			expectedImage: testdata.Medium,
 		},
 		{
-			name:               "NoSource",
+			name:               "ErrorNoSource",
 			params:             imageserver.Params{},
 			expectedParamError: imageserver_source.Param,
 		},
 		{
-			name: "InvalidURL",
+			name: "ErrorInvalidURL",
 			params: imageserver.Params{
 				imageserver_source.Param: "%",
 			},
 			expectedParamError: imageserver_source.Param,
 		},
 		{
-			name: "UnreachableURL",
+			name: "ErrorUnreachableURL",
 			params: imageserver.Params{
 				imageserver_source.Param: "http://localhost:123456",
 			},
 			expectedParamError: imageserver_source.Param,
 		},
 		{
-			name: "NotFound",
+			name: "ErrorNotFound",
 			params: imageserver.Params{
 				imageserver_source.Param: createTestSource(httpSrv, testdata.MediumFileName) + "foobar",
+			},
+			expectedParamError: imageserver_source.Param,
+		},
+		{
+			name: "ErrorIdentify",
+			params: imageserver.Params{
+				imageserver_source.Param: createTestSource(httpSrv, "testdata.go"),
 			},
 			expectedParamError: imageserver_source.Param,
 		},
@@ -93,12 +100,12 @@ func (erc *errorReadCloser) Close() error {
 	return fmt.Errorf("error")
 }
 
-func TestParseResponseErrorData(t *testing.T) {
-	response := &http.Response{
+func TestLoadDataError(t *testing.T) {
+	resp := &http.Response{
 		StatusCode: http.StatusOK,
 		Body:       &errorReadCloser{},
 	}
-	_, err := parseResponse(response)
+	_, err := loadData(resp)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -113,4 +120,63 @@ func createTestHTTPServer() *httptest.Server {
 
 func createTestSource(srv *httptest.Server, filename string) string {
 	return fmt.Sprintf("http://%s/%s", srv.Listener.Addr(), filename)
+}
+
+func TestIdentifyHeader(t *testing.T) {
+	for _, tc := range []struct {
+		name           string
+		resp           *http.Response
+		data           []byte
+		expectedFormat string
+		expectedError  bool
+	}{
+		{
+			name: "Normal",
+			resp: &http.Response{
+				StatusCode: http.StatusOK,
+				Header: http.Header{
+					"Content-Type": {"image/jpeg"},
+				},
+			},
+			data:           testdata.Medium.Data,
+			expectedFormat: testdata.Medium.Format,
+			expectedError:  false,
+		},
+		{
+			name: "ErrorNoHeader",
+			resp: &http.Response{
+				StatusCode: http.StatusOK,
+			},
+			data:          testdata.Medium.Data,
+			expectedError: true,
+		},
+		{
+			name: "InvalidHeader",
+			resp: &http.Response{
+				StatusCode: http.StatusOK,
+				Header: http.Header{
+					"Content-Type": {"invalid"},
+				},
+			},
+			data:          testdata.Medium.Data,
+			expectedError: true,
+		},
+	} {
+		func() {
+			t.Logf("test: %s", tc.name)
+			format, err := IdentifyHeader(tc.resp, tc.data)
+			if err != nil {
+				if tc.expectedError {
+					return
+				}
+				t.Fatal(err)
+			}
+			if tc.expectedError {
+				t.Fatal("no error")
+			}
+			if format != tc.expectedFormat {
+				t.Fatalf("unexpected format: got %s, want %s", format, tc.expectedFormat)
+			}
+		}()
+	}
 }
