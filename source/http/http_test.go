@@ -131,15 +131,39 @@ func TestIdentifyHeader(t *testing.T) {
 		expectedError  bool
 	}{
 		{
-			name: "Normal",
+			name: "JPEG",
 			resp: &http.Response{
 				StatusCode: http.StatusOK,
 				Header: http.Header{
-					"Content-Type": {"image/jpeg"},
+					"Content-Type": {"image/" + testdata.Medium.Format},
 				},
 			},
 			data:           testdata.Medium.Data,
 			expectedFormat: testdata.Medium.Format,
+			expectedError:  false,
+		},
+		{
+			name: "PNG",
+			resp: &http.Response{
+				StatusCode: http.StatusOK,
+				Header: http.Header{
+					"Content-Type": {"image/" + testdata.Random.Format},
+				},
+			},
+			data:           testdata.Random.Data,
+			expectedFormat: testdata.Random.Format,
+			expectedError:  false,
+		},
+		{
+			name: "GIF",
+			resp: &http.Response{
+				StatusCode: http.StatusOK,
+				Header: http.Header{
+					"Content-Type": {"image/" + testdata.Animated.Format},
+				},
+			},
+			data:           testdata.Animated.Data,
+			expectedFormat: testdata.Animated.Format,
 			expectedError:  false,
 		},
 		{
