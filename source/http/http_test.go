@@ -14,7 +14,7 @@ import (
 
 var _ imageserver.Server = &Server{}
 
-func TestGet(t *testing.T) {
+func TestServerGet(t *testing.T) {
 	srv := &Server{}
 	httpSrv := createTestHTTPServer()
 	defer httpSrv.Close()
