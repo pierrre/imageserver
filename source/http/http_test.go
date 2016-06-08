@@ -119,7 +119,7 @@ func createTestHTTPServer() *httptest.Server {
 }
 
 func createTestSource(srv *httptest.Server, filename string) string {
-	return fmt.Sprintf("http://%s/%s", srv.Listener.Addr(), filename)
+	return srv.URL + "/" + filename
 }
 
 func TestIdentifyHeader(t *testing.T) {
