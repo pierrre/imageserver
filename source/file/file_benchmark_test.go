@@ -33,14 +33,12 @@ func benchmarkServerGet(b *testing.B, filename string) {
 	}
 	var bs int
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			im, err := srv.Get(params)
-			if err != nil {
-				b.Fatal(err)
-			}
-			bs = len(im.Data)
+	for i := 0; i < b.N; i++ {
+		im, err := srv.Get(params)
+		if err != nil {
+			b.Fatal(err)
 		}
-	})
+		bs = len(im.Data)
+	}
 	b.SetBytes(int64(bs))
 }
