@@ -1,6 +1,7 @@
 package image
 
 import (
+	"context"
 	"image"
 
 	"github.com/pierrre/imageserver"
@@ -10,16 +11,16 @@ import (
 //
 // It can return the given Image, but should not modify it.
 type Processor interface {
-	Process(image.Image, imageserver.Params) (image.Image, error)
+	Process(context.Context, image.Image, imageserver.Params) (image.Image, error)
 	Changer
 }
 
 // ProcessorFunc is a Processor func.
-type ProcessorFunc func(image.Image, imageserver.Params) (image.Image, error)
+type ProcessorFunc func(context.Context, image.Image, imageserver.Params) (image.Image, error)
 
 // Process implements Processor.
-func (f ProcessorFunc) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
-	return f(nim, params)
+func (f ProcessorFunc) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
+	return f(ctx, nim, params)
 }
 
 // Change implements Processor.
@@ -31,10 +32,10 @@ func (f ProcessorFunc) Change(params imageserver.Params) bool {
 type ListProcessor []Processor
 
 // Process implements Processor.
-func (prc ListProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc ListProcessor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	for _, p := range prc {
 		var err error
-		nim, err = p.Process(nim, params)
+		nim, err = p.Process(ctx, nim, params)
 		if err != nil {
 			return nil, err
 		}

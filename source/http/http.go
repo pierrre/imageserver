@@ -2,6 +2,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -26,8 +27,8 @@ type Server struct {
 }
 
 // Get implements imageserver.Server.
-func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
-	resp, err := srv.doRequest(params)
+func (srv *Server) Get(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
+	resp, err := srv.doRequest(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
 	}, nil
 }
 
-func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) {
+func (srv *Server) doRequest(ctx context.Context, params imageserver.Params) (*http.Response, error) {
 	src, err := params.GetString(imageserver_source.Param)
 	if err != nil {
 		return nil, err
@@ -57,6 +58,7 @@ func (srv *Server) doRequest(params imageserver.Params) (*http.Response, error) 
 	if err != nil {
 		return nil, newSourceError(err.Error())
 	}
+	req = req.WithContext(ctx)
 	c := srv.Client
 	if c == nil {
 		c = http.DefaultClient

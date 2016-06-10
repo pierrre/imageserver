@@ -2,6 +2,8 @@
 package source
 
 import (
+	"context"
+
 	"github.com/pierrre/imageserver"
 )
 
@@ -16,11 +18,11 @@ type Server struct {
 }
 
 // Get implements imageserver.Server.
-func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+func (s *Server) Get(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 	src, err := params.Get(Param)
 	if err != nil {
 		return nil, err
 	}
 	params = imageserver.Params{Param: src}
-	return s.Server.Get(params)
+	return s.Server.Get(ctx, params)
 }

@@ -2,6 +2,7 @@
 package crop
 
 import (
+	"context"
 	"fmt"
 	"image"
 
@@ -20,7 +21,7 @@ const param = "crop"
 type Processor struct{}
 
 // Process implements imageserver/image.Processor.
-func (prc *Processor) Process(im image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *Processor) Process(ctx context.Context, im image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(param) {
 		return im, nil
 	}

@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -21,7 +22,7 @@ type RotateProcessor struct {
 }
 
 // Process implements imageserver/image.Processor.
-func (prc *RotateProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *RotateProcessor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(rotateParam) {
 		return nim, nil
 	}

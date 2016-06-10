@@ -1,6 +1,7 @@
 package graphicsmagick
 
 import (
+	"context"
 	"os/exec"
 	"testing"
 	"time"
@@ -24,7 +25,7 @@ func TestHandle(t *testing.T) {
 			"height": 100,
 		},
 	}
-	_, err := hdr.Handle(testdata.Medium, params)
+	_, err := hdr.Handle(context.Background(), testdata.Medium, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,20 +35,20 @@ func TestHandleErrorTimeout(t *testing.T) {
 	testCheckAvailable(t)
 	hdr := &Handler{
 		Executable: testExecutable,
-		Timeout:    1 * time.Nanosecond,
 	}
+	ctx, _ := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	params := imageserver.Params{
 		param: imageserver.Params{
 			"width":  100,
 			"height": 100,
 		},
 	}
-	_, err := hdr.Handle(testdata.Medium, params)
+	_, err := hdr.Handle(ctx, testdata.Medium, params)
 	if err == nil {
 		t.Fatal("no error")
 	}
-	if _, ok := err.(*imageserver.ImageError); !ok {
-		t.Fatalf("unexpected error type: %T", err)
+	if err != context.DeadlineExceeded {
+		t.Fatalf("unexpected error: got %#v, want %#v", err, context.DeadlineExceeded)
 	}
 }
 

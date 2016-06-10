@@ -1,6 +1,7 @@
 package image
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"testing"
@@ -12,12 +13,12 @@ var _ Processor = ProcessorFunc(nil)
 
 func TestProcessorFunc(t *testing.T) {
 	called := false
-	f := ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+	f := ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 		called = true
 		return nim, nil
 	})
 	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	_, _ = f.Process(nim, imageserver.Params{})
+	_, _ = f.Process(context.Background(), nim, imageserver.Params{})
 	if !called {
 		t.Fatal("not called")
 	}
@@ -34,7 +35,7 @@ func TestListProcessorProcess(t *testing.T) {
 	params := imageserver.Params{}
 	prc := ListProcessor{}
 
-	nim, err := prc.Process(nim1, params)
+	nim, err := prc.Process(context.Background(), nim1, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,10 +43,10 @@ func TestListProcessorProcess(t *testing.T) {
 		t.Fatal("not equal")
 	}
 
-	prc = append(prc, ProcessorFunc(func(image.Image, imageserver.Params) (image.Image, error) {
+	prc = append(prc, ProcessorFunc(func(context.Context, image.Image, imageserver.Params) (image.Image, error) {
 		return nim2, nil
 	}))
-	nim, err = prc.Process(nim1, params)
+	nim, err = prc.Process(context.Background(), nim1, params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,10 +57,10 @@ func TestListProcessorProcess(t *testing.T) {
 		t.Fatal("not equal")
 	}
 
-	prc = append(prc, ProcessorFunc(func(image.Image, imageserver.Params) (image.Image, error) {
+	prc = append(prc, ProcessorFunc(func(context.Context, image.Image, imageserver.Params) (image.Image, error) {
 		return nil, fmt.Errorf("error")
 	}))
-	_, err = prc.Process(nim1, params)
+	_, err = prc.Process(context.Background(), nim1, params)
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -91,7 +92,7 @@ func TestListProcessorChange(t *testing.T) {
 
 type testChangeProcessor bool
 
-func (prc testChangeProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc testChangeProcessor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	return nim, nil
 }
 

@@ -1,6 +1,8 @@
 package image
 
 import (
+	"context"
+
 	"github.com/pierrre/imageserver"
 )
 
@@ -13,12 +15,12 @@ type Server struct {
 }
 
 // Get implements imageserver.Server.
-func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+func (srv *Server) Get(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 	enc, format, err := getEncoderFormat(srv.DefaultFormat, params)
 	if err != nil {
 		return nil, err
 	}
-	nim, err := srv.Provider.Get(params)
+	nim, err := srv.Provider.Get(ctx, params)
 	if err != nil {
 		return nil, err
 	}

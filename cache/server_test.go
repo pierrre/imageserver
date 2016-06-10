@@ -1,6 +1,7 @@
 package cache_test
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"testing"
@@ -16,7 +17,7 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: cachetest.NewMapCache(),
@@ -24,11 +25,11 @@ func TestServer(t *testing.T) {
 			return "test"
 		}),
 	}
-	image1, err := s.Get(imageserver.Params{})
+	image1, err := s.Get(context.Background(), imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	image2, err := s.Get(imageserver.Params{})
+	image2, err := s.Get(context.Background(), imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +42,7 @@ func TestServer(t *testing.T) {
 func TestServerErrorCacheGet(t *testing.T) {
 	s := &Server{
 		Cache: &Func{
-			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+			GetFunc: func(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, fmt.Errorf("error")
 			},
 		},
@@ -49,7 +50,7 @@ func TestServerErrorCacheGet(t *testing.T) {
 			return "test"
 		}),
 	}
-	_, err := s.Get(imageserver.Params{})
+	_, err := s.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -57,7 +58,7 @@ func TestServerErrorCacheGet(t *testing.T) {
 
 func TestServerErrorServer(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 		Cache: cachetest.NewMapCache(),
@@ -65,7 +66,7 @@ func TestServerErrorServer(t *testing.T) {
 			return "test"
 		}),
 	}
-	_, err := s.Get(imageserver.Params{})
+	_, err := s.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -73,14 +74,14 @@ func TestServerErrorServer(t *testing.T) {
 
 func TestServerErrorCacheSet(t *testing.T) {
 	s := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		Cache: &Func{
-			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+			GetFunc: func(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, nil
 			},
-			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
+			SetFunc: func(ctx context.Context, key string, image *imageserver.Image, params imageserver.Params) error {
 				return fmt.Errorf("error")
 			},
 		},
@@ -88,7 +89,7 @@ func TestServerErrorCacheSet(t *testing.T) {
 			return "test"
 		}),
 	}
-	_, err := s.Get(imageserver.Params{})
+	_, err := s.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

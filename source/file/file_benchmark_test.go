@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -12,6 +13,7 @@ func BenchmarkServerGet(b *testing.B) {
 	srv := &Server{
 		Root: testdata.Dir,
 	}
+	ctx := context.Background()
 	for _, tc := range []struct {
 		name     string
 		filename string
@@ -28,7 +30,7 @@ func BenchmarkServerGet(b *testing.B) {
 			var bs int
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				im, err := srv.Get(params)
+				im, err := srv.Get(ctx, params)
 				if err != nil {
 					b.Fatal(err)
 				}

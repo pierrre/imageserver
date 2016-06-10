@@ -2,6 +2,7 @@
 package testdata
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -79,7 +80,7 @@ var (
 	Invalid = loadImage(InvalidFileName, "invalid")
 
 	// Server is an Image Server that uses filename as source.
-	Server = imageserver.Server(imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+	Server = imageserver.Server(imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 		source, err := params.GetString(imageserver_source.Param)
 		if err != nil {
 			return nil, err

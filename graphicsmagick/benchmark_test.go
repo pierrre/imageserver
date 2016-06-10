@@ -1,6 +1,7 @@
 package graphicsmagick
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -12,6 +13,7 @@ func BenchmarkResize(b *testing.B) {
 	hdr := &Handler{
 		Executable: testExecutable,
 	}
+	ctx := context.Background()
 	params := imageserver.Params{
 		param: imageserver.Params{
 			"width": 100,
@@ -28,7 +30,7 @@ func BenchmarkResize(b *testing.B) {
 	} {
 		b.Run(tc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err := hdr.Handle(tc.im, params)
+				_, err := hdr.Handle(ctx, tc.im, params)
 				if err != nil {
 					b.Fatal(err)
 				}

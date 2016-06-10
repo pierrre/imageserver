@@ -1,6 +1,7 @@
 package gif
 
 import (
+	"context"
 	"image"
 	"image/gif"
 
@@ -11,7 +12,7 @@ import (
 
 // Processor processes a GIF image.
 type Processor interface {
-	Process(*gif.GIF, imageserver.Params) (*gif.GIF, error)
+	Process(context.Context, *gif.GIF, imageserver.Params) (*gif.GIF, error)
 	imageserver_image.Changer
 }
 
@@ -21,10 +22,10 @@ type SimpleProcessor struct {
 }
 
 // Process implements Processor.
-func (prc *SimpleProcessor) Process(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+func (prc *SimpleProcessor) Process(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 	out := new(gif.GIF)
 	var err error
-	out.Image, err = prc.processImages(g.Image, params)
+	out.Image, err = prc.processImages(ctx, g.Image, params)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +49,11 @@ func (prc *SimpleProcessor) Process(g *gif.GIF, params imageserver.Params) (*gif
 	return out, nil
 }
 
-func (prc *SimpleProcessor) processImages(ps []*image.Paletted, params imageserver.Params) ([]*image.Paletted, error) {
+func (prc *SimpleProcessor) processImages(ctx context.Context, ps []*image.Paletted, params imageserver.Params) ([]*image.Paletted, error) {
 	out := make([]*image.Paletted, len(ps))
 	for i, p := range ps {
 		var err error
-		out[i], err = prc.processImage(p, params)
+		out[i], err = prc.processImage(ctx, p, params)
 		if err != nil {
 			return nil, err
 		}
@@ -60,25 +61,25 @@ func (prc *SimpleProcessor) processImages(ps []*image.Paletted, params imageserv
 	return out, nil
 }
 
-func (prc *SimpleProcessor) processImage(p *image.Paletted, params imageserver.Params) (*image.Paletted, error) {
-	tmp, err := prc.Processor.Process(p, params)
+func (prc *SimpleProcessor) processImage(ctx context.Context, p *image.Paletted, params imageserver.Params) (*image.Paletted, error) {
+	tmp, err := prc.Processor.Process(ctx, p, params)
 	if err != nil {
 		return nil, err
 	}
 	out, ok := tmp.(*image.Paletted)
 	if !ok {
 		out = image.NewPaletted(tmp.Bounds(), p.Palette)
-		imageserver_image_internal.Copy(out, tmp)
+		imageserver_image_internal.Copy(ctx, out, tmp)
 	}
 	return out, nil
 }
 
 // ProcessorFunc is a Processor func.
-type ProcessorFunc func(*gif.GIF, imageserver.Params) (*gif.GIF, error)
+type ProcessorFunc func(context.Context, *gif.GIF, imageserver.Params) (*gif.GIF, error)
 
 // Process implements Processor.
-func (f ProcessorFunc) Process(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
-	return f(g, params)
+func (f ProcessorFunc) Process(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+	return f(ctx, g, params)
 }
 
 // Change implements Processor.

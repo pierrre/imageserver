@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"strings"
 	"testing"
 	"time"
@@ -38,7 +39,7 @@ func TestGetErrorAddress(t *testing.T) {
 	defer func() {
 		_ = cache.Client.Close()
 	}()
-	_, err := cache.Get(cachetest.KeyValid, imageserver.Params{})
+	_, err := cache.Get(context.Background(), cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -49,7 +50,7 @@ func TestSetErrorAddress(t *testing.T) {
 	defer func() {
 		_ = cache.Client.Close()
 	}()
-	err := cache.Set(cachetest.KeyValid, testdata.Medium, imageserver.Params{})
+	err := cache.Set(context.Background(), cachetest.KeyValid, testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -69,7 +70,7 @@ func TestGetErrorUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = cache.Get(cachetest.KeyValid, imageserver.Params{})
+	_, err = cache.Get(context.Background(), cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -86,7 +87,7 @@ func TestSetErrorMarshal(t *testing.T) {
 	im := &imageserver.Image{
 		Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
 	}
-	err := cache.Set(cachetest.KeyValid, im, imageserver.Params{})
+	err := cache.Set(context.Background(), cachetest.KeyValid, im, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

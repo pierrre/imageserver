@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"context"
 	"testing"
 
 	"github.com/disintegration/gift"
@@ -241,7 +242,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			if prc == nil {
 				prc = &ResizeProcessor{}
 			}
-			nim, err := prc.Process(nim, tc.params)
+			nim, err := prc.Process(context.Background(), nim, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
 					return

@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"context"
 	"fmt"
 	"image/color"
 	"strconv"
@@ -41,9 +42,10 @@ func benchmarkRotateProcessor(b *testing.B, name string, params imageserver.Para
 		rotateParam: params,
 	}
 	prc := &RotateProcessor{}
+	ctx := context.Background()
 	b.Run(name, func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_, err := prc.Process(nim, params)
+			_, err := prc.Process(ctx, nim, params)
 			if err != nil {
 				b.Fatal(err)
 			}

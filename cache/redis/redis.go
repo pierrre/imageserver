@@ -2,6 +2,7 @@
 package redis
 
 import (
+	"context"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -19,7 +20,7 @@ type Cache struct {
 }
 
 // Get implements imageserver/cache.Cache.
-func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
+func (cache *Cache) Get(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 	data, err := cache.getData(key)
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (cache *Cache) getData(key string) ([]byte, error) {
 }
 
 // Set implements imageserver/cache.Cache.
-func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
+func (cache *Cache) Set(ctx context.Context, key string, im *imageserver.Image, params imageserver.Params) error {
 	data, err := im.MarshalBinary()
 	if err != nil {
 		return err

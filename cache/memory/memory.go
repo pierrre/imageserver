@@ -2,6 +2,8 @@
 package memory
 
 import (
+	"context"
+
 	"github.com/pierrre/imageserver"
 	"github.com/pierrre/lrucache"
 )
@@ -23,7 +25,7 @@ func New(capacity int64) *Cache {
 }
 
 // Get implements imageserver/cache.Cache.
-func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
+func (cache *Cache) Get(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 	value, ok := cache.lru.Get(key)
 	if !ok {
 		return nil, nil
@@ -34,7 +36,7 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 }
 
 // Set implements imageserver/cache.Cache.
-func (cache *Cache) Set(key string, image *imageserver.Image, params imageserver.Params) error {
+func (cache *Cache) Set(ctx context.Context, key string, image *imageserver.Image, params imageserver.Params) error {
 	item := &item{
 		image: image,
 	}

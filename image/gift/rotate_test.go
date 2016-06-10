@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"context"
 	"image/color"
 	"testing"
 
@@ -165,7 +166,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			nim, err := prc.Process(nim, tc.params)
+			nim, err := prc.Process(context.Background(), nim, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
 					return

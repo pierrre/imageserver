@@ -2,6 +2,7 @@ package gif
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image/gif"
 	"testing"
@@ -14,11 +15,11 @@ var _ imageserver.Handler = &Handler{}
 
 func TestHandler(t *testing.T) {
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 			return g, nil
 		}),
 	}
-	im, err := hdr.Handle(testdata.Animated, imageserver.Params{})
+	im, err := hdr.Handle(context.Background(), testdata.Animated, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +36,7 @@ func TestHandlerNoChange(t *testing.T) {
 	hdr := &Handler{
 		Processor: testProcessorChange(false),
 	}
-	im, err := hdr.Handle(testdata.Animated, imageserver.Params{})
+	im, err := hdr.Handle(context.Background(), testdata.Animated, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +47,7 @@ func TestHandlerNoChange(t *testing.T) {
 
 func TestHandlerErrorFormat(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -57,14 +58,14 @@ func TestHandlerErrorFormat(t *testing.T) {
 
 func TestHandlerErrorDecode(t *testing.T) {
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 			return g, nil
 		}),
 	}
 	im := &imageserver.Image{
 		Format: "gif",
 	}
-	_, err := hdr.Handle(im, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), im, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -76,11 +77,11 @@ func TestHandlerErrorDecode(t *testing.T) {
 func TestHandlerErrorProcessor(t *testing.T) {
 	errPrc := fmt.Errorf("error")
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 			return nil, errPrc
 		}),
 	}
-	_, err := hdr.Handle(testdata.Animated, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), testdata.Animated, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -91,11 +92,11 @@ func TestHandlerErrorProcessor(t *testing.T) {
 
 func TestHandlerErrorEncode(t *testing.T) {
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 			return &gif.GIF{}, nil
 		}),
 	}
-	_, err := hdr.Handle(testdata.Animated, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), testdata.Animated, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -110,12 +111,12 @@ func TestFallbackHandler(t *testing.T) {
 	var hc bool
 	hdr := &FallbackHandler{
 		Handler: &Handler{
-			Processor: ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+			Processor: ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 				hc = true
 				return g, nil
 			}),
 		},
-		Fallback: imageserver.HandlerFunc(func(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+		Fallback: imageserver.HandlerFunc(func(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 			hc = false
 			if !params.Has("format") {
 				return im, nil
@@ -174,7 +175,7 @@ func TestFallbackHandler(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			im, err := hdr.Handle(tc.image, tc.params)
+			im, err := hdr.Handle(context.Background(), tc.image, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
 					return

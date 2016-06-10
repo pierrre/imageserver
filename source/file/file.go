@@ -2,6 +2,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"mime"
@@ -27,7 +28,7 @@ type Server struct {
 }
 
 // Get implements imageserver.Server.
-func (srv *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+func (srv *Server) Get(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 	pth, err := srv.getPath(params)
 	if err != nil {
 		return nil, err

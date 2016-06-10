@@ -1,6 +1,7 @@
 package cache_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -22,19 +23,19 @@ func TestIgnoreErrorGetSet(t *testing.T) {
 func TestIgnoreErrorGetSetError(t *testing.T) {
 	c := &IgnoreError{
 		Cache: &Func{
-			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
+			GetFunc: func(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 				return nil, fmt.Errorf("error")
 			},
-			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
+			SetFunc: func(ctx context.Context, key string, image *imageserver.Image, params imageserver.Params) error {
 				return fmt.Errorf("error")
 			},
 		},
 	}
-	_, err := c.Get("test", imageserver.Params{})
+	_, err := c.Get(context.Background(), "test", imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = c.Set("test", testdata.Medium, imageserver.Params{})
+	err = c.Set(context.Background(), "test", testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,23 +48,23 @@ func TestAsyncGetSet(t *testing.T) {
 	setCallCh := make(chan struct{})
 	asyncCache := &Async{
 		Cache: &Func{
-			GetFunc: func(key string, params imageserver.Params) (*imageserver.Image, error) {
-				return mapCache.Get(key, params)
+			GetFunc: func(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
+				return mapCache.Get(ctx, key, params)
 			},
-			SetFunc: func(key string, image *imageserver.Image, params imageserver.Params) error {
-				err := mapCache.Set(key, image, params)
+			SetFunc: func(ctx context.Context, key string, image *imageserver.Image, params imageserver.Params) error {
+				err := mapCache.Set(ctx, key, image, params)
 				setCallCh <- struct{}{}
 				return err
 			},
 		},
 	}
 
-	err := asyncCache.Set("foo", testdata.Small, imageserver.Params{})
+	err := asyncCache.Set(context.Background(), "foo", testdata.Small, imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}
 	<-setCallCh
-	im, err := asyncCache.Get("foo", imageserver.Params{})
+	im, err := asyncCache.Get(context.Background(), "foo", imageserver.Params{})
 	if err != nil {
 		panic(err)
 	}

@@ -2,6 +2,7 @@
 package internal
 
 import (
+	"context"
 	"image"
 	"image/color"
 	"image/draw"
@@ -57,12 +58,15 @@ func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
 }
 
 // Copy copies src to dst.
-func Copy(dst draw.Image, src image.Image) {
+func Copy(ctx context.Context, dst draw.Image, src image.Image) {
 	bd := src.Bounds().Intersect(dst.Bounds())
 	at := imageutil.NewAtFunc(src)
 	set := imageutil.NewSetFunc(dst)
-	imageutil.Parallel1D(bd, func(bd image.Rectangle) {
+	imageutil.Parallel1D(ctx, bd, func(ctx context.Context, bd image.Rectangle) {
 		for y := bd.Min.Y; y < bd.Max.Y; y++ {
+			if ctx.Err() != nil {
+				return
+			}
 			for x := bd.Min.X; x < bd.Max.X; x++ {
 				r, g, b, a := at(x, y)
 				set(x, y, r, g, b, a)

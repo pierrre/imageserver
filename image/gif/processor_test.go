@@ -1,6 +1,7 @@
 package gif
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -17,11 +18,11 @@ var _ Processor = &SimpleProcessor{}
 func TestSimpleProcessor(t *testing.T) {
 	g1 := newTestImage()
 	prc := &SimpleProcessor{
-		Processor: imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+		Processor: imageserver_image.ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 			return image.NewRGBA(image.Rectangle{Min: nim.Bounds().Min.Div(2), Max: nim.Bounds().Max.Div(2)}), nil
 		}),
 	}
-	g2, err := prc.Process(g1, imageserver.Params{})
+	g2, err := prc.Process(context.Background(), g1, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,11 +54,11 @@ func TestSimpleProcessor(t *testing.T) {
 func TestSimpleProcessorError(t *testing.T) {
 	g := newTestImage()
 	prc := &SimpleProcessor{
-		Processor: imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+		Processor: imageserver_image.ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
-	_, err := prc.Process(g, imageserver.Params{})
+	_, err := prc.Process(context.Background(), g, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -68,11 +69,11 @@ var _ Processor = ProcessorFunc(nil)
 func TestProcessorFunc(t *testing.T) {
 	g := newTestImage()
 	called := false
-	prc := ProcessorFunc(func(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+	prc := ProcessorFunc(func(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 		called = true
 		return g, nil
 	})
-	_, err := prc.Process(g, imageserver.Params{})
+	_, err := prc.Process(context.Background(), g, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +110,7 @@ func newTestImage() *gif.GIF {
 
 type testProcessorChange bool
 
-func (prc testProcessorChange) Process(g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
+func (prc testProcessorChange) Process(ctx context.Context, g *gif.GIF, params imageserver.Params) (*gif.GIF, error) {
 	return g, nil
 }
 

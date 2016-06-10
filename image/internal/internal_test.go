@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -140,10 +141,11 @@ func TestCopy(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
 			src := image.NewRGBA(tc.srcSize)
 			testDrawRandom(src)
 			dst := image.NewRGBA(tc.dstSize)
-			Copy(dst, src)
+			Copy(ctx, dst, src)
 			bd := src.Bounds().Intersect(dst.Bounds())
 			for y, yEnd := bd.Min.Y, bd.Max.Y; y < yEnd; y++ {
 				for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
@@ -155,6 +157,24 @@ func TestCopy(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestCopyCtxDone(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	bd := image.Rect(0, 0, 10, 10)
+	src := image.NewRGBA(bd)
+	testDrawRandom(src)
+	dst := image.NewRGBA(bd)
+	Copy(ctx, dst, src)
+	for y := bd.Min.Y; y < bd.Max.Y; y++ {
+		for x := bd.Min.X; x < bd.Max.X; x++ {
+			c := dst.RGBAAt(x, y)
+			if c != (color.RGBA{}) {
+				t.Fatalf("pixel %d,%d is not blank: %#v", x, y, c)
+			}
+		}
 	}
 }
 

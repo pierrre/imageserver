@@ -1,6 +1,7 @@
 package image
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"testing"
@@ -12,11 +13,11 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	srv := &Server{
-		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
+		Provider: ProviderFunc(func(ctx context.Context, params imageserver.Params) (image.Image, error) {
 			return image.NewRGBA(image.Rect(0, 0, 1, 1)), nil
 		}),
 	}
-	im, err := srv.Get(imageserver.Params{"format": "jpeg"})
+	im, err := srv.Get(context.Background(), imageserver.Params{"format": "jpeg"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,12 +32,12 @@ func TestServer(t *testing.T) {
 
 func TestServerDefaultFormat(t *testing.T) {
 	srv := &Server{
-		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
+		Provider: ProviderFunc(func(ctx context.Context, params imageserver.Params) (image.Image, error) {
 			return image.NewRGBA(image.Rect(0, 0, 1, 1)), nil
 		}),
 		DefaultFormat: "jpeg",
 	}
-	im, err := srv.Get(imageserver.Params{})
+	im, err := srv.Get(context.Background(), imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +52,7 @@ func TestServerDefaultFormat(t *testing.T) {
 
 func TestServerErrorFormatNotSet(t *testing.T) {
 	srv := &Server{}
-	_, err := srv.Get(imageserver.Params{})
+	_, err := srv.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -65,7 +66,7 @@ func TestServerErrorFormatNotSet(t *testing.T) {
 
 func TestServerErrorFormatUnknown(t *testing.T) {
 	srv := &Server{}
-	_, err := srv.Get(imageserver.Params{"format": "unknown"})
+	_, err := srv.Get(context.Background(), imageserver.Params{"format": "unknown"})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -79,11 +80,11 @@ func TestServerErrorFormatUnknown(t *testing.T) {
 
 func TestServerErrorProvider(t *testing.T) {
 	srv := &Server{
-		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
+		Provider: ProviderFunc(func(ctx context.Context, params imageserver.Params) (image.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
-	_, err := srv.Get(imageserver.Params{"format": "jpeg"})
+	_, err := srv.Get(context.Background(), imageserver.Params{"format": "jpeg"})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -91,11 +92,11 @@ func TestServerErrorProvider(t *testing.T) {
 
 func TestServerErrorEncode(t *testing.T) {
 	srv := &Server{
-		Provider: ProviderFunc(func(params imageserver.Params) (image.Image, error) {
+		Provider: ProviderFunc(func(ctx context.Context, params imageserver.Params) (image.Image, error) {
 			return image.NewRGBA(image.Rect(0, 0, 1, 1)), nil
 		}),
 	}
-	_, err := srv.Get(imageserver.Params{"format": "jpeg", "quality": 9001})
+	_, err := srv.Get(context.Background(), imageserver.Params{"format": "jpeg", "quality": 9001})
 	if err == nil {
 		t.Fatal("no error")
 	}

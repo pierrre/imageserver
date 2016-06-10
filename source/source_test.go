@@ -1,6 +1,7 @@
 package source
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -11,7 +12,7 @@ var _ imageserver.Server = &Server{}
 
 func TestServer(t *testing.T) {
 	srv := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			if !params.Has(Param) {
 				t.Fatal("no source param")
 			}
@@ -21,7 +22,7 @@ func TestServer(t *testing.T) {
 			return &imageserver.Image{}, nil
 		}),
 	}
-	_, err := srv.Get(imageserver.Params{
+	_, err := srv.Get(context.Background(), imageserver.Params{
 		Param: "source",
 		"foo": "bar",
 	})
@@ -32,11 +33,11 @@ func TestServer(t *testing.T) {
 
 func TestServerErrorServer(t *testing.T) {
 	srv := &Server{
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
-	_, err := srv.Get(imageserver.Params{Param: "source"})
+	_, err := srv.Get(context.Background(), imageserver.Params{Param: "source"})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -44,7 +45,7 @@ func TestServerErrorServer(t *testing.T) {
 
 func TestServerErrorNoSource(t *testing.T) {
 	srv := &Server{}
-	_, err := srv.Get(imageserver.Params{})
+	_, err := srv.Get(context.Background(), imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}

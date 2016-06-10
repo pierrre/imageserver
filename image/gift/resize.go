@@ -1,6 +1,7 @@
 package gift
 
 import (
+	"context"
 	"fmt"
 	"image"
 
@@ -37,7 +38,7 @@ type ResizeProcessor struct {
 }
 
 // Process implements imageserver/image.Processor.
-func (prc *ResizeProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *ResizeProcessor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(resizeParam) {
 		return nim, nil
 	}

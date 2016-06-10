@@ -2,6 +2,7 @@
 package nfntresize
 
 import (
+	"context"
 	"fmt"
 	"image"
 
@@ -37,7 +38,7 @@ type Processor struct {
 }
 
 // Process implements imageserver/image.Processor.
-func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *Processor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	if !params.Has(param) {
 		return nim, nil
 	}

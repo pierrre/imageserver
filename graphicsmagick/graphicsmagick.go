@@ -3,13 +3,13 @@ package graphicsmagick
 
 import (
 	"container/list"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/pierrre/imageserver"
 )
@@ -39,9 +39,6 @@ type Handler struct {
 	// Executable is the path to "gm" executable, usually "/usr/bin/gm".
 	Executable string
 
-	// Timeoput is an optional timeout for process.
-	Timeout time.Duration
-
 	// TempDir is an optional temp directory for image files.
 	TempDir string
 
@@ -50,7 +47,7 @@ type Handler struct {
 }
 
 // Handle implements imageserver.Handler.
-func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *Handler) Handle(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	if !params.Has(param) {
 		return im, nil
 	}
@@ -61,7 +58,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	if params.Empty() {
 		return im, nil
 	}
-	im, err = hdr.handle(im, params)
+	im, err = hdr.handle(ctx, im, params)
 	if err != nil {
 		if err, ok := err.(*imageserver.ParamError); ok {
 			err.Param = param + "." + err.Param
@@ -72,7 +69,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 }
 
 // nolint: gocyclo
-func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *Handler) handle(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	arguments := list.New()
 
 	width, height, err := hdr.buildArgumentsResize(arguments, params)
@@ -122,9 +119,12 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 	}
 
 	argumentSlice := convertArgumentsToSlice(arguments)
-	cmd := exec.Command(hdr.Executable, argumentSlice...)
-	err = hdr.runCommand(cmd)
+	cmd := exec.CommandContext(ctx, hdr.Executable, argumentSlice...)
+	err = cmd.Run()
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
 		return nil, err
 	}
 
@@ -315,29 +315,4 @@ func convertArgumentsToSlice(arguments *list.List) []string {
 		argumentSlice = append(argumentSlice, e.Value.(string))
 	}
 	return argumentSlice
-}
-
-func (hdr *Handler) runCommand(cmd *exec.Cmd) error {
-	err := cmd.Start()
-	if err != nil {
-		return err
-	}
-	cmdChan := make(chan error, 1)
-	go func() {
-		cmdChan <- cmd.Wait()
-	}()
-	var timeoutChan <-chan time.Time
-	if hdr.Timeout != 0 {
-		timeoutChan = time.After(hdr.Timeout)
-	}
-	select {
-	case err = <-cmdChan:
-	case <-timeoutChan:
-		_ = cmd.Process.Kill()
-		err = fmt.Errorf("timeout after %s", hdr.Timeout)
-	}
-	if err != nil {
-		return &imageserver.ImageError{Message: fmt.Sprintf("GraphicsMagick command: %s", err)}
-	}
-	return nil
 }

@@ -1,6 +1,7 @@
 package image
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"testing"
@@ -13,7 +14,7 @@ var _ imageserver.Handler = &Handler{}
 
 func TestHandler(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{"quality": 85})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{"quality": 85})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -21,7 +22,7 @@ func TestHandler(t *testing.T) {
 
 func TestHandlerNoChange(t *testing.T) {
 	hdr := &Handler{}
-	im, err := hdr.Handle(testdata.Medium, imageserver.Params{})
+	im, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +33,7 @@ func TestHandlerNoChange(t *testing.T) {
 
 func TestHandlerFormat(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{"format": "jpeg"})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{"format": "jpeg"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,11 +41,11 @@ func TestHandlerFormat(t *testing.T) {
 
 func TestHandlerProcessor(t *testing.T) {
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 			return nim, nil
 		}),
 	}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +53,7 @@ func TestHandlerProcessor(t *testing.T) {
 
 func TestHandlerErrorFormatParam(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{"format": "unknown"})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{"format": "unknown"})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -63,7 +64,7 @@ func TestHandlerErrorFormatParam(t *testing.T) {
 
 func TestHandlerErrorFormatImage(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(&imageserver.Image{Format: "unknown"}, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), &imageserver.Image{Format: "unknown"}, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -74,7 +75,7 @@ func TestHandlerErrorFormatImage(t *testing.T) {
 
 func TestHandlerErrorDecode(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Invalid, imageserver.Params{"format": "jpeg"})
+	_, err := hdr.Handle(context.Background(), testdata.Invalid, imageserver.Params{"format": "jpeg"})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -85,11 +86,11 @@ func TestHandlerErrorDecode(t *testing.T) {
 
 func TestHandlerErrorProcessor(t *testing.T) {
 	hdr := &Handler{
-		Processor: ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+		Processor: ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 			return nil, fmt.Errorf("error")
 		}),
 	}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
 	}
@@ -97,7 +98,7 @@ func TestHandlerErrorProcessor(t *testing.T) {
 
 func TestHandlerErrorEncode(t *testing.T) {
 	hdr := &Handler{}
-	_, err := hdr.Handle(testdata.Medium, imageserver.Params{"quality": 9001})
+	_, err := hdr.Handle(context.Background(), testdata.Medium, imageserver.Params{"quality": 9001})
 	if err == nil {
 		t.Fatal("no error")
 	}

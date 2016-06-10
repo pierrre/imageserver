@@ -1,6 +1,7 @@
 package _test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -9,8 +10,9 @@ import (
 
 // BenchmarkGet is a helper to benchmark imageserver/cache.Cache.Get().
 func BenchmarkGet(b *testing.B, cache imageserver_cache.Cache, parallelism int, im *imageserver.Image) {
+	ctx := context.Background()
 	key := "test"
-	err := cache.Set(key, im, imageserver.Params{})
+	err := cache.Set(ctx, key, im, imageserver.Params{})
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -19,7 +21,7 @@ func BenchmarkGet(b *testing.B, cache imageserver_cache.Cache, parallelism int, 
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			im, err := cache.Get(key, params)
+			im, err := cache.Get(ctx, key, params)
 			if err != nil {
 				b.Fatal(err)
 			}

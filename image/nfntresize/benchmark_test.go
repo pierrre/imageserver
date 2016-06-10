@@ -1,6 +1,7 @@
 package nfntresize
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -47,9 +48,10 @@ func benchmark(b *testing.B, name string, im *imageserver.Image, params imageser
 		param: params,
 	}
 	proc := &Processor{}
+	ctx := context.Background()
 	b.Run(name, func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_, err := proc.Process(nim, params)
+			_, err := proc.Process(ctx, nim, params)
 			if err != nil {
 				b.Fatal(err)
 			}

@@ -1,17 +1,19 @@
 // Package imageserver provides an Image server toolkit.
 package imageserver
 
+import "context"
+
 // Server serves an Image.
 type Server interface {
-	Get(Params) (*Image, error)
+	Get(context.Context, Params) (*Image, error)
 }
 
 // ServerFunc is a Server func.
-type ServerFunc func(Params) (*Image, error)
+type ServerFunc func(context.Context, Params) (*Image, error)
 
 // Get implements Server.
-func (f ServerFunc) Get(params Params) (*Image, error) {
-	return f(params)
+func (f ServerFunc) Get(ctx context.Context, params Params) (*Image, error) {
+	return f(ctx, params)
 }
 
 // NewLimitServer creates a new Server that limits the number of concurrent executions.
@@ -29,10 +31,10 @@ type limitServer struct {
 	limitCh chan struct{}
 }
 
-func (s *limitServer) Get(params Params) (*Image, error) {
+func (s *limitServer) Get(ctx context.Context, params Params) (*Image, error) {
 	s.limitCh <- struct{}{}
 	defer func() {
 		<-s.limitCh
 	}()
-	return s.Server.Get(params)
+	return s.Server.Get(ctx, params)
 }

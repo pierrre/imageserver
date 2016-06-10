@@ -1,6 +1,7 @@
 package groupcache
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
@@ -34,19 +35,20 @@ func BenchmarkServerParallelism(b *testing.B) {
 func benchmarkServer(b *testing.B, name string, im *imageserver.Image, parallelism int) {
 	b.Run(name, func(b *testing.B) {
 		srv := newTestServer(
-			imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+			imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 				return im, nil
 			}),
 			imageserver_cache.KeyGeneratorFunc(func(params imageserver.Params) string {
 				return "test"
 			}),
 		)
+		ctx := context.Background()
 		params := imageserver.Params{}
 		b.SetParallelism(parallelism)
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				_, err := srv.Get(params)
+				_, err := srv.Get(ctx, params)
 				if err != nil {
 					b.Fatal(err)
 				}

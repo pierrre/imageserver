@@ -74,7 +74,7 @@ func (handler *Handler) serveHTTP(rw http.ResponseWriter, req *http.Request) err
 	if handler.checkNotModified(rw, req, etag) {
 		return nil
 	}
-	image, err := handler.Server.Get(params)
+	image, err := handler.Server.Get(req.Context(), params)
 	if err != nil {
 		return err
 	}

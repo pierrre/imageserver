@@ -2,6 +2,7 @@ package gif
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image/gif"
 
@@ -21,7 +22,7 @@ type Handler struct {
 }
 
 // Handle implements imageserver.Handler.
-func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *Handler) Handle(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	if im.Format != "gif" {
 		return nil, &imageserver.ImageError{Message: fmt.Sprintf("image format is not gif: %s", im.Format)}
 	}
@@ -32,7 +33,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	if err != nil {
 		return nil, &imageserver.ImageError{Message: err.Error()}
 	}
-	g, err = hdr.Processor.Process(g, params)
+	g, err = hdr.Processor.Process(ctx, g, params)
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +59,12 @@ type FallbackHandler struct {
 }
 
 // Handle implements imageserver.Handler.
-func (hdr *FallbackHandler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *FallbackHandler) Handle(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	h, err := hdr.getHandler(im, params)
 	if err != nil {
 		return nil, err
 	}
-	return h.Handle(im, params)
+	return h.Handle(ctx, im, params)
 }
 
 func (hdr *FallbackHandler) getHandler(im *imageserver.Image, params imageserver.Params) (imageserver.Handler, error) {

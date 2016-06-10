@@ -2,6 +2,7 @@
 package gamma
 
 import (
+	"context"
 	"image"
 	"image/draw"
 	"math"
@@ -40,12 +41,12 @@ func NewProcessor(gamma float64, highQuality bool) *Processor {
 // Process implements imageserver/image.Processor.
 //
 // It doesn't return an error.
-func (prc *Processor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *Processor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	out := prc.newDrawable(nim)
 	bd := nim.Bounds().Intersect(out.Bounds())
 	at := imageutil.NewAtFunc(nim)
 	set := imageutil.NewSetFunc(out)
-	imageutil.Parallel1D(bd, func(bd image.Rectangle) {
+	imageutil.Parallel1D(ctx, bd, func(ctx context.Context, bd image.Rectangle) {
 		for y := bd.Min.Y; y < bd.Max.Y; y++ {
 			for x := bd.Min.X; x < bd.Max.X; x++ {
 				r, g, b, a := at(x, y)
@@ -98,15 +99,15 @@ func NewCorrectionProcessor(prc imageserver_image.Processor, enabled bool) *Corr
 }
 
 // Process implements imageserver/image.Processor.
-func (prc *CorrectionProcessor) Process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *CorrectionProcessor) Process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	enabled, err := prc.isEnabled(params)
 	if err != nil {
 		return nil, err
 	}
 	if enabled {
-		return prc.process(nim, params)
+		return prc.process(ctx, nim, params)
 	}
-	return prc.Processor.Process(nim, params)
+	return prc.Processor.Process(ctx, nim, params)
 }
 
 func (prc *CorrectionProcessor) isEnabled(params imageserver.Params) (bool, error) {
@@ -116,17 +117,17 @@ func (prc *CorrectionProcessor) isEnabled(params imageserver.Params) (bool, erro
 	return prc.enabled, nil
 }
 
-func (prc *CorrectionProcessor) process(nim image.Image, params imageserver.Params) (image.Image, error) {
+func (prc *CorrectionProcessor) process(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 	original := nim
-	nim, _ = prc.before.Process(nim, params)
-	nim, err := prc.Processor.Process(nim, params)
+	nim, _ = prc.before.Process(ctx, nim, params)
+	nim, err := prc.Processor.Process(ctx, nim, params)
 	if err != nil {
 		return nil, err
 	}
-	nim, _ = prc.after.Process(nim, params)
+	nim, _ = prc.after.Process(ctx, nim, params)
 	if isHighQuality(nim) && !isHighQuality(original) {
 		newNim := imageserver_image_internal.NewDrawableSize(original, nim.Bounds())
-		imageserver_image_internal.Copy(newNim, nim)
+		imageserver_image_internal.Copy(ctx, newNim, nim)
 		nim = newNim
 	}
 	return nim, nil

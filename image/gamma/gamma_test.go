@@ -1,6 +1,7 @@
 package gamma
 
 import (
+	"context"
 	"fmt"
 	"image"
 	"testing"
@@ -20,7 +21,7 @@ func TestProcessorProcess(t *testing.T) {
 	}
 	for _, highQuality := range []bool{false, true} {
 		prc := NewProcessor(2.2, highQuality)
-		_, err = prc.Process(nim, imageserver.Params{})
+		_, err = prc.Process(context.Background(), nim, imageserver.Params{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -42,10 +43,10 @@ func TestCorrectionProcessor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	simplePrc := imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+	simplePrc := imageserver_image.ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 		return nim, nil
 	})
-	errPrc := imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
+	errPrc := imageserver_image.ProcessorFunc(func(ctx context.Context, nim image.Image, params imageserver.Params) (image.Image, error) {
 		return nil, fmt.Errorf("error")
 	})
 	for _, tc := range []struct {
@@ -103,7 +104,7 @@ func TestCorrectionProcessor(t *testing.T) {
 			if params == nil {
 				params = imageserver.Params{}
 			}
-			_, err = prc.Process(nim, params)
+			_, err = prc.Process(context.Background(), nim, params)
 			if tc.errorExpected && err == nil {
 				t.Fatal("no error")
 			} else if !tc.errorExpected && err != nil {

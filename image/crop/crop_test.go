@@ -1,6 +1,7 @@
 package crop
 
 import (
+	"context"
 	"image"
 	"image/color"
 	"testing"
@@ -117,7 +118,7 @@ func TestProcess(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			im, err := prc.Process(tc.newImage(), tc.params)
+			im, err := prc.Process(context.Background(), tc.newImage(), tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && tc.expectedParamError == err.Param {
 					return

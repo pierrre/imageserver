@@ -1,6 +1,8 @@
 package image
 
 import (
+	"context"
+
 	"github.com/pierrre/imageserver"
 )
 
@@ -15,7 +17,7 @@ type Handler struct {
 }
 
 // Handle implements imageserver.Handler.
-func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
+func (hdr *Handler) Handle(ctx context.Context, im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	enc, format, err := getEncoderFormat(im.Format, params)
 	if err != nil {
 		if _, ok := err.(*imageserver.ParamError); !ok {
@@ -31,7 +33,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 		return nil, err
 	}
 	if hdr.Processor != nil {
-		nim, err = hdr.Processor.Process(nim, params)
+		nim, err = hdr.Processor.Process(ctx, nim, params)
 		if err != nil {
 			return nil, err
 		}

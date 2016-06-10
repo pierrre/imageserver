@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"encoding/hex"
 	"hash"
 	"io"
@@ -24,20 +25,20 @@ type Server struct {
 }
 
 // Get implements imageserver.Server.
-func (s *Server) Get(params imageserver.Params) (*imageserver.Image, error) {
+func (s *Server) Get(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 	key := s.KeyGenerator.GetKey(params)
-	im, err := s.Cache.Get(key, params)
+	im, err := s.Cache.Get(ctx, key, params)
 	if err != nil {
 		return nil, err
 	}
 	if im != nil {
 		return im, nil
 	}
-	im, err = s.Server.Get(params)
+	im, err = s.Server.Get(ctx, params)
 	if err != nil {
 		return nil, err
 	}
-	err = s.Cache.Set(key, im, params)
+	err = s.Cache.Set(ctx, key, im, params)
 	if err != nil {
 		return nil, err
 	}

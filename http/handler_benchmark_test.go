@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"crypto/sha256"
 	"net/http"
 	"testing"
@@ -12,7 +13,7 @@ import (
 func BenchmarkHandler(b *testing.B) {
 	h := &Handler{
 		Parser: &nopParser{},
-		Server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
+		Server: imageserver.ServerFunc(func(ctx context.Context, params imageserver.Params) (*imageserver.Image, error) {
 			return testdata.Medium, nil
 		}),
 		ETagFunc: func(params imageserver.Params) string {

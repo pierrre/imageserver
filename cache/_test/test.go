@@ -2,6 +2,7 @@
 package _test
 
 import (
+	"context"
 	"sync"
 	"testing"
 
@@ -20,11 +21,11 @@ const (
 
 // TestGetSet is a helper to test imageserver/cache.Cache.Get()/Set().
 func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
-	err := cache.Set(KeyValid, testdata.Medium, imageserver.Params{})
+	err := cache.Set(context.Background(), KeyValid, testdata.Medium, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	im, err := cache.Get(KeyValid, imageserver.Params{})
+	im, err := cache.Get(context.Background(), KeyValid, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +40,7 @@ func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 
 // TestGetMiss is a helper to test imageserver/cache.Cache.Get() with a "cache miss".
 func TestGetMiss(t *testing.T, cache imageserver_cache.Cache) {
-	im, err := cache.Get(KeyMiss, imageserver.Params{})
+	im, err := cache.Get(context.Background(), KeyMiss, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,14 +63,14 @@ func NewMapCache() *MapCache {
 }
 
 // Get implements imageserver/cache.Cache.
-func (cache *MapCache) Get(key string, params imageserver.Params) (*imageserver.Image, error) {
+func (cache *MapCache) Get(ctx context.Context, key string, params imageserver.Params) (*imageserver.Image, error) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()
 	return cache.data[key], nil
 }
 
 // Set implements imageserver/cache.Cache.
-func (cache *MapCache) Set(key string, im *imageserver.Image, params imageserver.Params) error {
+func (cache *MapCache) Set(ctx context.Context, key string, im *imageserver.Image, params imageserver.Params) error {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 	cache.data[key] = im
