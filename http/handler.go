@@ -97,13 +97,13 @@ func (handler *Handler) checkNotModified(rw http.ResponseWriter, req *http.Reque
 	if inm != etag {
 		return false
 	}
-	handler.setImageHeaderCommon(rw, req, etag)
+	handler.setImageHeaderCommon(rw, etag)
 	rw.WriteHeader(http.StatusNotModified)
 	return true
 }
 
 func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, image *imageserver.Image, etag string) {
-	handler.setImageHeaderCommon(rw, req, etag)
+	handler.setImageHeaderCommon(rw, etag)
 	if image.Format != "" {
 		rw.Header().Set("Content-Type", "image/"+image.Format)
 	}
@@ -113,7 +113,7 @@ func (handler *Handler) sendImage(rw http.ResponseWriter, req *http.Request, ima
 	}
 }
 
-func (handler *Handler) setImageHeaderCommon(rw http.ResponseWriter, req *http.Request, etag string) {
+func (handler *Handler) setImageHeaderCommon(rw http.ResponseWriter, etag string) {
 	if etag != "" {
 		rw.Header().Set("ETag", etag)
 	}
