@@ -9,7 +9,7 @@ import (
 const (
 	// ImageFormatMaxLen is the maximum length for the Image's format.
 	ImageFormatMaxLen = 1 << 8 // 256 B
-	// ImageDataMaxLen is the maximum length for the Mmage's data.
+	// ImageDataMaxLen is the maximum length for the Image's data.
 	ImageDataMaxLen = 1 << 30 // 1 GiB
 )
 
