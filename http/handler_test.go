@@ -21,7 +21,6 @@ func TestHandler(t *testing.T) {
 		method                string
 		url                   string
 		header                map[string]string
-		responseWriter        http.ResponseWriter
 		expectedStatusCode    int
 		expectedHeader        map[string]string
 		expectErrorFuncCalled bool
@@ -150,10 +149,7 @@ func TestHandler(t *testing.T) {
 			if tc.hasETagFunc {
 				h.ETagFunc = NewParamsHashETagFunc(sha256.New)
 			}
-			rw := tc.responseWriter
-			if rw == nil {
-				rw = httptest.NewRecorder()
-			}
+			rw := httptest.NewRecorder()
 			met := tc.method
 			if met == "" {
 				met = "GET"
@@ -168,11 +164,9 @@ func TestHandler(t *testing.T) {
 				}
 			}
 			h.ServeHTTP(rw, req)
-			if rw, ok := rw.(*httptest.ResponseRecorder); ok {
-				rw.Flush()
-				if tc.expectedStatusCode != 0 && rw.Code != tc.expectedStatusCode {
-					t.Fatalf("unexpected statud code: got %d, want %d", rw.Code, tc.expectedStatusCode)
-				}
+			rw.Flush()
+			if tc.expectedStatusCode != 0 && rw.Code != tc.expectedStatusCode {
+				t.Fatalf("unexpected statud code: got %d, want %d", rw.Code, tc.expectedStatusCode)
 			}
 			if tc.expectedHeader != nil {
 				for hd, want := range tc.expectedHeader {
