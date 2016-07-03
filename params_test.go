@@ -229,6 +229,22 @@ func TestParamsKeys(t *testing.T) {
 	}
 }
 
+func TestParamsCopy(t *testing.T) {
+	p1 := Params{
+		"s": "aaa",
+		"b": true,
+		"i": 123,
+		"f": 123.456,
+		"p": Params{
+			"foo": "bar",
+		},
+	}
+	p2 := p1.Copy()
+	if !reflect.DeepEqual(p2, p1) {
+		t.Fatalf("not equal: got %#v, want %#v", p2, p1)
+	}
+}
+
 var _ error = &ParamError{}
 
 func TestParamError(t *testing.T) {

@@ -164,6 +164,18 @@ func (params Params) toBuffer(buf *bytes.Buffer) {
 	_, _ = buf.WriteString("]")
 }
 
+// Copy returns a deep copy of the Params.
+func (params Params) Copy() Params {
+	p := Params{}
+	for k, v := range params {
+		if q, ok := v.(Params); ok {
+			v = q.Copy()
+		}
+		p[k] = v
+	}
+	return p
+}
+
 // ParamError is an error for a param.
 type ParamError struct {
 	Param   string // Nested param path uses "." as separator
