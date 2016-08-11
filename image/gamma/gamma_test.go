@@ -48,22 +48,25 @@ func TestCorrectionProcessor(t *testing.T) {
 	errPrc := imageserver_image.ProcessorFunc(func(nim image.Image, params imageserver.Params) (image.Image, error) {
 		return nil, fmt.Errorf("error")
 	})
-	type TC struct {
+	for _, tc := range []struct {
+		name          string
 		processor     imageserver_image.Processor
 		enabled       bool
 		params        imageserver.Params
 		errorExpected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:      "DefaultEnabled",
 			processor: simplePrc,
 			enabled:   true,
 		},
 		{
+			name:      "DefaultDisabled",
 			processor: simplePrc,
 			enabled:   false,
 		},
 		{
+			name:      "ParamDisabled",
 			processor: simplePrc,
 			enabled:   true,
 			params: imageserver.Params{
@@ -71,6 +74,7 @@ func TestCorrectionProcessor(t *testing.T) {
 			},
 		},
 		{
+			name:      "ParamEnabled",
 			processor: simplePrc,
 			enabled:   false,
 			params: imageserver.Params{
@@ -78,11 +82,13 @@ func TestCorrectionProcessor(t *testing.T) {
 			},
 		},
 		{
+			name:          "Error",
 			processor:     errPrc,
 			enabled:       true,
 			errorExpected: true,
 		},
 		{
+			name:      "Invalid",
 			processor: simplePrc,
 			enabled:   true,
 			params: imageserver.Params{
@@ -91,12 +97,7 @@ func TestCorrectionProcessor(t *testing.T) {
 			errorExpected: true,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			prc := NewCorrectionProcessor(tc.processor, tc.enabled)
 			params := tc.params
 			if params == nil {
@@ -108,34 +109,38 @@ func TestCorrectionProcessor(t *testing.T) {
 			} else if !tc.errorExpected && err != nil {
 				t.Fatal(err)
 			}
-		}()
-
+		})
 	}
 }
 
 func TestIsHighQuality(t *testing.T) {
 	r := image.Rect(0, 0, 1, 1)
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		p        image.Image
 		expected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "RGBA64",
 			p:        image.NewRGBA64(r),
 			expected: true,
 		},
 		{
+			name:     "NRGBA64",
 			p:        image.NewNRGBA64(r),
 			expected: true,
 		},
 		{
+			name:     "RGBA",
 			p:        image.NewRGBA(r),
 			expected: false,
 		},
 	} {
-		res := isHighQuality(tc.p)
-		if res != tc.expected {
-			t.Fatalf("unexpected result for %T: got %t, want %t", tc.p, res, tc.expected)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			res := isHighQuality(tc.p)
+			if res != tc.expected {
+				t.Fatalf("unexpected result for %T: got %t, want %t", tc.p, res, tc.expected)
+			}
+		})
 	}
 }

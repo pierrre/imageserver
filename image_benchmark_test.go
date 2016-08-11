@@ -7,92 +7,68 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkImageMarshalBinarySmall(b *testing.B) {
-	benchmarkImageMarshalBinary(b, testdata.Small)
-}
-
-func BenchmarkImageMarshalBinaryMedium(b *testing.B) {
-	benchmarkImageMarshalBinary(b, testdata.Medium)
-}
-
-func BenchmarkImageMarshalBinaryLarge(b *testing.B) {
-	benchmarkImageMarshalBinary(b, testdata.Large)
-}
-
-func BenchmarkImageMarshalBinaryHuge(b *testing.B) {
-	benchmarkImageMarshalBinary(b, testdata.Huge)
-}
-
-func benchmarkImageMarshalBinary(b *testing.B, im *Image) {
-	for i := 0; i < b.N; i++ {
-		_, err := im.MarshalBinary()
-		if err != nil {
-			b.Fatal(err)
-		}
+func BenchmarkImageMarshalBinary(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		im   *Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := tc.im.MarshalBinary()
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+			b.SetBytes(int64(len(tc.im.Data)))
+		})
 	}
-	b.SetBytes(int64(len(im.Data)))
 }
 
-func BenchmarkImageUnmarshalBinarySmall(b *testing.B) {
-	benchmarkImageUnmarshalBinary(b, testdata.Small)
-}
-
-func BenchmarkImageUnmarshalBinaryMedium(b *testing.B) {
-	benchmarkImageUnmarshalBinary(b, testdata.Medium)
-}
-
-func BenchmarkImageUnmarshalBinaryLarge(b *testing.B) {
-	benchmarkImageUnmarshalBinary(b, testdata.Large)
-}
-
-func BenchmarkImageUnmarshalBinaryHuge(b *testing.B) {
-	benchmarkImageUnmarshalBinary(b, testdata.Huge)
-}
-
-func benchmarkImageUnmarshalBinary(b *testing.B, im *Image) {
-	data, err := im.MarshalBinary()
-	if err != nil {
-		b.Fatal(err)
+func BenchmarkImageUnmarshalBinary(b *testing.B) {
+	for _, tcnc := range []struct {
+		name   string
+		nocopy bool
+	}{
+		{"Normal", false},
+		{"NoCopy", true},
+	} {
+		b.Run(tcnc.name, func(b *testing.B) {
+			for _, tcim := range []struct {
+				name string
+				im   *Image
+			}{
+				{"Small", testdata.Small},
+				{"Medium", testdata.Medium},
+				{"Large", testdata.Large},
+				{"Huge", testdata.Huge},
+			} {
+				b.Run(tcim.name, func(b *testing.B) {
+					data, err := tcim.im.MarshalBinary()
+					if err != nil {
+						b.Fatal(err)
+					}
+					imNew := new(Image)
+					var m func([]byte) error
+					if tcnc.nocopy {
+						m = imNew.UnmarshalBinaryNoCopy
+					} else {
+						m = imNew.UnmarshalBinary
+					}
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						err := m(data)
+						if err != nil {
+							b.Fatal(err)
+						}
+					}
+					b.SetBytes(int64(len(tcim.im.Data)))
+				})
+			}
+		})
 	}
-	imNew := new(Image)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		err := imNew.UnmarshalBinary(data)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-	b.SetBytes(int64(len(im.Data)))
-}
-
-func BenchmarkImageUnmarshalBinaryNoCopySmall(b *testing.B) {
-	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Small)
-}
-
-func BenchmarkImageUnmarshalBinaryNoCopyMedium(b *testing.B) {
-	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Medium)
-}
-
-func BenchmarkImageUnmarshalBinaryNoCopyLarge(b *testing.B) {
-	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Large)
-}
-
-func BenchmarkImageUnmarshalBinaryNoCopyHuge(b *testing.B) {
-	benchmarkImageUnmarshalBinaryNoCopy(b, testdata.Huge)
-}
-
-func benchmarkImageUnmarshalBinaryNoCopy(b *testing.B, im *Image) {
-	data, err := im.MarshalBinary()
-	if err != nil {
-		b.Fatal(err)
-	}
-	imNew := new(Image)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		err := imNew.UnmarshalBinaryNoCopy(data)
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-	b.SetBytes(int64(len(im.Data)))
 }

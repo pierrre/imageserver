@@ -17,26 +17,29 @@ func TestResizeProcessorProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	type TC struct {
+	for _, tc := range []struct {
+		name               string
 		processor          *ResizeProcessor
 		params             imageserver.Params
 		expectedWidth      int
 		expectedHeight     int
 		expectedParamError string
-	}
-	for _, tc := range []TC{
+	}{
 		// no size
 		{
+			name:           "Empty",
 			params:         imageserver.Params{},
 			expectedWidth:  1024,
 			expectedHeight: 819,
 		},
 		{
+			name:           "EmptyParam",
 			params:         imageserver.Params{resizeParam: imageserver.Params{}},
 			expectedWidth:  1024,
 			expectedHeight: 819,
 		},
 		{
+			name: "SizeZero",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  0,
 				"height": 0,
@@ -46,18 +49,21 @@ func TestResizeProcessorProcess(t *testing.T) {
 		},
 		// with size
 		{
+			name: "Width",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 100,
 			}},
 			expectedWidth: 100,
 		},
 		{
+			name: "Height",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"height": 100,
 			}},
 			expectedHeight: 100,
 		},
 		{
+			name: "WidthHeight",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  100,
 				"height": 100,
@@ -67,6 +73,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 		},
 		// mode
 		{
+			name: "ModeFit",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  100,
 				"height": 100,
@@ -76,6 +83,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedHeight: 80,
 		},
 		{
+			name: "ModeFillWidthHeight",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  100,
 				"height": 100,
@@ -85,6 +93,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedHeight: 100,
 		},
 		{
+			name: "ModeFill",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 100,
 				"mode":  "fill",
@@ -94,6 +103,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 		},
 		// resampling
 		{
+			name:      "ResamplingDefault",
 			processor: &ResizeProcessor{DefaultResampling: gift.NearestNeighborResampling},
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 100,
@@ -101,6 +111,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "ResamplingNearestNeighbor",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "nearest_neighbor",
@@ -108,6 +119,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "ResamplingBox",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "box",
@@ -115,6 +127,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "ResamplingLinear",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "linear",
@@ -122,6 +135,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "ResamplingCubic",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "cubic",
@@ -129,6 +143,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "ResamplingLanczos",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "lanczos",
@@ -137,34 +152,40 @@ func TestResizeProcessorProcess(t *testing.T) {
 		},
 		// error
 		{
+			name:               "ParamInvalid",
 			params:             imageserver.Params{resizeParam: "invalid"},
 			expectedParamError: resizeParam,
 		},
 		{
+			name: "WidthInvalidType",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": "invalid",
 			}},
 			expectedParamError: resizeParam + ".width",
 		},
 		{
+			name: "HeightInvalidInvalid",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"height": "invalid",
 			}},
 			expectedParamError: resizeParam + ".height",
 		},
 		{
+			name: "WidthInvalidNegative",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": -1,
 			}},
 			expectedParamError: resizeParam + ".width",
 		},
 		{
+			name: "HeightInvalidNegative",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"height": -1,
 			}},
 			expectedParamError: resizeParam + ".height",
 		},
 		{
+			name:      "WidthInvalidTooLarge",
 			processor: &ResizeProcessor{MaxWidth: 500},
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 1000,
@@ -172,6 +193,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".width",
 		},
 		{
+			name:      "HeightInvalidTooLarge",
 			processor: &ResizeProcessor{MaxHeight: 500},
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"height": 1000,
@@ -179,6 +201,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".height",
 		},
 		{
+			name: "ModeInvalidType",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  100,
 				"height": 100,
@@ -187,6 +210,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".mode",
 		},
 		{
+			name: "ModeInvalidUnknown",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":  100,
 				"height": 100,
@@ -195,6 +219,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".mode",
 		},
 		{
+			name: "ResamplingInvalidType",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": 666,
@@ -202,6 +227,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".resampling",
 		},
 		{
+			name: "ResamplingInvalidUnknown",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width":      100,
 				"resampling": "invalid",
@@ -209,12 +235,7 @@ func TestResizeProcessorProcess(t *testing.T) {
 			expectedParamError: resizeParam + ".resampling",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			prc := tc.processor
 			if prc == nil {
 				prc = &ResizeProcessor{}
@@ -235,58 +256,59 @@ func TestResizeProcessorProcess(t *testing.T) {
 			if tc.expectedHeight != 0 && nim.Bounds().Dy() != tc.expectedHeight {
 				t.Fatalf("unexpected height: got %d, want %d", nim.Bounds().Dy(), tc.expectedHeight)
 			}
-		}()
+		})
 	}
 }
 
 func TestResizeProcessorChange(t *testing.T) {
 	prc := &ResizeProcessor{}
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		params   imageserver.Params
 		expected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "Empty",
 			params:   imageserver.Params{},
 			expected: false,
 		},
 		{
+			name:     "ParamInvalid",
 			params:   imageserver.Params{resizeParam: "invalid"},
 			expected: true,
 		},
 		{
+			name:     "EmptyParam",
 			params:   imageserver.Params{resizeParam: imageserver.Params{}},
 			expected: false,
 		},
 		{
+			name: "Width",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"width": 100,
 			}},
 			expected: true,
 		},
 		{
+			name: "Invalid",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"height": 100,
 			}},
 			expected: true,
 		},
 		{
+			name: "ParamUnknown",
 			params: imageserver.Params{resizeParam: imageserver.Params{
 				"foo": "bar",
 			}},
 			expected: false,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			result := prc.Change(tc.params)
 			if result != tc.expected {
 				t.Fatalf("unexpected result: got %t, want %t", result, tc.expected)
 			}
-		}()
+		})
 	}
 }

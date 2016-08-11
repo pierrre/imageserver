@@ -65,8 +65,7 @@ func TestServerGet(t *testing.T) {
 			expectedParamError: imageserver_source.Param,
 		},
 	} {
-		func() {
-			t.Logf("test: %s", tc.name)
+		t.Run(tc.name, func(t *testing.T) {
 			im, err := srv.Get(tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
@@ -86,7 +85,7 @@ func TestServerGet(t *testing.T) {
 			if !bytes.Equal(im.Data, tc.expectedImage.Data) {
 				t.Fatal("data not equal")
 			}
-		}()
+		})
 	}
 }
 
@@ -186,8 +185,7 @@ func TestIdentifyHeader(t *testing.T) {
 			expectedError: true,
 		},
 	} {
-		func() {
-			t.Logf("test: %s", tc.name)
+		t.Run(tc.name, func(t *testing.T) {
 			format, err := IdentifyHeader(tc.resp, tc.data)
 			if err != nil {
 				if tc.expectedError {
@@ -201,6 +199,6 @@ func TestIdentifyHeader(t *testing.T) {
 			if format != tc.expectedFormat {
 				t.Fatalf("unexpected format: got %s, want %s", format, tc.expectedFormat)
 			}
-		}()
+		})
 	}
 }

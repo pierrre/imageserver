@@ -143,24 +143,26 @@ func TestImageMarshalBugByteBufferPool(t *testing.T) {
 }
 
 func TestImageEqual(t *testing.T) {
-	type TC struct {
-		im1         *Image
-		im2         *Image
-		equal       bool
-		description string
-	}
-	for _, tc := range []TC{
-		{nil, nil, true, "both nil"},
-		{nil, testdata.Medium, false, "nil / not nil"},
-		{testdata.Medium, nil, false, "not nil / nil"},
-		{testdata.Medium, testdata.Medium, true, "same"},
-		{testdata.Medium, imageCopy(testdata.Medium), true, "copy"},
-		{testdata.Medium, testdata.Animated, false, "different format"},
-		{testdata.Medium, testdata.Small, false, "different data"},
+	for _, tc := range []struct {
+		name     string
+		im1      *Image
+		im2      *Image
+		expected bool
+	}{
+		{"BothNil", nil, nil, true},
+		{"Nil|NotNil", nil, testdata.Medium, false},
+		{"NotNil|Nil", testdata.Medium, nil, false},
+		{"Same", testdata.Medium, testdata.Medium, true},
+		{"Copy", testdata.Medium, imageCopy(testdata.Medium), true},
+		{"DifferentFormat", testdata.Medium, testdata.Animated, false},
+		{"DifferentData", testdata.Medium, testdata.Small, false},
 	} {
-		if ImageEqual(tc.im1, tc.im2) != tc.equal {
-			t.Fatalf("invalid result for test: %s", tc.description)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			res := ImageEqual(tc.im1, tc.im2)
+			if res != tc.expected {
+				t.Fatalf("unexpected result: got %t, want %t", res, tc.expected)
+			}
+		})
 	}
 }
 

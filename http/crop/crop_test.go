@@ -13,18 +13,20 @@ var _ imageserver_http.Parser = &Parser{}
 
 func TestParse(t *testing.T) {
 	ps := &Parser{}
-	type TC struct {
+	for _, tc := range []struct {
+		name               string
 		url                string
 		expectedParams     imageserver.Params
 		expectedParamError string
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:           "Empty",
 			url:            "http://localhost",
 			expectedParams: imageserver.Params{},
 		},
 		{
-			url: "http://localhost?crop=1,2|3,4",
+			name: "Valid",
+			url:  "http://localhost?crop=1,2|3,4",
 			expectedParams: imageserver.Params{param: imageserver.Params{
 				"min_x": 1,
 				"min_y": 2,
@@ -33,16 +35,12 @@ func TestParse(t *testing.T) {
 			}},
 		},
 		{
+			name:               "Invalid",
 			url:                "http://localhost?crop=invalid",
 			expectedParamError: "crop",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			req, err := http.NewRequest("GET", tc.url, nil)
 			if err != nil {
 				t.Fatal(err)
@@ -61,34 +59,39 @@ func TestParse(t *testing.T) {
 			if !reflect.DeepEqual(params, tc.expectedParams) {
 				t.Fatalf("unexpected params: got %s, want %s", params, tc.expectedParams)
 			}
-		}()
+		})
 	}
 }
 
 func TestResolve(t *testing.T) {
 	ps := &Parser{}
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		param    string
 		expected string
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "Param",
 			param:    param,
 			expected: param,
 		},
 		{
+			name:     "MinX",
 			param:    param + ".min_x",
 			expected: param,
 		},
 		{
+			name:     "Other",
 			param:    "foobar",
 			expected: "",
 		},
 	} {
-		httpParam := ps.Resolve(tc.param)
-		if httpParam != tc.expected {
-			t.Logf("param %s", tc.param)
-			t.Fatalf("unexpected result: got '%s', want %s''", httpParam, tc.expected)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			httpParam := ps.Resolve(tc.param)
+			if httpParam != tc.expected {
+				t.Logf("param %s", tc.param)
+				t.Fatalf("unexpected result: got '%s', want %s''", httpParam, tc.expected)
+			}
+		})
 	}
 }

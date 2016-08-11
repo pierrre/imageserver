@@ -107,13 +107,6 @@ func TestHandlerErrorEncode(t *testing.T) {
 var _ imageserver.Handler = &FallbackHandler{}
 
 func TestFallbackHandler(t *testing.T) {
-	type TC struct {
-		image              *imageserver.Image
-		params             imageserver.Params
-		expectedHandler    bool
-		expectedFormat     string
-		expectedParamError string
-	}
 	var hc bool
 	hdr := &FallbackHandler{
 		Handler: &Handler{
@@ -137,43 +130,50 @@ func TestFallbackHandler(t *testing.T) {
 			return im, nil
 		}),
 	}
-	for _, tc := range []TC{
+	for _, tc := range []struct {
+		name               string
+		image              *imageserver.Image
+		params             imageserver.Params
+		expectedHandler    bool
+		expectedFormat     string
+		expectedParamError string
+	}{
 		{
+			name:            "JPEGDefaultFallbackHandler",
 			image:           testdata.Medium,
 			params:          imageserver.Params{},
 			expectedHandler: false,
 			expectedFormat:  "jpeg",
 		},
 		{
+			name:            "GifDefaultHandler",
 			image:           testdata.Animated,
 			params:          imageserver.Params{},
 			expectedHandler: true,
 			expectedFormat:  "gif",
 		},
 		{
+			name:               "InvalidFormat",
 			image:              testdata.Animated,
 			params:             imageserver.Params{"format": 666},
 			expectedParamError: "format",
 		},
 		{
+			name:            "GifParamFallbackHandler",
 			image:           testdata.Animated,
 			params:          imageserver.Params{"format": "jpeg"},
 			expectedHandler: false,
 			expectedFormat:  "jpeg",
 		},
 		{
+			name:            "GifParamHandler",
 			image:           testdata.Animated,
 			params:          imageserver.Params{"format": "gif"},
 			expectedHandler: true,
 			expectedFormat:  "gif",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			im, err := hdr.Handle(tc.image, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
@@ -190,6 +190,6 @@ func TestFallbackHandler(t *testing.T) {
 			if hc != tc.expectedHandler {
 				t.Fatalf("wrong Handler called: got %t, want %t", hc, tc.expectedHandler)
 			}
-		}()
+		})
 	}
 }

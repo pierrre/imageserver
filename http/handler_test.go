@@ -15,7 +15,8 @@ import (
 var _ http.Handler = &Handler{}
 
 func TestHandler(t *testing.T) {
-	type TC struct {
+	for _, tc := range []struct {
+		name                  string
 		hasETagFunc           bool
 		server                imageserver.Server
 		method                string
@@ -24,9 +25,9 @@ func TestHandler(t *testing.T) {
 		expectedStatusCode    int
 		expectedHeader        map[string]string
 		expectErrorFuncCalled bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:               "Normal",
 			hasETagFunc:        true,
 			url:                "http://localhost?source=medium.jpg",
 			expectedStatusCode: http.StatusOK,
@@ -39,12 +40,14 @@ func TestHandler(t *testing.T) {
 			},
 		},
 		{
+			name:               "MethodHead",
 			method:             "HEAD",
 			url:                "http://localhost?source=medium.jpg",
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			url: "http://localhost?source=medium.jpg",
+			name: "IfNoneMatchNoETagFunc",
+			url:  "http://localhost?source=medium.jpg",
 			header: map[string]string{
 				"If-None-Match": fmt.Sprintf("\"%s\"", NewParamsHashETagFunc(sha256.New)(imageserver.Params{
 					imageserver_source.Param: testdata.MediumFileName,
@@ -53,6 +56,7 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
+			name:        "IfNoneMatchNotModified",
 			hasETagFunc: true,
 			url:         "http://localhost?source=medium.jpg",
 			header: map[string]string{
@@ -63,6 +67,7 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusNotModified,
 		},
 		{
+			name:        "IfNoneMatchInvalidFormat",
 			hasETagFunc: true,
 			url:         "http://localhost?source=medium.jpg",
 			header: map[string]string{
@@ -71,6 +76,7 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
+			name:        "IfNoneMatchDifferent",
 			hasETagFunc: true,
 			url:         "http://localhost?source=medium.jpg",
 			header: map[string]string{
@@ -79,16 +85,19 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
+			name:               "MethodUnsupported",
 			method:             "POST",
 			url:                "http://localhost?source=medium.jpg",
 			expectedStatusCode: http.StatusMethodNotAllowed,
 		},
 		{
+			name:               "RequestParseError",
 			url:                "http://localhost?error=foo",
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			url: "http://localhost",
+			name: "SourceParamError",
+			url:  "http://localhost",
 			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ParamError{
 					Param:   imageserver_source.Param,
@@ -98,7 +107,8 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			url: "http://localhost",
+			name: "ParamError",
+			url:  "http://localhost",
 			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ParamError{
 					Param:   "foobar",
@@ -108,7 +118,8 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			url: "http://localhost",
+			name: "ImageError",
+			url:  "http://localhost",
 			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 				return nil, &imageserver.ImageError{
 					Message: "error",
@@ -117,7 +128,8 @@ func TestHandler(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			url: "http://localhost",
+			name: "InternalError",
+			url:  "http://localhost",
 			server: imageserver.ServerFunc(func(params imageserver.Params) (*imageserver.Image, error) {
 				return nil, fmt.Errorf("error")
 			}),
@@ -125,12 +137,7 @@ func TestHandler(t *testing.T) {
 			expectErrorFuncCalled: true,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			errorFuncCalled := false
 			h := &Handler{
 				Parser: ListParser{
@@ -179,7 +186,7 @@ func TestHandler(t *testing.T) {
 			if tc.expectErrorFuncCalled && !errorFuncCalled {
 				t.Fatal("ErrorFunc not called")
 			}
-		}()
+		})
 	}
 }
 

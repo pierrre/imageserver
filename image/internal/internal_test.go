@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -91,7 +92,9 @@ func TestNewDrawable(t *testing.T) {
 		},
 	} {
 		p := newImage(r)
-		NewDrawable(p)
+		t.Run(fmt.Sprintf("%T", p), func(t *testing.T) {
+			NewDrawable(p)
+		})
 	}
 }
 
@@ -100,50 +103,58 @@ type testImageDefault struct {
 }
 
 func TestCopy(t *testing.T) {
-	type TC struct {
+	for _, tc := range []struct {
+		name    string
 		srcSize image.Rectangle
 		dstSize image.Rectangle
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:    "Equal",
 			srcSize: image.Rect(0, 0, 10, 10),
 			dstSize: image.Rect(0, 0, 10, 10),
 		},
 		{
+			name:    "Larger",
 			srcSize: image.Rect(0, 0, 5, 5),
 			dstSize: image.Rect(0, 0, 10, 10),
 		},
 		{
+			name:    "Smaller",
 			srcSize: image.Rect(0, 0, 10, 10),
 			dstSize: image.Rect(0, 0, 5, 5),
 		},
 		{
+			name:    "NoIntersection",
 			srcSize: image.Rect(0, 0, 5, 5),
 			dstSize: image.Rect(5, 5, 10, 10),
 		},
 		{
+			name:    "Intersection1",
 			srcSize: image.Rect(0, 0, 10, 10),
 			dstSize: image.Rect(5, 5, 15, 15),
 		},
 		{
+			name:    "Intersection2",
 			srcSize: image.Rect(5, 5, 15, 15),
 			dstSize: image.Rect(0, 0, 10, 10),
 		},
 	} {
-		src := image.NewRGBA(tc.srcSize)
-		testDrawRandom(src)
-		dst := image.NewRGBA(tc.dstSize)
-		Copy(dst, src)
-		bd := src.Bounds().Intersect(dst.Bounds())
-		for y, yEnd := bd.Min.Y, bd.Max.Y; y < yEnd; y++ {
-			for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
-				cSrc := src.At(x, y)
-				cDst := dst.At(x, y)
-				if cSrc != cDst {
-					t.Fatalf("different color: %#v, pixel %dx%d: src=%#v, dst=%#v", tc, x, y, cSrc, cDst)
+		t.Run(tc.name, func(t *testing.T) {
+			src := image.NewRGBA(tc.srcSize)
+			testDrawRandom(src)
+			dst := image.NewRGBA(tc.dstSize)
+			Copy(dst, src)
+			bd := src.Bounds().Intersect(dst.Bounds())
+			for y, yEnd := bd.Min.Y, bd.Max.Y; y < yEnd; y++ {
+				for x, xEnd := bd.Min.X, bd.Max.X; x < xEnd; x++ {
+					cSrc := src.At(x, y)
+					cDst := dst.At(x, y)
+					if cSrc != cDst {
+						t.Fatalf("different color: %#v, pixel %dx%d: src=%#v, dst=%#v", tc, x, y, cSrc, cDst)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 

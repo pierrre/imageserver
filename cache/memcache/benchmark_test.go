@@ -8,19 +8,18 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkGetSmall(b *testing.B) {
-	benchmarkGet(b, testdata.Small)
-}
-
-func BenchmarkGetMedium(b *testing.B) {
-	benchmarkGet(b, testdata.Medium)
-}
-
-func BenchmarkGetLarge(b *testing.B) {
-	benchmarkGet(b, testdata.Large)
-}
-
-func benchmarkGet(b *testing.B, image *imageserver.Image) {
-	cache := newTestCache(b)
-	cachetest.BenchmarkGet(b, cache, 1, image) // memcached is unstable with more parallelism
+func BenchmarkGet(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			cch := newTestCache(b)
+			cachetest.BenchmarkGet(b, cch, 1, tc.im) // memcached is unstable with more parallelism
+		})
+	}
 }

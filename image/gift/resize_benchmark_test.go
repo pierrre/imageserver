@@ -8,54 +8,35 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkResizeProcessorSizeSmall(b *testing.B) {
-	benchmarkResizeProcessorSize(b, testdata.Small)
-}
-
-func BenchmarkResizeProcessorSizeMedium(b *testing.B) {
-	benchmarkResizeProcessorSize(b, testdata.Medium)
-}
-
-func BenchmarkResizeProcessorSizeLarge(b *testing.B) {
-	benchmarkResizeProcessorSize(b, testdata.Large)
-}
-
-func BenchmarkResizeProcessorSizeHuge(b *testing.B) {
-	benchmarkResizeProcessorSize(b, testdata.Huge)
-}
-
-func benchmarkResizeProcessorSize(b *testing.B, im *imageserver.Image) {
-	benchmarkResizeProcessor(b, im, imageserver.Params{})
-}
-
-func BenchmarkResizeProcessorResamplingNearestNeighbor(b *testing.B) {
-	benchmarkResizeProcessorResampling(b, "nearest_neighbor")
-}
-
-func BenchmarkResizeProcessorResamplingBox(b *testing.B) {
-	benchmarkResizeProcessorResampling(b, "box")
-}
-
-func BenchmarkResizeProcessorResamplingLinear(b *testing.B) {
-	benchmarkResizeProcessorResampling(b, "linear")
-}
-
-func BenchmarkResizeProcessorResamplingCubic(b *testing.B) {
-	benchmarkResizeProcessorResampling(b, "cubic")
-}
-
-func BenchmarkResizeProcessorResamplingLanczos(b *testing.B) {
-	benchmarkResizeProcessorResampling(b, "lanczos")
-}
-
-func benchmarkResizeProcessorResampling(b *testing.B, rsp string) {
-	params := imageserver.Params{
-		"resampling": rsp,
+func BenchmarkResizeProcessorSize(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
+		benchmarkResizeProcessor(b, tc.name, tc.im, imageserver.Params{})
 	}
-	benchmarkResizeProcessor(b, testdata.Medium, params)
 }
 
-func benchmarkResizeProcessor(b *testing.B, im *imageserver.Image, params imageserver.Params) {
+func BenchmarkResizeProcessorResampling(b *testing.B) {
+	for _, r := range []string{
+		"nearest_neighbor",
+		"box",
+		"linear",
+		"cubic",
+		"lanczos",
+	} {
+		benchmarkResizeProcessor(b, r, testdata.Medium, imageserver.Params{
+			"resampling": r,
+		})
+	}
+}
+
+func benchmarkResizeProcessor(b *testing.B, name string, im *imageserver.Image, params imageserver.Params) {
 	nim, err := imageserver_image.Decode(im)
 	if err != nil {
 		b.Fatal(err)
@@ -65,11 +46,12 @@ func benchmarkResizeProcessor(b *testing.B, im *imageserver.Image, params images
 		resizeParam: params,
 	}
 	prc := &ResizeProcessor{}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, err := prc.Process(nim, params)
-		if err != nil {
-			b.Fatal(err)
+	b.Run(name, func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_, err := prc.Process(nim, params)
+			if err != nil {
+				b.Fatal(err)
+			}
 		}
-	}
+	})
 }

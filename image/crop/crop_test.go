@@ -13,15 +13,16 @@ var _ imageserver_image.Processor = &Processor{}
 
 func TestProcess(t *testing.T) {
 	prc := &Processor{}
-	type TC struct {
+	for _, tc := range []struct {
+		name               string
 		newImage           func() image.Image
 		params             imageserver.Params
 		expectedParamError string
 		expectedImageError bool
 		expectedBounds     image.Rectangle
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name: "Empty",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -29,6 +30,7 @@ func TestProcess(t *testing.T) {
 			expectedBounds: image.Rect(0, 0, 100, 100),
 		},
 		{
+			name: "Crop",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -41,6 +43,7 @@ func TestProcess(t *testing.T) {
 			expectedBounds: image.Rect(20, 20, 50, 50),
 		},
 		{
+			name: "Invalid",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -48,6 +51,7 @@ func TestProcess(t *testing.T) {
 			params:             imageserver.Params{param: "invalid"},
 		},
 		{
+			name: "InvalidMinX",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -60,6 +64,7 @@ func TestProcess(t *testing.T) {
 			expectedParamError: "crop.min_x",
 		},
 		{
+			name: "InvalidMinY",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -72,6 +77,7 @@ func TestProcess(t *testing.T) {
 			expectedParamError: "crop.min_y",
 		},
 		{
+			name: "InvalidMaxX",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -84,6 +90,7 @@ func TestProcess(t *testing.T) {
 			expectedParamError: "crop.max_x",
 		},
 		{
+			name: "InvalidMaxY",
 			newImage: func() image.Image {
 				return image.NewRGBA(image.Rect(0, 0, 100, 100))
 			},
@@ -96,6 +103,7 @@ func TestProcess(t *testing.T) {
 			expectedParamError: "crop.max_y",
 		},
 		{
+			name: "ImageError",
 			newImage: func() image.Image {
 				return image.NewUniform(color.White)
 			},
@@ -108,12 +116,7 @@ func TestProcess(t *testing.T) {
 			expectedImageError: true,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			im, err := prc.Process(tc.newImage(), tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && tc.expectedParamError == err.Param {
@@ -133,22 +136,24 @@ func TestProcess(t *testing.T) {
 			if im.Bounds() != tc.expectedBounds {
 				t.Fatalf("unexpected bounds: got %#v, want %#v", im.Bounds(), tc.expectedBounds)
 			}
-		}()
+		})
 	}
 }
 
 func TestChange(t *testing.T) {
 	prc := &Processor{}
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		params   imageserver.Params
 		expected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "Empty",
 			params:   imageserver.Params{},
 			expected: false,
 		},
 		{
+			name: "Crop",
 			params: imageserver.Params{
 				param: imageserver.Params{
 					"min_x": 1,
@@ -160,15 +165,18 @@ func TestChange(t *testing.T) {
 			expected: true,
 		},
 		{
+			name: "Invalid",
 			params: imageserver.Params{
 				param: "invalid",
 			},
 			expected: true,
 		},
 	} {
-		change := prc.Change(tc.params)
-		if change != tc.expected {
-			t.Fatalf("unexpected result for %s: got %t, want %t", tc.params, change, tc.expected)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			change := prc.Change(tc.params)
+			if change != tc.expected {
+				t.Fatalf("unexpected result for %s: got %t, want %t", tc.params, change, tc.expected)
+			}
+		})
 	}
 }

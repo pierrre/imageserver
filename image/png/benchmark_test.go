@@ -10,51 +10,41 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkSizeSmall(b *testing.B) {
-	benchmarkSize(b, testdata.Small)
-}
-
-func BenchmarkSizeMedium(b *testing.B) {
-	benchmarkSize(b, testdata.Medium)
-}
-
-func BenchmarkSizeLarge(b *testing.B) {
-	benchmarkSize(b, testdata.Large)
-}
-
-func BenchmarkSizeHuge(b *testing.B) {
-	benchmarkSize(b, testdata.Huge)
-}
-
-func benchmarkSize(b *testing.B, im *imageserver.Image) {
+func BenchmarkSize(b *testing.B) {
 	enc := &Encoder{}
-	benchmark(b, enc, im)
-}
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
 
-func BenchmarkCompressionLevelDefaultCompression(b *testing.B) {
-	benchmarkCompressionLevel(b, png.DefaultCompression)
-}
-
-func BenchmarkCompressionLevelNoCompression(b *testing.B) {
-	benchmarkCompressionLevel(b, png.NoCompression)
-}
-
-func BenchmarkCompressionLevelBestSpeed(b *testing.B) {
-	benchmarkCompressionLevel(b, png.BestSpeed)
-}
-
-func BenchmarkCompressionLevelBestCompression(b *testing.B) {
-	benchmarkCompressionLevel(b, png.BestCompression)
-}
-
-func benchmarkCompressionLevel(b *testing.B, cl png.CompressionLevel) {
-	enc := &Encoder{
-		CompressionLevel: cl,
+		benchmark(b, tc.name, enc, tc.im)
 	}
-	benchmark(b, enc, testdata.Medium)
 }
 
-func benchmark(b *testing.B, enc *Encoder, im *imageserver.Image) {
-	params := imageserver.Params{}
-	imageserver_image_test.BenchmarkEncoder(b, enc, im, params)
+func BenchmarkCompressionLevel(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		cl   png.CompressionLevel
+	}{
+		{"DefaultCompression", png.DefaultCompression},
+		{"NoCompression", png.NoCompression},
+		{"BestSpeed", png.BestSpeed},
+		{"BestCompression", png.BestCompression},
+	} {
+		enc := &Encoder{
+			CompressionLevel: tc.cl,
+		}
+		benchmark(b, tc.name, enc, testdata.Medium)
+	}
+}
+
+func benchmark(b *testing.B, name string, enc *Encoder, im *imageserver.Image) {
+	b.Run(name, func(b *testing.B) {
+		imageserver_image_test.BenchmarkEncoder(b, enc, im, imageserver.Params{})
+	})
 }

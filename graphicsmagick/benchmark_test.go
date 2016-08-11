@@ -7,23 +7,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkResizeSmall(b *testing.B) {
-	benchmarkResize(b, testdata.Small)
-}
-
-func BenchmarkResizeMedium(b *testing.B) {
-	benchmarkResize(b, testdata.Medium)
-}
-
-func BenchmarkResizeLarge(b *testing.B) {
-	benchmarkResize(b, testdata.Large)
-}
-
-func BenchmarkResizeHuge(b *testing.B) {
-	benchmarkResize(b, testdata.Huge)
-}
-
-func benchmarkResize(b *testing.B, im *imageserver.Image) {
+func BenchmarkResize(b *testing.B) {
 	testCheckAvailable(b)
 	hdr := &Handler{
 		Executable: testExecutable,
@@ -33,10 +17,22 @@ func benchmarkResize(b *testing.B, im *imageserver.Image) {
 			"width": 100,
 		},
 	}
-	for i := 0; i < b.N; i++ {
-		_, err := hdr.Handle(im, params)
-		if err != nil {
-			b.Fatal(err)
-		}
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, err := hdr.Handle(tc.im, params)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }

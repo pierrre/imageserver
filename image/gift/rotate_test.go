@@ -17,27 +17,30 @@ func TestRotateProcessorProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	type TC struct {
-		processor          *RotateProcessor
+	prc := &RotateProcessor{}
+	for _, tc := range []struct {
+		name               string
 		params             imageserver.Params
 		expectedWidth      int
 		expectedHeight     int
 		expectedParamError string
-	}
-	for _, tc := range []TC{
+	}{
 		// no rotation
 		{
+			name:           "Empty",
 			params:         imageserver.Params{},
 			expectedWidth:  1024,
 			expectedHeight: 819,
 		},
 		{
+			name:           "EmptyParam",
 			params:         imageserver.Params{rotateParam: imageserver.Params{}},
 			expectedWidth:  1024,
 			expectedHeight: 819,
 		},
 		// with rotation
 		{
+			name: "Rotation0",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 0.0,
 			}},
@@ -45,6 +48,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedHeight: 819,
 		},
 		{
+			name: "Rotation360",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 360.0,
 			}},
@@ -52,6 +56,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedHeight: 819,
 		},
 		{
+			name: "Rotation90",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 90.0,
 			}},
@@ -59,6 +64,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedHeight: 1024,
 		},
 		{
+			name: "Rotation180",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 180.0,
 			}},
@@ -66,6 +72,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedHeight: 819,
 		},
 		{
+			name: "Rotation270",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 270.0,
 			}},
@@ -73,6 +80,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedHeight: 1024,
 		},
 		{
+			name: "Rotation45",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 45.0,
 			}},
@@ -81,6 +89,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 		},
 		// background
 		{
+			name: "Background",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":   45.0,
 				"background": "FF0000",
@@ -88,18 +97,21 @@ func TestRotateProcessorProcess(t *testing.T) {
 		},
 		// interpolation
 		{
+			name: "InterpolationNearestNeighbor",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":      45.0,
 				"interpolation": "nearest_neighbor",
 			}},
 		},
 		{
+			name: "InterpolationLinear",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":      45.0,
 				"interpolation": "linear",
 			}},
 		},
 		{
+			name: "InterpolationCubic",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":      45.0,
 				"interpolation": "cubic",
@@ -107,16 +119,19 @@ func TestRotateProcessorProcess(t *testing.T) {
 		},
 		// error
 		{
+			name:               "ParamInvalid",
 			params:             imageserver.Params{rotateParam: "invalid"},
 			expectedParamError: rotateParam,
 		},
 		{
+			name: "RotationInvalid",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": "invalid",
 			}},
 			expectedParamError: rotateParam + ".rotation",
 		},
 		{
+			name: "BackgroundInvalidColor",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":   45.0,
 				"background": "invalid",
@@ -124,6 +139,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedParamError: rotateParam + ".background",
 		},
 		{
+			name: "BackgroundInvalidType",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":   45.0,
 				"background": 666,
@@ -131,6 +147,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedParamError: rotateParam + ".background",
 		},
 		{
+			name: "InterpolationInvalidUnknown",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":      45.0,
 				"interpolation": "invalid",
@@ -138,6 +155,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedParamError: rotateParam + ".interpolation",
 		},
 		{
+			name: "InteprolationInvalidType",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation":      45.0,
 				"interpolation": 666,
@@ -145,16 +163,7 @@ func TestRotateProcessorProcess(t *testing.T) {
 			expectedParamError: rotateParam + ".interpolation",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
-			prc := tc.processor
-			if prc == nil {
-				prc = &RotateProcessor{}
-			}
+		t.Run(tc.name, func(t *testing.T) {
 			nim, err := prc.Process(nim, tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
@@ -171,59 +180,67 @@ func TestRotateProcessorProcess(t *testing.T) {
 			if tc.expectedHeight != 0 && nim.Bounds().Dy() != tc.expectedHeight {
 				t.Fatalf("unexpected height: got %d, want %d", nim.Bounds().Dy(), tc.expectedHeight)
 			}
-		}()
+		})
 	}
 }
 
 func TestRotateProcessorGetRotation(t *testing.T) {
 	prc := &RotateProcessor{}
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		params   imageserver.Params
 		expected float32
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "Empty",
 			params:   imageserver.Params{},
 			expected: 0,
 		},
 		{
+			name: "0",
 			params: imageserver.Params{
 				"rotation": 0.0,
 			},
 			expected: 0,
 		},
 		{
+			name: "10",
 			params: imageserver.Params{
 				"rotation": 10.0,
 			},
 			expected: 10,
 		},
 		{
+			name: "-10",
 			params: imageserver.Params{
 				"rotation": -10.0,
 			},
 			expected: 350,
 		},
 		{
+			name: "370",
 			params: imageserver.Params{
 				"rotation": 370.0,
 			},
 			expected: 10,
 		},
 		{
+			name: "360",
 			params: imageserver.Params{
 				"rotation": 360.0,
 			},
 			expected: 0,
 		},
 	} {
-		res, err := prc.getRotation(tc.params)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if res != tc.expected {
-			t.Fatalf("unexpected result for %#v: got %f, want %f", tc.params, res, tc.expected)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			res, err := prc.getRotation(tc.params)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if res != tc.expected {
+				t.Fatalf("unexpected result for %#v: got %f, want %f", tc.params, res, tc.expected)
+			}
+		})
 	}
 }
 
@@ -236,56 +253,55 @@ func TestRotateProcessorGetRotationError(t *testing.T) {
 
 func TestRotateProcessorChange(t *testing.T) {
 	prc := &RotateProcessor{}
-	type TC struct {
+	for _, tc := range []struct {
+		name     string
 		params   imageserver.Params
 		expected bool
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:     "Empty",
 			params:   imageserver.Params{},
 			expected: false,
 		},
 		{
+			name:     "ParamInvalid",
 			params:   imageserver.Params{rotateParam: "invalid"},
 			expected: true,
 		},
 		{
+			name:     "ParamEmpty",
 			params:   imageserver.Params{rotateParam: imageserver.Params{}},
 			expected: false,
 		},
 		{
+			name: "Rotation",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 45.0,
 			}},
 			expected: true,
 		},
 		{
+			name: "ParamUnknown",
 			params: imageserver.Params{rotateParam: imageserver.Params{
 				"foo": "bar",
 			}},
 			expected: false,
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			result := prc.Change(tc.params)
 			if result != tc.expected {
 				t.Fatalf("unexpected result: got %t, want %t", result, tc.expected)
 			}
-		}()
+		})
 	}
 }
 
 func TestParseHexColor(t *testing.T) {
-	type TC struct {
+	for _, tc := range []struct {
 		hex      string
 		expected color.Color
-	}
-	for _, tc := range []TC{
+	}{
 		{
 			hex:      "F84",
 			expected: color.NRGBA{R: 0xff, G: 0x88, B: 0x44, A: 0xff},
@@ -303,13 +319,15 @@ func TestParseHexColor(t *testing.T) {
 			expected: color.NRGBA{R: 0x86, G: 0x42, B: 0x10, A: 0xfc},
 		},
 	} {
-		res, err := parseHexColor(tc.hex)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if res != tc.expected {
-			t.Fatalf("unexpected result for \"%s\": got %#v, want %#v", tc.hex, res, tc.expected)
-		}
+		t.Run(tc.hex, func(t *testing.T) {
+			res, err := parseHexColor(tc.hex)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if res != tc.expected {
+				t.Fatalf("unexpected result for \"%s\": got %#v, want %#v", tc.hex, res, tc.expected)
+			}
+		})
 	}
 }
 
@@ -319,19 +337,20 @@ func TestParseHexColorError(t *testing.T) {
 		"zzz",
 		"0000000",
 	} {
-		_, err := parseHexColor(hex)
-		if err == nil {
-			t.Fatalf("no error for \"%s\"", hex)
-		}
+		t.Run(hex, func(t *testing.T) {
+			_, err := parseHexColor(hex)
+			if err == nil {
+				t.Fatalf("no error for \"%s\"", hex)
+			}
+		})
 	}
 }
 
 func TestHexStringToInts(t *testing.T) {
-	type TC struct {
+	for _, tc := range []struct {
 		hex      string
 		expected []uint8
-	}
-	for _, tc := range []TC{
+	}{
 		{
 			hex:      "",
 			expected: nil,
@@ -350,13 +369,15 @@ func TestHexStringToInts(t *testing.T) {
 			},
 		},
 	} {
-		res, err := hexStringToInts(tc.hex)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if !reflect.DeepEqual(res, tc.expected) {
-			t.Fatalf("unexpected result for \"%s\": got %#v, want %#v", tc.hex, res, tc.expected)
-		}
+		t.Run(tc.hex, func(t *testing.T) {
+			res, err := hexStringToInts(tc.hex)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(res, tc.expected) {
+				t.Fatalf("unexpected result for \"%s\": got %#v, want %#v", tc.hex, res, tc.expected)
+			}
+		})
 	}
 }
 

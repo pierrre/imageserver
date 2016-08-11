@@ -8,37 +8,33 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkServerGetSmall(b *testing.B) {
-	benchmarkServerGet(b, testdata.SmallFileName)
-}
-
-func BenchmarkServerGetMedium(b *testing.B) {
-	benchmarkServerGet(b, testdata.MediumFileName)
-}
-
-func BenchmarkServerGetLarge(b *testing.B) {
-	benchmarkServerGet(b, testdata.LargeFileName)
-}
-
-func BenchmarkServerGetHuge(b *testing.B) {
-	benchmarkServerGet(b, testdata.HugeFileName)
-}
-
-func benchmarkServerGet(b *testing.B, filename string) {
+func BenchmarkServerGet(b *testing.B) {
 	srv := &Server{
 		Root: testdata.Dir,
 	}
-	params := imageserver.Params{
-		imageserver_source.Param: filename,
+	for _, tc := range []struct {
+		name     string
+		filename string
+	}{
+		{"Small", testdata.SmallFileName},
+		{"Medium", testdata.MediumFileName},
+		{"Large", testdata.LargeFileName},
+		{"Huge", testdata.HugeFileName},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			params := imageserver.Params{
+				imageserver_source.Param: tc.filename,
+			}
+			var bs int
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				im, err := srv.Get(params)
+				if err != nil {
+					b.Fatal(err)
+				}
+				bs = len(im.Data)
+			}
+			b.SetBytes(int64(bs))
+		})
 	}
-	var bs int
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		im, err := srv.Get(params)
-		if err != nil {
-			b.Fatal(err)
-		}
-		bs = len(im.Data)
-	}
-	b.SetBytes(int64(bs))
 }

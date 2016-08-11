@@ -12,42 +12,44 @@ import (
 var _ imageserver_http.Parser = &RotateParser{}
 
 func TestRotateParserParse(t *testing.T) {
-	type TC struct {
+	prs := &RotateParser{}
+	for _, tc := range []struct {
+		name               string
 		query              url.Values
 		expectedParams     imageserver.Params
 		expectedParamError string
-	}
-	for _, tc := range []TC{
-		{},
+	}{
 		{
+			name: "Empty",
+		},
+		{
+			name:  "Rotation",
 			query: url.Values{"rotation": {"90"}},
 			expectedParams: imageserver.Params{rotateParam: imageserver.Params{
 				"rotation": 90.0,
 			}},
 		},
 		{
+			name:  "Interpolation",
 			query: url.Values{"interpolation": {"cubic"}},
 			expectedParams: imageserver.Params{rotateParam: imageserver.Params{
 				"interpolation": "cubic",
 			}},
 		},
 		{
+			name:  "Background",
 			query: url.Values{"background": {"FF0000"}},
 			expectedParams: imageserver.Params{rotateParam: imageserver.Params{
 				"background": "FF0000",
 			}},
 		},
 		{
+			name:               "RotationInvalid",
 			query:              url.Values{"rotation": {"invalid"}},
 			expectedParamError: rotateParam + ".rotation",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			u := &url.URL{
 				Scheme:   "http",
 				Host:     "localhost",
@@ -57,9 +59,8 @@ func TestRotateParserParse(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			prc := &RotateParser{}
 			params := imageserver.Params{}
-			err = prc.Parse(req, params)
+			err = prs.Parse(req, params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && tc.expectedParamError == err.Param {
 					return
@@ -69,21 +70,21 @@ func TestRotateParserParse(t *testing.T) {
 			if params.String() != tc.expectedParams.String() {
 				t.Fatalf("unexpected params: got %s, want %s", params, tc.expectedParams)
 			}
-		}()
+		})
 	}
 }
 
 func TestRotateParserResolve(t *testing.T) {
-	prc := &RotateParser{}
-	httpParam := prc.Resolve(rotateParam + ".rotation")
+	prs := &RotateParser{}
+	httpParam := prs.Resolve(rotateParam + ".rotation")
 	if httpParam != "rotation" {
 		t.Fatal("not equal")
 	}
 }
 
 func TestRotateParserResolveNoMatch(t *testing.T) {
-	prc := &RotateParser{}
-	httpParam := prc.Resolve("foo")
+	prs := &RotateParser{}
+	httpParam := prs.Resolve("foo")
 	if httpParam != "" {
 		t.Fatal("not equal")
 	}

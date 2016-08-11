@@ -13,52 +13,55 @@ var _ imageserver_http.Parser = &Parser{}
 
 func TestParse(t *testing.T) {
 	p := &Parser{}
-	type TC struct {
+	for _, tc := range []struct {
+		name               string
 		query              url.Values
 		expectedParams     imageserver.Params
 		expectedParamError string
-	}
-	for _, tc := range []TC{
-		{},
+	}{
 		{
+			name: "Empty",
+		},
+		{
+			name:  "Width",
 			query: url.Values{"width": {"100"}},
 			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"width": 100,
 			}},
 		},
 		{
+			name:  "Height",
 			query: url.Values{"height": {"100"}},
 			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"height": 100,
 			}},
 		},
 		{
+			name:  "Interpolation",
 			query: url.Values{"interpolation": {"lanczos3"}},
 			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"interpolation": "lanczos3",
 			}},
 		},
 		{
+			name:  "Mode",
 			query: url.Values{"mode": {"resize"}},
 			expectedParams: imageserver.Params{globalParam: imageserver.Params{
 				"mode": "resize",
 			}},
 		},
 		{
+			name:               "WidthInvalid",
 			query:              url.Values{"width": {"invalid"}},
 			expectedParamError: globalParam + ".width",
 		},
 		{
+			name:               "HeightInvalid",
 			query:              url.Values{"height": {"invalid"}},
 			expectedParamError: globalParam + ".height",
 		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			u := &url.URL{
 				Scheme:   "http",
 				Host:     "localhost",
@@ -68,7 +71,6 @@ func TestParse(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
 			params := imageserver.Params{}
 			err = p.Parse(req, params)
 			if err != nil {
@@ -80,7 +82,7 @@ func TestParse(t *testing.T) {
 			if params.String() != tc.expectedParams.String() {
 				t.Fatalf("unexpected params: got %s, want %s", params, tc.expectedParams)
 			}
-		}()
+		})
 	}
 }
 

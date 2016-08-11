@@ -9,25 +9,20 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkEncoderSmall(b *testing.B) {
-	benchmarkEncoder(b, testdata.Small)
-}
-
-func BenchmarkEncoderMedium(b *testing.B) {
-	benchmarkEncoder(b, testdata.Medium)
-}
-
-func BenchmarkEncoderLarge(b *testing.B) {
-	benchmarkEncoder(b, testdata.Large)
-}
-
-func BenchmarkEncoderHuge(b *testing.B) {
-	benchmarkEncoder(b, testdata.Huge)
-}
-
-func benchmarkEncoder(b *testing.B, im *imageserver.Image) {
+func BenchmarkEncoder(b *testing.B) {
 	enc := &Encoder{}
 	params := imageserver.Params{}
-	b.ResetTimer()
-	imageserver_image_test.BenchmarkEncoder(b, enc, im, params)
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			imageserver_image_test.BenchmarkEncoder(b, enc, tc.im, params)
+		})
+	}
 }

@@ -56,8 +56,7 @@ func TestServerGet(t *testing.T) {
 			expectedParamError: imageserver_source.Param,
 		},
 	} {
-		func() {
-			t.Logf("test: %s", tc.name)
+		t.Run(tc.name, func(t *testing.T) {
 			im, err := srv.Get(tc.params)
 			if err != nil {
 				if err, ok := err.(*imageserver.ParamError); ok && err.Param == tc.expectedParamError {
@@ -77,7 +76,7 @@ func TestServerGet(t *testing.T) {
 			if !bytes.Equal(im.Data, tc.expectedImage.Data) {
 				t.Fatal("data not equal")
 			}
-		}()
+		})
 	}
 }
 
@@ -98,8 +97,7 @@ func TestServerGetPath(t *testing.T) {
 		{"UpDown", "../dir/file", "root/dir/file"},
 		{"DownUp", "dir/../file", "root/file"},
 	} {
-		func() {
-			t.Logf("test: %s", tc.name)
+		t.Run(tc.name, func(t *testing.T) {
 			pth, err := srv.getPath(imageserver.Params{
 				imageserver_source.Param: tc.source,
 			})
@@ -109,7 +107,7 @@ func TestServerGetPath(t *testing.T) {
 			if pth != tc.expected {
 				t.Fatalf("unexpected result: got \"%s\", want \"%s\"", pth, tc.expected)
 			}
-		}()
+		})
 	}
 }
 
@@ -161,8 +159,7 @@ func TestIdentifyMime(t *testing.T) {
 			expectedError: true,
 		},
 	} {
-		func() {
-			t.Logf("test: %s", tc.name)
+		t.Run(tc.name, func(t *testing.T) {
 			format, err := IdentifyMime(filepath.Join(testdata.Dir, tc.filename), tc.data)
 			if err != nil {
 				if tc.expectedError {
@@ -176,6 +173,6 @@ func TestIdentifyMime(t *testing.T) {
 			if format != tc.expectedFormat {
 				t.Fatalf("unexpected format: got %s, want %s", format, tc.expectedFormat)
 			}
-		}()
+		})
 	}
 }

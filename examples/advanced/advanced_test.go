@@ -10,39 +10,47 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func TestServer(t *testing.T) {
+func Test(t *testing.T) {
 	h := newHTTPHandler()
-	type TC struct {
+	for _, tc := range []struct {
+		name               string
 		path               string
 		query              url.Values
 		expectedStatusCode int
 		expectedFormat     string
 		expectedWidth      int
 		expectedHeight     int
-	}
-	for _, tc := range []TC{
+	}{
 		{
+			name:               "NoPath",
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "Small",
 			path: testdata.SmallFileName,
 		},
 		{
+			name: "Medium",
 			path: testdata.MediumFileName,
 		},
 		{
+			name: "Large",
 			path: testdata.LargeFileName,
 		},
 		{
+			name: "Huge",
 			path: testdata.HugeFileName,
 		},
 		{
+			name: "Animated",
 			path: testdata.AnimatedFileName,
 		},
 		{
+			name: "MediumFromCache",
 			path: testdata.MediumFileName,
 		},
 		{
+			name: "InvalidFormat",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"format": {"foobar"},
@@ -50,6 +58,7 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "PNG",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"format": {"png"},
@@ -57,6 +66,7 @@ func TestServer(t *testing.T) {
 			expectedFormat: "png",
 		},
 		{
+			name: "GIF",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"format": {"gif"},
@@ -64,6 +74,7 @@ func TestServer(t *testing.T) {
 			expectedFormat: "gif",
 		},
 		{
+			name: "JPEGInvalidQuality",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"format":  {"jpeg"},
@@ -72,6 +83,7 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "JPEG",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"format":  {"jpeg"},
@@ -80,6 +92,7 @@ func TestServer(t *testing.T) {
 			expectedFormat: "jpeg",
 		},
 		{
+			name: "WidthInvalidNegative",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"width": {"-100"},
@@ -87,6 +100,7 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "WidthInvalidTooLarge",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"width": {"9001"},
@@ -94,6 +108,7 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "Width",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"width": {"100"},
@@ -101,6 +116,7 @@ func TestServer(t *testing.T) {
 			expectedWidth: 100,
 		},
 		{
+			name: "HeightInvalidNegative",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"height": {"-100"},
@@ -108,6 +124,7 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "HeightInvalidTooLarge",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"height": {"9001"},
@@ -115,19 +132,41 @@ func TestServer(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
+			name: "Height",
 			path: testdata.MediumFileName,
 			query: url.Values{
 				"height": {"100"},
 			},
 			expectedHeight: 100,
 		},
+		{
+			name: "RotationInvalid",
+			path: testdata.MediumFileName,
+			query: url.Values{
+				"rotation": {"invalid"},
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+		{
+			name: "Rotation45",
+			path: testdata.MediumFileName,
+			query: url.Values{
+				"rotation": {"45"},
+			},
+			expectedWidth:  1304,
+			expectedHeight: 1304,
+		},
+		{
+			name: "Rotation90",
+			path: testdata.MediumFileName,
+			query: url.Values{
+				"rotation": {"90"},
+			},
+			expectedWidth:  819,
+			expectedHeight: 1024,
+		},
 	} {
-		func() {
-			defer func() {
-				if t.Failed() {
-					t.Logf("%#v", tc)
-				}
-			}()
+		t.Run(tc.name, func(t *testing.T) {
 			u := &url.URL{
 				Scheme:   "http",
 				Host:     "localhost",
@@ -142,7 +181,7 @@ func TestServer(t *testing.T) {
 			h.ServeHTTP(w, req)
 			w.Flush()
 			if tc.expectedStatusCode != 0 && w.Code != tc.expectedStatusCode {
-				t.Fatalf("unexpected http status: %d", w.Code)
+				t.Fatalf("unexpected http status: got %d, want %d", w.Code, tc.expectedStatusCode)
 			}
 			if w.Code != http.StatusOK {
 				if tc.expectedStatusCode != 0 {
@@ -155,14 +194,14 @@ func TestServer(t *testing.T) {
 				t.Fatal(err)
 			}
 			if tc.expectedFormat != "" && format != tc.expectedFormat {
-				t.Fatalf("unexpected format: %s", format)
+				t.Fatalf("unexpected format: got %s, want %s", format, tc.expectedFormat)
 			}
 			if tc.expectedWidth != 0 && im.Bounds().Dx() != tc.expectedWidth {
-				t.Fatalf("unexpected width: %d", im.Bounds().Dx())
+				t.Fatalf("unexpected width: got %d, want %d", im.Bounds().Dx(), tc.expectedWidth)
 			}
 			if tc.expectedHeight != 0 && im.Bounds().Dy() != tc.expectedHeight {
-				t.Fatalf("unexpected height: %d", im.Bounds().Dy())
+				t.Fatalf("unexpected height: got %d, want %d", im.Bounds().Dy(), tc.expectedHeight)
 			}
-		}()
+		})
 	}
 }

@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -8,66 +9,34 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
-func BenchmarkGetSizeSmall(b *testing.B) {
-	benchmarkGetSize(b, testdata.Small)
+func BenchmarkGetSize(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		im   *imageserver.Image
+	}{
+		{"Small", testdata.Small},
+		{"Medium", testdata.Medium},
+		{"Large", testdata.Large},
+		{"Huge", testdata.Huge},
+	} {
+		benchmarkGet(b, tc.name, tc.im, 1)
+	}
 }
 
-func BenchmarkGetSizeMedium(b *testing.B) {
-	benchmarkGetSize(b, testdata.Medium)
+func BenchmarkGetParallelism(b *testing.B) {
+	for _, p := range []int{
+		1, 2, 4, 8, 16, 32, 64, 128,
+	} {
+		benchmarkGet(b, strconv.Itoa(p), testdata.Medium, p)
+	}
 }
 
-func BenchmarkGetSizeLarge(b *testing.B) {
-	benchmarkGetSize(b, testdata.Large)
-}
-
-func BenchmarkGetSizeHuge(b *testing.B) {
-	benchmarkGetSize(b, testdata.Huge)
-}
-
-func benchmarkGetSize(b *testing.B, image *imageserver.Image) {
-	benchmarkGet(b, image, 1)
-}
-
-func BenchmarkGetParallelism1(b *testing.B) {
-	benchmarkGetParallelism(b, 1)
-}
-
-func BenchmarkGetParallelism2(b *testing.B) {
-	benchmarkGetParallelism(b, 2)
-}
-
-func BenchmarkGetParallelism4(b *testing.B) {
-	benchmarkGetParallelism(b, 4)
-}
-
-func BenchmarkGetParallelism8(b *testing.B) {
-	benchmarkGetParallelism(b, 8)
-}
-
-func BenchmarkGetParallelism16(b *testing.B) {
-	benchmarkGetParallelism(b, 16)
-}
-
-func BenchmarkGetParallelism32(b *testing.B) {
-	benchmarkGetParallelism(b, 32)
-}
-
-func BenchmarkGetParallelism64(b *testing.B) {
-	benchmarkGetParallelism(b, 64)
-}
-
-func BenchmarkGetParallelism128(b *testing.B) {
-	benchmarkGetParallelism(b, 128)
-}
-
-func benchmarkGetParallelism(b *testing.B, parallelism int) {
-	benchmarkGet(b, testdata.Medium, parallelism)
-}
-
-func benchmarkGet(b *testing.B, image *imageserver.Image, parallelism int) {
-	cache := newTestCache(b)
-	defer func() {
-		_ = cache.Pool.Close()
-	}()
-	cachetest.BenchmarkGet(b, cache, parallelism, image)
+func benchmarkGet(b *testing.B, name string, image *imageserver.Image, parallelism int) {
+	b.Run(name, func(b *testing.B) {
+		cch := newTestCache(b)
+		defer func() {
+			_ = cch.Pool.Close()
+		}()
+		cachetest.BenchmarkGet(b, cch, parallelism, image)
+	})
 }
