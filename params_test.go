@@ -74,6 +74,31 @@ func TestParamsGetIntErrorWrongType(t *testing.T) {
 	testParamsCheckErrorType(err, t)
 }
 
+func TestParamsGetInt64(t *testing.T) {
+	params := make(Params)
+	params.Set("foo", int64(7))
+	value, err := params.GetInt64("foo")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value != 7 {
+		t.Fatal("not equals")
+	}
+}
+
+func TestParamsGetInt64ErrorMiss(t *testing.T) {
+	params := make(Params)
+	_, err := params.GetInt64("foo")
+	testParamsCheckErrorType(err, t)
+}
+
+func TestParamsGetInt64ErrorWrongType(t *testing.T) {
+	params := make(Params)
+	params.Set("foo", "bar")
+	_, err := params.GetInt64("foo")
+	testParamsCheckErrorType(err, t)
+}
+
 func TestParamsGetFloat(t *testing.T) {
 	params := make(Params)
 	params.Set("foo", 12.34)

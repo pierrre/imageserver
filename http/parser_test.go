@@ -320,6 +320,52 @@ func TestParseQueryIntError(t *testing.T) {
 	}
 }
 
+func TestParseQueryInt64(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost?int64=42", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	params := imageserver.Params{}
+	err = ParseQueryInt64("int64", req, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	i, err := params.GetInt64("int64")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if i != 42 {
+		t.Fatal("not equals")
+	}
+}
+
+func TestParseQueryInt64Undefined(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	params := imageserver.Params{}
+	err = ParseQueryInt64("int64", req, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if params.Has("int64") {
+		t.Fatal("should not be set")
+	}
+}
+
+func TestParseQueryInt64Error(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost?int64=invalid", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	params := imageserver.Params{}
+	err = ParseQueryInt64("int64", req, params)
+	if err == nil {
+		t.Fatal("no error")
+	}
+}
+
 func TestParseQueryFloat(t *testing.T) {
 	req, err := http.NewRequest("GET", "http://localhost?float=12.34", nil)
 	if err != nil {

@@ -55,6 +55,19 @@ func (params Params) GetInt(key string) (int, error) {
 	return vt, nil
 }
 
+// GetInt64 returns the int64 value for the key.
+func (params Params) GetInt64(key string) (int64, error) {
+	v, err := params.Get(key)
+	if err != nil {
+		return 0, err
+	}
+	vt, ok := v.(int64)
+	if !ok {
+		return 0, newErrorType(key, v, "int64")
+	}
+	return vt, nil
+}
+
 // GetFloat returns the float64 value for the key.
 func (params Params) GetFloat(key string) (float64, error) {
 	v, err := params.Get(key)

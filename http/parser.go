@@ -149,6 +149,20 @@ func ParseQueryInt(param string, req *http.Request, params imageserver.Params) e
 	return nil
 }
 
+// ParseQueryInt64 takes the param from the HTTP URL query, parse it as an int64 and add it to the Params.
+func ParseQueryInt64(param string, req *http.Request, params imageserver.Params) error {
+	s := req.URL.Query().Get(param)
+	if s == "" {
+		return nil
+	}
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return newParseTypeParamError(param, "int", err)
+	}
+	params.Set(param, i)
+	return nil
+}
+
 // ParseQueryFloat takes the param from the HTTP URL query, parse it as a float64 and add it to the Params.
 func ParseQueryFloat(param string, req *http.Request, params imageserver.Params) error {
 	s := req.URL.Query().Get(param)
