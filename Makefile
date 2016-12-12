@@ -1,4 +1,26 @@
-all: test lint
+all: build test lint
+
+build: \
+	build-example-simple \
+	build-example-cache \
+	build-example-httpsource \
+	build-example-groupcache \
+	build-example-advanced
+
+build-example-simple:
+	go build -v -i -o build/example-simple ./examples/simple
+
+build-example-cache:
+	go build -v -i -o build/example-cache ./examples/cache
+
+build-example-httpsource:
+	go build -v -i -o build/example-httpsource ./examples/httpsource
+
+build-example-groupcache:
+	go build -v -i -o build/example-groupcache ./examples/groupcache
+
+build-example-advanced:
+	go build -v -i -o build/example-advanced ./examples/advanced
 
 test:
 	mkdir -p build
@@ -19,4 +41,13 @@ lint:
 clean:
 	rm -rf build
 
-.PHONY: test lint clean
+.PHONY: \
+	build \
+	build-example-simple \
+	build-example-cache \
+	build-example-httpsource \
+	build-example-groupcache \
+	build-example-advanced \
+	test \
+	lint \
+	clean
