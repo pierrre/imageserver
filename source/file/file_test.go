@@ -89,13 +89,13 @@ func TestServerGetPath(t *testing.T) {
 		source   string
 		expected string
 	}{
-		{"Normal", "file", "root/file"},
-		{"SlashBefore", "/file", "root/file"},
-		{"SlashAfter", "file/", "root/file"},
-		{"MultipleSlash", "///file", "root/file"},
-		{"Up", "../file", "root/file"},
-		{"UpDown", "../dir/file", "root/dir/file"},
-		{"DownUp", "dir/../file", "root/file"},
+		{"Normal", "file", filepath.Join("root", "file")},
+		{"SlashBefore", "/file", filepath.Join("root", "file")},
+		{"SlashAfter", "file/", filepath.Join("root", "file")},
+		{"MultipleSlash", "///file", filepath.Join("root", "file")},
+		{"Up", "../file", filepath.Join("root", "file")},
+		{"UpDown", "../dir/file", filepath.Join("root", "dir", "file")},
+		{"DownUp", "dir/../file", filepath.Join("root", "file")},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			pth, err := srv.getPath(imageserver.Params{
