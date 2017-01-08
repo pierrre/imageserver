@@ -2,6 +2,7 @@ package groupcache
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
@@ -78,7 +79,7 @@ func newTestServer(srv imageserver.Server, kg imageserver_cache.KeyGenerator) *S
 }
 
 func newTestServerName() string {
-	return fmt.Sprintf("test_%d", time.Now().UnixNano())
+	return fmt.Sprintf("test_%d_%d", time.Now().UnixNano(), rand.Int63())
 }
 
 var _ groupcache.Getter = &Getter{}
