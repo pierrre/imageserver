@@ -14,6 +14,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
+	imageserver_cache_file "github.com/pierrre/imageserver/cache/file"
 	imageserver_cache_memcache "github.com/pierrre/imageserver/cache/memcache"
 	imageserver_cache_memory "github.com/pierrre/imageserver/cache/memory"
 	imageserver_cache_redis "github.com/pierrre/imageserver/cache/redis"
@@ -33,6 +34,7 @@ var (
 	flagMemory   = int64(128 * (1 << 20))
 	flagRedis    = "localhost:6379"
 	flagMemcache = "localhost:11211"
+	flagFile     = ""
 )
 
 func main() {
@@ -45,6 +47,7 @@ func parseFlags() {
 	flag.Int64Var(&flagMemory, "memory", flagMemory, "Memory")
 	flag.StringVar(&flagRedis, "redis", flagRedis, "Redis")
 	flag.StringVar(&flagMemcache, "memcache", flagMemcache, "Memcache")
+	flag.StringVar(&flagFile, "file", flagFile, "File")
 	flag.Parse()
 }
 
@@ -72,6 +75,7 @@ func newImageHTTPHandler() http.Handler {
 func newServer() imageserver.Server {
 	srv := imageserver_testdata.Server
 	srv = newServerImage(srv)
+	srv = newServerFile(srv)
 	srv = newServerMemcache(srv)
 	srv = newServerRedis(srv)
 	srv = newServerMemory(srv)
@@ -145,6 +149,19 @@ func newServerMemory(srv imageserver.Server) imageserver.Server {
 	return &imageserver_cache.Server{
 		Server:       srv,
 		Cache:        cch,
+		KeyGenerator: kg,
+	}
+}
+
+func newServerFile(srv imageserver.Server) imageserver.Server {
+	if flagFile == "" {
+		return srv
+	}
+	cch := imageserver_cache_file.Cache{Path: flagFile}
+	kg := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
+	return &imageserver_cache.Server{
+		Server:       srv,
+		Cache:        &cch,
 		KeyGenerator: kg,
 	}
 }
