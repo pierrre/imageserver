@@ -98,8 +98,7 @@ func newServerMemcache(srv imageserver.Server) imageserver.Server {
 		return srv
 	}
 	cl := memcache.New(flagMemcache)
-	var cch imageserver_cache.Cache
-	cch = &imageserver_cache_memcache.Cache{Client: cl}
+	var cch imageserver_cache.Cache = &imageserver_cache_memcache.Cache{Client: cl}
 	cch = &imageserver_cache.IgnoreError{Cache: cch}
 	cch = &imageserver_cache.Async{Cache: cch}
 	kg := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
@@ -120,15 +119,13 @@ func newServerRedis(srv imageserver.Server) imageserver.Server {
 		},
 		MaxIdle: 50,
 	}
-	var cch imageserver_cache.Cache
-	cch = &imageserver_cache_redis.Cache{
+	var cch imageserver_cache.Cache = &imageserver_cache_redis.Cache{
 		Pool:   pool,
 		Expire: 7 * 24 * time.Hour,
 	}
 	cch = &imageserver_cache.IgnoreError{Cache: cch}
 	cch = &imageserver_cache.Async{Cache: cch}
-	var kg imageserver_cache.KeyGenerator
-	kg = imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
+	var kg imageserver_cache.KeyGenerator = imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
 	kg = &imageserver_cache.PrefixKeyGenerator{
 		KeyGenerator: kg,
 		Prefix:       "image:",

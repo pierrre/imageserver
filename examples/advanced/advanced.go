@@ -83,8 +83,7 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 }
 
 func newImageHTTPHandler() http.Handler {
-	var handler http.Handler
-	handler = &imageserver_http.Handler{
+	var handler http.Handler = &imageserver_http.Handler{
 		Parser: imageserver_http.ListParser([]imageserver_http.Parser{
 			&imageserver_http.SourcePathParser{},
 			&imageserver_http_crop.Parser{},
