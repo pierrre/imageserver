@@ -158,6 +158,11 @@ Format: `min_x,min_y|max_x,max_y`
 			<td><a href="https://imageserver.pierredurand.fr/rings.png?width=200&gamma_correction=false"><img src="https://imageserver.pierredurand.fr/rings.png?width=200&gamma_correction=false" /></a></td>
 			<td><a href="https://imageserver.pierredurand.fr/rings.png?width=200&gamma_correction=true"><img src="https://imageserver.pierredurand.fr/rings.png?width=200&gamma_correction=true" /></a></td>
 		</tr>
+		<tr>
+			<td><a href="https://imageserver.pierredurand.fr/rules_sucks.png">Rules / sucks</a></td>
+			<td><a href="https://imageserver.pierredurand.fr/rules_sucks.png?width=200&gamma_correction=false"><img src="https://imageserver.pierredurand.fr/rules_sucks.png?width=200&gamma_correction=false" /></a></td>
+			<td><a href="https://imageserver.pierredurand.fr/rules_sucks.png?width=200&gamma_correction=true"><img src="https://imageserver.pierredurand.fr/rules_sucks.png?width=200&gamma_correction=true" /></a></td>
+		</tr>
 	</tbody>
 </table>
 

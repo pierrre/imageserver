@@ -50,13 +50,18 @@ var (
 
 	// DalaiGammaFileName is the file name of DalaiGamma.
 	DalaiGammaFileName = "dalai_gamma.jpg"
-	// DalaiGamma is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html).
+	// DalaiGamma is a gamma test Image (from http://www.ericbrasseur.org/gamma.html).
 	DalaiGamma = loadImage(DalaiGammaFileName, "jpeg")
 
 	// GraySquaresFileName is the file name of GraySquares.
 	GraySquaresFileName = "gray_squares.jpg"
-	// GraySquares is a gamma test Image (from http://www.4p8.com/eric.brasseur/gamma.html)
+	// GraySquares is a gamma test Image (from http://www.ericbrasseur.org/gamma.html)
 	GraySquares = loadImage(GraySquaresFileName, "jpeg")
+
+	// RulesSucksFileName is the file name of RulesSucks.
+	RulesSucksFileName = "rules_sucks.png"
+	// RulesSucks is a gamma test Image (from http://www.ericbrasseur.org/gamma.html)
+	RulesSucks = loadImage(RulesSucksFileName, "png")
 
 	// RingsFileName is the file name of Rings.
 	RingsFileName = "rings.png"
