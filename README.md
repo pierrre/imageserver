@@ -128,7 +128,7 @@ Format: `min_x,min_y|max_x,max_y`
 	</tbody>
 </table>
 
-### Gamma correction ([more info](http://www.4p8.com/eric.brasseur/gamma.html))
+### Gamma correction ([more info](http://www.ericbrasseur.org/gamma.html))
 <table>
 	<thead>
 		<tr>
