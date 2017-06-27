@@ -1,9 +1,10 @@
-language: go
-
+dist: trusty
 sudo: false
 
+language: go
 go:
-  - 1.8
+  - 1.8.3
+  - 1.9beta2
   - tip
 
 services:
