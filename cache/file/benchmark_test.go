@@ -19,7 +19,7 @@ func BenchmarkGet(b *testing.B) {
 		{"Huge", testdata.Huge},
 	} {
 		b.Run(tc.name, func(b *testing.B) {
-			cch := newTestCache(b)
+			cch := newTestCache()
 			cachetest.BenchmarkGet(b, cch, 1, tc.im)
 		})
 	}

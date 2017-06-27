@@ -24,7 +24,7 @@ func TestGetMiss(t *testing.T) {
 }
 
 func TestGetErrorServer(t *testing.T) {
-	cache := newTestCacheInvalidServer(t)
+	cache := newTestCacheInvalidServer()
 	_, err := cache.Get(cachetest.KeyValid, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -32,7 +32,7 @@ func TestGetErrorServer(t *testing.T) {
 }
 
 func TestSetErrorServer(t *testing.T) {
-	cache := newTestCacheInvalidServer(t)
+	cache := newTestCacheInvalidServer()
 	err := cache.Set(cachetest.KeyValid, testdata.Medium, imageserver.Params{})
 	if err == nil {
 		t.Fatal("no error")
@@ -79,7 +79,7 @@ func newTestCache(tb testing.TB) *Cache {
 	return cache
 }
 
-func newTestCacheInvalidServer(tb testing.TB) *Cache {
+func newTestCacheInvalidServer() *Cache {
 	return newTestCacheWithClient(newTestClient("localhost:11311"))
 }
 

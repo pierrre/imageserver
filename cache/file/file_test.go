@@ -1,6 +1,8 @@
 package file
 
 import (
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -9,8 +11,6 @@ import (
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
 	"github.com/pierrre/imageserver/testdata"
-	"io/ioutil"
-	"os"
 )
 
 var _ imageserver_cache.Cache = &Cache{}
@@ -33,12 +33,12 @@ func realMain(m *testing.M) int {
 }
 
 func TestGetSet(t *testing.T) {
-	cache := newTestCache(t)
+	cache := newTestCache()
 	cachetest.TestGetSet(t, cache)
 }
 
 func TestGetMiss(t *testing.T) {
-	cache := newTestCache(t)
+	cache := newTestCache()
 	cachetest.TestGetMiss(t, cache)
 }
 
@@ -51,7 +51,7 @@ func TestPathIsNotSet(t *testing.T) {
 }
 
 func TestFileExistsButCantRead(t *testing.T) {
-	cache := newTestCache(t)
+	cache := newTestCache()
 	if err := os.Chmod(filepath.Join(testDirPath, cachetest.KeyValid), 0111); err != nil {
 		t.Fatal("os.Chmod return error.")
 	}
@@ -68,7 +68,7 @@ func TestFileExistsButCantRead(t *testing.T) {
 }
 
 func TestGetErrorUnmarshal(t *testing.T) {
-	cache := newTestCache(t)
+	cache := newTestCache()
 	data, err := testdata.Medium.MarshalBinary()
 	if err != nil {
 		t.Fatal(err)
@@ -88,7 +88,7 @@ func TestGetErrorUnmarshal(t *testing.T) {
 }
 
 func TestSetErrorMarshal(t *testing.T) {
-	cache := newTestCache(t)
+	cache := newTestCache()
 	im := &imageserver.Image{
 		Format: strings.Repeat("a", imageserver.ImageFormatMaxLen+1),
 	}
@@ -101,7 +101,7 @@ func TestSetErrorMarshal(t *testing.T) {
 	}
 }
 
-func newTestCache(tb testing.TB) *Cache {
+func newTestCache() *Cache {
 	cache := &Cache{Path: testDirPath}
 	return cache
 }

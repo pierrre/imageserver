@@ -34,7 +34,7 @@ func TestGetMiss(t *testing.T) {
 }
 
 func TestGetErrorAddress(t *testing.T) {
-	cache := newTestCacheInvalidAddress(t)
+	cache := newTestCacheInvalidAddress()
 	defer func() {
 		_ = cache.Pool.Close()
 	}()
@@ -45,7 +45,7 @@ func TestGetErrorAddress(t *testing.T) {
 }
 
 func TestSetErrorAddress(t *testing.T) {
-	cache := newTestCacheInvalidAddress(t)
+	cache := newTestCacheInvalidAddress()
 	defer func() {
 		_ = cache.Pool.Close()
 	}()
@@ -101,7 +101,7 @@ func newTestCache(tb testing.TB) *Cache {
 	return cache
 }
 
-func newTestCacheInvalidAddress(tb testing.TB) *Cache {
+func newTestCacheInvalidAddress() *Cache {
 	return newTestCacheWithRedigoPool(newTestRedigoPool("localhost:16379"))
 }
 

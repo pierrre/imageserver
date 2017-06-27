@@ -125,7 +125,7 @@ func newServerRedis(srv imageserver.Server) imageserver.Server {
 	}
 	cch = &imageserver_cache.IgnoreError{Cache: cch}
 	cch = &imageserver_cache.Async{Cache: cch}
-	var kg imageserver_cache.KeyGenerator = imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
+	kg := imageserver_cache.NewParamsHashKeyGenerator(sha256.New)
 	kg = &imageserver_cache.PrefixKeyGenerator{
 		KeyGenerator: kg,
 		Prefix:       "image:",

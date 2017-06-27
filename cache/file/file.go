@@ -3,11 +3,12 @@ package file
 
 import (
 	"fmt"
-	"github.com/pierrre/imageserver"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/pierrre/imageserver"
 )
 
 // Cache is a implementation of disk based cache system.
