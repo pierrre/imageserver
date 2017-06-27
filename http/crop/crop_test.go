@@ -2,9 +2,9 @@ package crop
 
 import (
 	"net/http"
-	"reflect"
 	"testing"
 
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	imageserver_http "github.com/pierrre/imageserver/http"
 )
@@ -56,8 +56,9 @@ func TestParse(t *testing.T) {
 			if tc.expectedParamError != "" {
 				t.Fatalf("no error, expected: %s", tc.expectedParamError)
 			}
-			if !reflect.DeepEqual(params, tc.expectedParams) {
-				t.Fatalf("unexpected params: got %s, want %s", params, tc.expectedParams)
+			diff := compare.Compare(params, tc.expectedParams)
+			if len(diff) != 0 {
+				t.Fatalf("unexpected params:\ngot: %v\nwant: %v\ndiff:\n%+v", params, tc.expectedParams, diff)
 			}
 		})
 	}

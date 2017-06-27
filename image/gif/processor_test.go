@@ -5,9 +5,9 @@ import (
 	"image"
 	"image/color"
 	"image/gif"
-	"reflect"
 	"testing"
 
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	imageserver_image "github.com/pierrre/imageserver/image"
 )
@@ -28,14 +28,16 @@ func TestSimpleProcessor(t *testing.T) {
 	if len(g1.Image) != len(g2.Image) {
 		t.Fatalf("Image length not equal: %d & %d", len(g1.Image), len(g2.Image))
 	}
-	if !reflect.DeepEqual(g1.Delay, g2.Delay) {
-		t.Fatalf("Delay not equal: %#v & %#v", g1.Delay, g2.Delay)
+	diffDelay := compare.Compare(g1.Delay, g2.Delay)
+	if len(diffDelay) != 0 {
+		t.Fatalf("Delay not equal: %#v & %#v\ndiff: %+v", g1.Delay, g2.Delay, diffDelay)
 	}
 	if g1.LoopCount != g2.LoopCount {
 		t.Fatalf("LoopCount not equal: %d & %d", g1.LoopCount, g2.LoopCount)
 	}
-	if !reflect.DeepEqual(g1.Config.ColorModel, g2.Config.ColorModel) {
-		t.Fatalf("Config.ColorModel not equal: %#v & %#v", g1.Config.ColorModel, g2.Config.ColorModel)
+	diffColorModel := compare.Compare(g1.Config.ColorModel, g2.Config.ColorModel)
+	if len(diffColorModel) != 0 {
+		t.Fatalf("Config.ColorModel not equal: %#v & %#v\ndiff: %+v", g1.Config.ColorModel, g2.Config.ColorModel, diffColorModel)
 	}
 	if g2.Config.Width != 50 {
 		t.Fatalf("unexpected Config.Width value: got %d, want %d", g2.Config.Width, 50)

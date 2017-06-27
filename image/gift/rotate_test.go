@@ -2,9 +2,9 @@ package gift
 
 import (
 	"image/color"
-	"reflect"
 	"testing"
 
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	imageserver_image "github.com/pierrre/imageserver/image"
 	imageserver_testdata "github.com/pierrre/imageserver/testdata"
@@ -374,8 +374,9 @@ func TestHexStringToInts(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if !reflect.DeepEqual(res, tc.expected) {
-				t.Fatalf("unexpected result for \"%s\": got %#v, want %#v", tc.hex, res, tc.expected)
+			diff := compare.Compare(res, tc.expected)
+			if len(diff) != 0 {
+				t.Fatalf("unexpected result for \"%s\":\ngot: %#v\nwant: %#v\ndiff:\n%+v", tc.hex, res, tc.expected, diff)
 			}
 		})
 	}

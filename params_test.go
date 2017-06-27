@@ -1,9 +1,10 @@
 package imageserver
 
 import (
-	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/pierrre/compare"
 )
 
 func TestParamsSetGet(t *testing.T) {
@@ -246,11 +247,10 @@ func TestParamsKeys(t *testing.T) {
 	params.Set("a", "foo")
 	keys := params.Keys()
 	sort.Strings(keys)
-
 	expected := []string{"a", "b"}
-
-	if !reflect.DeepEqual(keys, expected) {
-		t.Fatal("not equals")
+	diff := compare.Compare(keys, expected)
+	if len(diff) != 0 {
+		t.Fatalf("not equals:\ngot: %#v\nwant: %#v\ndiff:\n%+v", keys, expected, diff)
 	}
 }
 
@@ -265,8 +265,9 @@ func TestParamsCopy(t *testing.T) {
 		},
 	}
 	p2 := p1.Copy()
-	if !reflect.DeepEqual(p2, p1) {
-		t.Fatalf("not equal: got %#v, want %#v", p2, p1)
+	diff := compare.Compare(p2, p1)
+	if len(diff) != 0 {
+		t.Fatalf("not equal:\ngot: %#v\nwant: %#v\ndiff:\n%+v", p2, p1, diff)
 	}
 }
 
