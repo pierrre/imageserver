@@ -1,7 +1,6 @@
 package imageserver
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -114,23 +113,6 @@ func (im *Image) UnmarshalBinaryNoCopy(data []byte) error {
 	im.Data = buf
 
 	return nil
-}
-
-// ImageEqual compares two images and returns true if they are equal.
-func ImageEqual(im1, im2 *Image) bool {
-	if im1 == im2 {
-		return true
-	}
-	if im1 == nil || im2 == nil {
-		return false
-	}
-	if im1.Format != im2.Format {
-		return false
-	}
-	if !bytes.Equal(im1.Data, im2.Data) {
-		return false
-	}
-	return true
 }
 
 // ImageError is an Image error.

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"unsafe"
 
+	"github.com/pierrre/compare"
 	. "github.com/pierrre/imageserver"
 	"github.com/pierrre/imageserver/testdata"
 )
@@ -25,8 +26,9 @@ func TestImageMarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !ImageEqual(im, testdata.Medium) {
-		t.Fatal("image not equals")
+	diff := compare.Compare(im, testdata.Medium)
+	if len(diff) != 0 {
+		t.Fatalf("images not equal, diff:\n%+v", diff)
 	}
 }
 
@@ -139,30 +141,6 @@ func TestImageMarshalBugByteBufferPool(t *testing.T) {
 	err = im2.UnmarshalBinary(d2)
 	if err != nil {
 		t.Fatal(err)
-	}
-}
-
-func TestImageEqual(t *testing.T) {
-	for _, tc := range []struct {
-		name     string
-		im1      *Image
-		im2      *Image
-		expected bool
-	}{
-		{"BothNil", nil, nil, true},
-		{"Nil|NotNil", nil, testdata.Medium, false},
-		{"NotNil|Nil", testdata.Medium, nil, false},
-		{"Same", testdata.Medium, testdata.Medium, true},
-		{"Copy", testdata.Medium, imageCopy(testdata.Medium), true},
-		{"DifferentFormat", testdata.Medium, testdata.Animated, false},
-		{"DifferentData", testdata.Medium, testdata.Small, false},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			res := ImageEqual(tc.im1, tc.im2)
-			if res != tc.expected {
-				t.Fatalf("unexpected result: got %t, want %t", res, tc.expected)
-			}
-		})
 	}
 }
 

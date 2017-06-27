@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang/groupcache"
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_source "github.com/pierrre/imageserver/source"
@@ -35,8 +36,9 @@ func TestServer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !imageserver.ImageEqual(im, testdata.Medium) {
-		t.Fatal("not equal")
+	diff := compare.Compare(im, testdata.Medium)
+	if len(diff) != 0 {
+		t.Fatalf("images not equal, diff:\n%+v", diff)
 	}
 }
 
@@ -104,8 +106,9 @@ func TestGetter(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !imageserver.ImageEqual(im, testdata.Medium) {
-		t.Fatal("not equal")
+	diff := compare.Compare(im, testdata.Medium)
+	if len(diff) != 0 {
+		t.Fatalf("images not equal, diff:\n%+v", diff)
 	}
 }
 

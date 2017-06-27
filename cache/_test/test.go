@@ -5,6 +5,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	"github.com/pierrre/imageserver/testdata"
@@ -30,8 +31,9 @@ func TestGetSet(t *testing.T, cache imageserver_cache.Cache) {
 	if im == nil {
 		t.Fatal("image nil")
 	}
-	if !imageserver.ImageEqual(im, testdata.Medium) {
-		t.Fatal("image not equals")
+	diff := compare.Compare(im, testdata.Medium)
+	if len(diff) != 0 {
+		t.Fatalf("images not equal, diff:\n%+v", diff)
 	}
 }
 

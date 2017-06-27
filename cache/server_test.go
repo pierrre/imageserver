@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/pierrre/compare"
 	"github.com/pierrre/imageserver"
 	. "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
@@ -31,8 +32,9 @@ func TestServer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !imageserver.ImageEqual(image1, image2) {
-		t.Fatal("not equal")
+	diff := compare.Compare(image1, image2)
+	if len(diff) != 0 {
+		t.Fatalf("images not equal, diff:\n%+v", diff)
 	}
 }
 
