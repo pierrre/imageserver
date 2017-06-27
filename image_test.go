@@ -148,8 +148,3 @@ func TestImageError(t *testing.T) {
 	err := &ImageError{Message: "test"}
 	_ = err.Error()
 }
-
-func imageCopy(im *Image) *Image {
-	value := *im
-	return &value
-}
