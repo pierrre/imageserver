@@ -1,5 +1,3 @@
-all: build test lint
-
 build: \
 	build-example-simple \
 	build-example-cache \
