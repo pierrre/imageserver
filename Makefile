@@ -23,14 +23,7 @@ build-example-advanced:
 	go build -v -i -o build/example-advanced ./examples/advanced
 
 test:
-	mkdir -p build
-	echo 'mode: set' > build/coverage.txt
-	go list ./... | xargs -n1 -I{} sh -c\
-	 'rm -f build/coverage.tmp && touch build/coverage.tmp &&\
-	 go test -v -covermode=set -coverprofile=build/coverage.tmp {} &&\
-	 tail -n +2 build/coverage.tmp >> build/coverage.txt'
-	rm build/coverage.tmp
-	go tool cover -html=build/coverage.txt -o=build/coverage.html
+	go test -v ./...
 
 lint:
 	go get -v -u github.com/alecthomas/gometalinter
