@@ -35,7 +35,7 @@ func benchmarkGet(b *testing.B, name string, image *imageserver.Image, paralleli
 	b.Run(name, func(b *testing.B) {
 		cch := newTestCache(b)
 		defer func() {
-			_ = cch.Pool.Close()
+			_ = cch.Client.Close()
 		}()
 		cachetest.BenchmarkGet(b, cch, parallelism, image)
 	})

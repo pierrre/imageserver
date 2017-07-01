@@ -2,18 +2,17 @@
 package redis
 
 import (
-	"strconv"
 	"time"
 
-	redigo "github.com/garyburd/redigo/redis"
+	"github.com/go-redis/redis"
 	"github.com/pierrre/imageserver"
 )
 
 // Cache is a Redis imageserver/cache.Cache implementation.
 //
-// It uses https://github.com/garyburd/redigo .
+// It uses https://github.com/go-redis/redis .
 type Cache struct {
-	Pool *redigo.Pool
+	Client redis.UniversalClient
 
 	// Expire is an optional expiration duration.
 	Expire time.Duration
@@ -37,13 +36,9 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 }
 
 func (cache *Cache) getData(key string) ([]byte, error) {
-	conn := cache.Pool.Get()
-	defer func() {
-		_ = conn.Close()
-	}()
-	data, err := redigo.Bytes(conn.Do("GET", key))
+	data, err := cache.Client.Get(key).Bytes()
 	if err != nil {
-		if err == redigo.ErrNil {
+		if err == redis.Nil {
 			return nil, nil
 		}
 		return nil, err
@@ -61,14 +56,5 @@ func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Pa
 }
 
 func (cache *Cache) setData(key string, data []byte) error {
-	params := []interface{}{key, data}
-	if cache.Expire != 0 {
-		params = append(params, "EX", strconv.Itoa(int(cache.Expire.Seconds())))
-	}
-	conn := cache.Pool.Get()
-	defer func() {
-		_ = conn.Close()
-	}()
-	_, err := conn.Do("SET", params...)
-	return err
+	return cache.Client.Set(key, data, cache.Expire).Err()
 }

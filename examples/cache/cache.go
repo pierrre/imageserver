@@ -11,7 +11,7 @@ import (
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/disintegration/gift"
-	"github.com/garyburd/redigo/redis"
+	"github.com/go-redis/redis"
 	"github.com/pierrre/imageserver"
 	imageserver_cache "github.com/pierrre/imageserver/cache"
 	imageserver_cache_file "github.com/pierrre/imageserver/cache/file"
@@ -113,14 +113,11 @@ func newServerRedis(srv imageserver.Server) imageserver.Server {
 	if flagRedis == "" {
 		return srv
 	}
-	pool := &redis.Pool{
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", flagRedis)
-		},
-		MaxIdle: 50,
-	}
+	client := redis.NewUniversalClient(&redis.UniversalOptions{
+		Addrs: []string{"localhost:6379"},
+	})
 	var cch imageserver_cache.Cache = &imageserver_cache_redis.Cache{
-		Pool:   pool,
+		Client: client,
 		Expire: 7 * 24 * time.Hour,
 	}
 	cch = &imageserver_cache.IgnoreError{Cache: cch}
