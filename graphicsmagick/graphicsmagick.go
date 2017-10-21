@@ -71,6 +71,7 @@ func (hdr *Handler) Handle(im *imageserver.Image, params imageserver.Params) (*i
 	return im, nil
 }
 
+// nolint: gocyclo
 func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*imageserver.Image, error) {
 	arguments := list.New()
 
@@ -142,6 +143,7 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 	return im, nil
 }
 
+// nolint: gocyclo
 func (hdr *Handler) buildArgumentsResize(arguments *list.List, params imageserver.Params) (width int, height int, err error) {
 	width, err = getDimension("width", params)
 	if err != nil {

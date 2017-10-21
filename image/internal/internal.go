@@ -25,6 +25,8 @@ func NewDrawable(p image.Image) draw.Image {
 // NewDrawableSize returns a new draw.Image with the same type as p and the given bounds.
 //
 // If p is not a draw.Image, another type is used.
+//
+// nolint: gocyclo
 func NewDrawableSize(p image.Image, r image.Rectangle) draw.Image {
 	switch p := p.(type) {
 	case *image.RGBA:

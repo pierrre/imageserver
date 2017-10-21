@@ -11,6 +11,7 @@ import (
 
 var _ imageserver_image.Processor = &Processor{}
 
+// nolint: gocyclo
 func TestProcessor(t *testing.T) {
 	nim, err := imageserver_image.Decode(imageserver_testdata.Medium)
 	if err != nil {

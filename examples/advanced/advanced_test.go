@@ -10,6 +10,7 @@ import (
 	"github.com/pierrre/imageserver/testdata"
 )
 
+// nolint: gocyclo
 func Test(t *testing.T) {
 	h := newHTTPHandler()
 	for _, tc := range []struct {

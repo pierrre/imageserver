@@ -12,6 +12,7 @@ import (
 
 var _ imageserver_image.Processor = &RotateProcessor{}
 
+// nolint: gocyclo
 func TestRotateProcessorProcess(t *testing.T) {
 	nim, err := imageserver_image.Decode(imageserver_testdata.Medium)
 	if err != nil {
