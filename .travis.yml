@@ -3,8 +3,7 @@ sudo: false
 
 language: go
 go:
-  - 1.8.x
-  - 1.9rc1
+  - 1.9.x
   - tip
 
 services:
@@ -15,9 +14,6 @@ addons:
   apt:
     packages:
       - graphicsmagick
-
-before_install:
-  - export GOROOT=$(go env GOROOT) # see https://github.com/travis-ci/travis-ci/issues/8177
 
 install: go get -v -d -t ./...
 
