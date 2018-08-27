@@ -7,7 +7,7 @@ import (
 	"github.com/pierrre/imageserver"
 	. "github.com/pierrre/imageserver/cache"
 	cachetest "github.com/pierrre/imageserver/cache/_test"
-	"github.com/pierrre/imageserver/testdata" // nolint: gotypex
+	"github.com/pierrre/imageserver/testdata"
 )
 
 var _ Cache = &IgnoreError{}

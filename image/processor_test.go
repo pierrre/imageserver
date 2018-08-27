@@ -95,7 +95,7 @@ func (prc testChangeProcessor) Process(nim image.Image, params imageserver.Param
 	return nim, nil
 }
 
-func (prc testChangeProcessor) Change(params imageserver.Params) bool {
+func (prc testChangeProcessor) Change(_ imageserver.Params) bool {
 	return bool(prc)
 }
 

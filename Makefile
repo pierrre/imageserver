@@ -26,8 +26,8 @@ test:
 lint:
 	go get -v -u github.com/alecthomas/gometalinter
 	gometalinter --install
-	GOGC=800 gometalinter --enable-all -D dupl -D lll -D gas -D goconst -D gotype -D interfacer -D safesql -D test -D testify -D vetshadow\
-	 --tests --warn-unmatched-nolint --deadline=10m --concurrency=4 --enable-gc ./...
+	GOGC=800 gometalinter --disable-all -E deadcode -E errcheck -E gocyclo -E gofmt -E goimports -E golint -E ineffassign -E megacheck -E misspell -E nakedret -E structcheck -E unconvert -E unparam -E varcheck -E vet\
+ --tests --vendor --warn-unmatched-nolint --deadline=10m --concurrency=4 --enable-gc ./...
 
 clean:
 	rm -rf build

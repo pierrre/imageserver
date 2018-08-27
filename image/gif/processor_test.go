@@ -113,6 +113,6 @@ func (prc testProcessorChange) Process(g *gif.GIF, params imageserver.Params) (*
 	return g, nil
 }
 
-func (prc testProcessorChange) Change(params imageserver.Params) bool {
+func (prc testProcessorChange) Change(_ imageserver.Params) bool {
 	return bool(prc)
 }
