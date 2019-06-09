@@ -1,9 +1,7 @@
 dist: trusty
-sudo: false
-
 language: go
 go:
-  - 1.11.x
+  - 1.12.x
   - tip
 
 services:
@@ -15,9 +13,6 @@ addons:
     packages:
       - graphicsmagick
 
-install: go get -v -d -t ./...
+install: true
 
-script:
-  - make build
-  - make test
-  - make lint
+script: make build test lint

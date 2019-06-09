@@ -1,3 +1,5 @@
+export GO111MODULE=on
+
 build: \
 	build/example-simple \
 	build/example-cache \
@@ -6,30 +8,39 @@ build: \
 	build/example-advanced
 
 build/example-simple:
-	go build -v -i -o build/example-simple ./examples/simple
+	go build -o build/example-simple ./examples/simple
 
 build/example-cache:
-	go build -v -i -o build/example-cache ./examples/cache
+	go build -o build/example-cache ./examples/cache
 
 build/example-httpsource:
-	go build -v -i -o build/example-httpsource ./examples/httpsource
+	go build -o build/example-httpsource ./examples/httpsource
 
 build/example-groupcache:
-	go build -v -i -o build/example-groupcache ./examples/groupcache
+	go build -o build/example-groupcache ./examples/groupcache
 
 build/example-advanced:
-	go build -v -i -o build/example-advanced ./examples/advanced
+	go build -o build/example-advanced ./examples/advanced
 
+.PHONY: test
 test:
-	go test -v ./...
+	go test ./...
 
-lint:
-	go get -v -u github.com/alecthomas/gometalinter
-	gometalinter --install
-	GOGC=800 gometalinter --disable-all -E deadcode -E errcheck -E gocyclo -E gofmt -E goimports -E golint -E ineffassign -E megacheck -E misspell -E nakedret -E structcheck -E unconvert -E unparam -E varcheck -E vet\
- --tests --vendor --warn-unmatched-nolint --deadline=10m --concurrency=4 --enable-gc ./...
+.PHONY: lint
+lint: \
+	golangci-lint
 
+GOLANGCI_LINT_VERSION=v1.17.0
+GOLANGCI_LINT_DIR=$(shell go env GOPATH)/pkg/golangci-lint/$(GOLANGCI_LINT_VERSION)
+$(GOLANGCI_LINT_DIR):
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOLANGCI_LINT_DIR) $(GOLANGCI_LINT_VERSION)
+
+.PHONY: install-golangci-lint
+install-golangci-lint: $(GOLANGCI_LINT_DIR)
+
+.PHONY: golangci-lint
+golangci-lint: install-golangci-lint
+	$(GOLANGCI_LINT_DIR)/golangci-lint run
+.PHONY: clean
 clean:
 	rm -rf build
-
-.PHONY: build test lint clean
