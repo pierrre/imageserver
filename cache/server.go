@@ -12,11 +12,11 @@ import (
 // Server is a imageserver.Server implementation that supports a Cache.
 //
 // Steps:
-//  - Generate the cache key.
-//  - Get the Image from the Cache, and return it if found.
-//  - Get the Image from the Server.
-//  - Set the Image to the Cache.
-//  - Return the Image.
+//   - Generate the cache key.
+//   - Get the Image from the Cache, and return it if found.
+//   - Get the Image from the Server.
+//   - Set the Image to the Cache.
+//   - Return the Image.
 type Server struct {
 	imageserver.Server
 	Cache        Cache
@@ -60,7 +60,7 @@ func (f KeyGeneratorFunc) GetKey(params imageserver.Params) string {
 // NewParamsHashKeyGenerator returns a new KeyGenerator that hashes the Params.
 func NewParamsHashKeyGenerator(newHashFunc func() hash.Hash) KeyGenerator {
 	pool := &sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return newHashFunc()
 		},
 	}

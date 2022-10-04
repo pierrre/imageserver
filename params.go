@@ -9,19 +9,19 @@ import (
 
 // Params are params used in imageserver.
 //
-// This is a wrapper around map[string]interface{} and provides utility methods.
+// This is a wrapper around map[string]any and provides utility methods.
 // It should only contains basic Go types values (string, int float64, ...) or nested Params.
 //
 // Getter methods return a *ParamError if the key does not exist or the type does not match.
-type Params map[string]interface{}
+type Params map[string]any
 
 // Set sets the value for the key.
-func (params Params) Set(key string, value interface{}) {
+func (params Params) Set(key string, value any) {
 	params[key] = value
 }
 
 // Get returns the value for the key.
-func (params Params) Get(key string) (interface{}, error) {
+func (params Params) Get(key string) (any, error) {
 	v, ok := params[key]
 	if !ok {
 		return nil, &ParamError{Param: key, Message: "not set"}
@@ -107,7 +107,7 @@ func (params Params) GetParams(key string) (Params, error) {
 	return vt, nil
 }
 
-func newErrorType(key string, value interface{}, expectedType string) error {
+func newErrorType(key string, value any, expectedType string) error {
 	return &ParamError{Param: key, Message: fmt.Sprintf("contains a value of type %T instead of %s", value, expectedType)}
 }
 
@@ -140,7 +140,7 @@ func (params Params) Keys() []string {
 }
 
 var bufferPool = &sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return new(bytes.Buffer)
 	},
 }

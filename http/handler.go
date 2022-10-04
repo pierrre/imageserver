@@ -22,21 +22,21 @@ import (
 // But it doesn't check if the Image really exists (the Server is not called).
 //
 // Steps:
-//  - Parse the HTTP request, and fill the Params.
-//  - If the given If-None-Match header matches the ETag, return a StatusNotModified/304 response.
-//  - Call the Server and get the Image.
-//  - Return a StatusOK/200 response containing the Image.
+//   - Parse the HTTP request, and fill the Params.
+//   - If the given If-None-Match header matches the ETag, return a StatusNotModified/304 response.
+//   - Call the Server and get the Image.
+//   - Return a StatusOK/200 response containing the Image.
 //
 // Errors (returned by Parser or Server):
-//  - *imageserver/http.Error will return a response with the given status code and message.
-//  - *imageserver.ParamError will return a StatusBadRequest/400 response, with a message including the resolved HTTP param.
-//  - *imageserver.ImageError will return a StatusBadRequest/400 response, with the given message.
-//  - Other error will return a StatusInternalServerError/500 response, and ErrorFunc will be called.
+//   - *imageserver/http.Error will return a response with the given status code and message.
+//   - *imageserver.ParamError will return a StatusBadRequest/400 response, with a message including the resolved HTTP param.
+//   - *imageserver.ImageError will return a StatusBadRequest/400 response, with the given message.
+//   - Other error will return a StatusInternalServerError/500 response, and ErrorFunc will be called.
 //
 // Returned headers:
-//  - Content-Type is set for StatusOK/200 response, and contains "image/{Image.Format}".
-//  - Content-Length is set for StatusOK/200 response, and contains the Image size.
-//  - ETag is set for StatusOK/200 and StatusNotModified/304 response, and contains the ETag value.
+//   - Content-Type is set for StatusOK/200 response, and contains "image/{Image.Format}".
+//   - Content-Length is set for StatusOK/200 response, and contains the Image size.
+//   - ETag is set for StatusOK/200 and StatusNotModified/304 response, and contains the ETag value.
 type Handler struct {
 	// Parser parses the HTTP request and fills the Params.
 	Parser Parser
@@ -151,7 +151,7 @@ func (handler *Handler) convertGenericErrorToHTTP(err error, req *http.Request) 
 // It is intended to be used in Handler.ETagFunc.
 func NewParamsHashETagFunc(newHashFunc func() hash.Hash) func(params imageserver.Params) string {
 	pool := &sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return newHashFunc()
 		},
 	}

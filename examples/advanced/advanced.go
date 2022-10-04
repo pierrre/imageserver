@@ -72,7 +72,7 @@ func newGitHubWebhookHTTPHandler() http.Handler {
 	}
 	return &githubhook.Handler{
 		Secret: flagGitHubWebhookSecret,
-		Delivery: func(event string, deliveryID string, payload interface{}) {
+		Delivery: func(event string, deliveryID string, payload any) {
 			if event == "push" {
 				time.AfterFunc(5*time.Second, func() {
 					os.Exit(0)

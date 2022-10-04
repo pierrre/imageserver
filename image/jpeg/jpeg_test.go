@@ -32,7 +32,7 @@ func TestEncoderQuality(t *testing.T) {
 func TestEncoderErrorQuality(t *testing.T) {
 	im := imageserver_image_test.NewImage()
 	enc := &Encoder{}
-	for _, quality := range []interface{}{"foo", -1, 101} {
+	for _, quality := range []any{"foo", -1, 101} {
 		err := enc.Encode(ioutil.Discard, im, imageserver.Params{"quality": quality})
 		if err == nil {
 			t.Fatal("no error")
