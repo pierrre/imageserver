@@ -1,6 +1,6 @@
 module github.com/pierrre/imageserver
 
-go 1.19
+go 1.20
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
