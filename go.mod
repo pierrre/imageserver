@@ -12,7 +12,7 @@ require (
 	github.com/pierrre/githubhook v1.0.0
 	github.com/pierrre/imageutil v1.0.0
 	github.com/pierrre/lrucache v0.0.0-20150302143820-f5fef5733804
-	golang.org/x/image v0.0.0-20190523035834-f03afa92d3ff
+	golang.org/x/image v0.5.0
 )
 
 require (
