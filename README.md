@@ -5,6 +5,8 @@ An image server toolkit in Go (Golang)
 [![Build Status](https://travis-ci.org/pierrre/imageserver.svg?branch=master)](https://travis-ci.org/pierrre/imageserver)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pierrre/imageserver)](https://goreportcard.com/report/github.com/pierrre/imageserver)
 
+:warning: This repository is not maintained anymore.
+
 ## Features
 - HTTP server
 - Resize ([GIFT](https://github.com/disintegration/gift), [nfnt resize](https://github.com/nfnt/resize), [Graphicsmagick](http://www.graphicsmagick.org/))
