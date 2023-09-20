@@ -3,7 +3,6 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -39,7 +38,7 @@ func (cache *Cache) Get(key string, params imageserver.Params) (*imageserver.Ima
 }
 
 func (cache *Cache) getData(key string) ([]byte, error) {
-	item, err := ioutil.ReadFile(filepath.Join(cache.Path, key))
+	item, err := os.ReadFile(filepath.Join(cache.Path, key))
 	if os.IsNotExist(err) {
 		return nil, nil
 	}
@@ -61,5 +60,5 @@ func (cache *Cache) Set(key string, im *imageserver.Image, params imageserver.Pa
 }
 
 func (cache *Cache) setData(key string, data []byte) error {
-	return ioutil.WriteFile(filepath.Join(cache.Path, key), data, 0644)
+	return os.WriteFile(filepath.Join(cache.Path, key), data, 0644)
 }

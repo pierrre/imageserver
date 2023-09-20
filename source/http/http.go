@@ -3,7 +3,7 @@ package http
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -72,7 +72,7 @@ func loadData(resp *http.Response) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, newSourceError(fmt.Sprintf("HTTP status code %d while downloading", resp.StatusCode))
 	}
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, newSourceError(fmt.Sprintf("error while downloading: %s", err))
 	}
