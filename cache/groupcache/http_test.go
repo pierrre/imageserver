@@ -2,7 +2,7 @@ package groupcache
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -90,7 +90,7 @@ func TestNewHTTPPoolTransport(t *testing.T) {
 			t.Fatal("not equals")
 		}
 		return &http.Response{
-			Body: ioutil.NopCloser(bytes.NewReader(nil)),
+			Body: io.NopCloser(bytes.NewReader(nil)),
 		}, nil
 	}))(ctx1).RoundTrip(req)
 	if err != nil {

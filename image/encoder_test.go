@@ -3,7 +3,6 @@ package image_test
 import (
 	"image"
 	"io"
-	"io/ioutil"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -21,7 +20,7 @@ func TestEncoderFunc(t *testing.T) {
 		return nil
 	})
 	nim := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	err := f.Encode(ioutil.Discard, nim, imageserver.Params{})
+	err := f.Encode(io.Discard, nim, imageserver.Params{})
 	if err != nil {
 		t.Fatal(err)
 	}

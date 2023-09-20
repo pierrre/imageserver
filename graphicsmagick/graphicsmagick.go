@@ -4,7 +4,6 @@ package graphicsmagick
 import (
 	"container/list"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -106,7 +105,7 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 
 	arguments.PushFront("mogrify")
 
-	tempDir, err := ioutil.TempDir(hdr.TempDir, tempDirPrefix)
+	tempDir, err := os.MkdirTemp(hdr.TempDir, tempDirPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +115,7 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 
 	file := filepath.Join(tempDir, "image")
 	arguments.PushBack(file)
-	err = ioutil.WriteFile(file, im.Data, os.FileMode(0600))
+	err = os.WriteFile(file, im.Data, os.FileMode(0600))
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +130,7 @@ func (hdr *Handler) handle(im *imageserver.Image, params imageserver.Params) (*i
 	if formatSpecified {
 		file = fmt.Sprintf("%s.%s", file, format)
 	}
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

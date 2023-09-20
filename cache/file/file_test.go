@@ -1,7 +1,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,7 @@ func TestMain(m *testing.M) {
 }
 
 func realMain(m *testing.M) int {
-	path, err := ioutil.TempDir("", "filecache")
+	path, err := os.MkdirTemp("", "filecache")
 	if err != nil {
 		return 1
 	}

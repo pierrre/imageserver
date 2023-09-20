@@ -3,8 +3,8 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
 	"mime"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -57,7 +57,7 @@ func (srv *Server) getPath(params imageserver.Params) (string, error) {
 }
 
 func loadFile(pth string) ([]byte, error) {
-	data, err := ioutil.ReadFile(pth)
+	data, err := os.ReadFile(pth)
 	if err != nil {
 		return nil, newSourceError(fmt.Sprintf("error while reading file: %s: %s", pth, err.Error()))
 	}

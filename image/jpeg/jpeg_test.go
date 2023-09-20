@@ -1,7 +1,7 @@
 package jpeg
 
 import (
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/pierrre/imageserver"
@@ -33,7 +33,7 @@ func TestEncoderErrorQuality(t *testing.T) {
 	im := imageserver_image_test.NewImage()
 	enc := &Encoder{}
 	for _, quality := range []any{"foo", -1, 101} {
-		err := enc.Encode(ioutil.Discard, im, imageserver.Params{"quality": quality})
+		err := enc.Encode(io.Discard, im, imageserver.Params{"quality": quality})
 		if err == nil {
 			t.Fatal("no error")
 		}
