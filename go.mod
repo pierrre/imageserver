@@ -1,6 +1,6 @@
 module github.com/pierrre/imageserver
 
-go 1.20
+go 1.25.0
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
@@ -12,7 +12,7 @@ require (
 	github.com/pierrre/githubhook v1.0.0
 	github.com/pierrre/imageutil v1.0.0
 	github.com/pierrre/lrucache v0.0.0-20150302143820-f5fef5733804
-	golang.org/x/image v0.18.0
+	golang.org/x/image v0.38.0
 )
 
 require (
