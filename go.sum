@@ -27,8 +27,8 @@ github.com/pierrre/imageutil v1.0.0 h1:/DqwfUW34DdeZ/+btQRAD1NNIlLs+rAkskJJv5+jx
 github.com/pierrre/imageutil v1.0.0/go.mod h1:7NQKvBWOPV2rUECRLS1xs/w1l1Dn6r5dn4f3mrz5SQg=
 github.com/pierrre/lrucache v0.0.0-20150302143820-f5fef5733804 h1:eYvh3CRuu7x65kAdUyskmFvKM4n/e+xiQ2gjMxNdWXU=
 github.com/pierrre/lrucache v0.0.0-20150302143820-f5fef5733804/go.mod h1:UgTAbB0O63OjwFrw196ZaABpM7CBcHB9J1RwuavCx2Q=
-golang.org/x/image v0.38.0 h1:5l+q+Y9JDC7mBOMjo4/aPhMDcxEptsX+Tt3GgRQRPuE=
-golang.org/x/image v0.38.0/go.mod h1:/3f6vaXC+6CEanU4KJxbcUZyEePbyKbaLoDOe4ehFYY=
+golang.org/x/image v0.41.0 h1:8wS72eGJMJaBxK6okTzd4WaXumUlTVlb753MlsSvTCo=
+golang.org/x/image v0.41.0/go.mod h1:uIc348UZMSvS5Z65CVZ7iDPaNobNFEPeJ4kbqTOszmA=
 golang.org/x/net v0.0.0-20180906233101-161cd47e91fd/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.55.0 h1:bcvxaJn3e1U6InsFWt1JUq1aSjnRxLzT2rtD2KfkDF8=
 golang.org/x/net v0.55.0/go.mod h1:L5U2KuzuOe1lY7Z+aWVIKK6qEeJXnXV9yzGA+WCHJww=
